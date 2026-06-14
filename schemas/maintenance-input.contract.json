@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.maintenanceInput",
+  "format": "json",
+  "required": [
+    "kind",
+    "id",
+    "title",
+    "summary"
+  ],
+  "properties": {
+    "kind": { "type": "string", "minLength": 1 },
+    "id": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "summary": { "type": "string", "minLength": 1 },
+    "priority": { "type": "string" },
+    "packageName": { "type": "string" },
+    "advisoryId": { "type": "string" },
+    "incidentId": { "type": "string" },
+    "severity": { "type": "string" },
+    "editableScope": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "forbiddenScope": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "verifyCommands": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "budgets": {
+      "type": "object",
+      "properties": {
+        "maxRuntimeMinutes": { "type": "number" },
+        "maxRetries": { "type": "number" },
+        "maxChangedFiles": { "type": "number" },
+        "maxPatchLines": { "type": "number" }
+      }
+    },
+    "expectedArtifacts": { "type": "array", "items": { "type": "string" } }
+  }
+}

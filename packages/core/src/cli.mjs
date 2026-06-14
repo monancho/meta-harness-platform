@@ -9,6 +9,7 @@ import { cmdSignalExport } from './sanitized-signal.mjs';
 import { cmdFactoryUpgrade } from './upgrade.mjs';
 import { cmdEvalList, cmdEvalRun } from './evals.mjs';
 import { cmdFeedbackAnalyze } from './feedback-analyzer.mjs';
+import { cmdMaintenanceCreate } from './maintenance.mjs';
 import { cmdProductizationInit, cmdProductizationReport } from './productization.mjs';
 import { cmdReleaseDryRun } from './release.mjs';
 
@@ -41,7 +42,7 @@ function cmdDoctor() {
 }
 
 function usage() {
-  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir> [--enable-kind-namespace]\n  factory upgrade --target <dir> --dry-run\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex [--execution-profile L0_LOCAL_WORKTREE|L1_CONTAINER_WORKER|L2_KIND_NAMESPACE] [--dry-run]\n  signal export --target <dir> [--run <run-id|run-result.json>] [--output <json>]\n  feedback analyze --input <sanitized-signal-dir> --output <analysis-dir>\n  productization init --target <dir> [--force]\n  productization report --target <dir> [--run <run-id|run-result.json>] [--output <md>]\n  release dry-run --target <dir>\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n  eval list\n  eval run --suite <suite-id> [--no-network] [--output <json>]\n`);
+  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir> [--enable-kind-namespace]\n  factory upgrade --target <dir> --dry-run\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex [--execution-profile L0_LOCAL_WORKTREE|L1_CONTAINER_WORKER|L2_KIND_NAMESPACE] [--dry-run]\n  signal export --target <dir> [--run <run-id|run-result.json>] [--output <json>]\n  feedback analyze --input <sanitized-signal-dir> --output <analysis-dir>\n  maintenance create --target <dir> --input <json>\n  productization init --target <dir> [--force]\n  productization report --target <dir> [--run <run-id|run-result.json>] [--output <md>]\n  release dry-run --target <dir>\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n  eval list\n  eval run --suite <suite-id> [--no-network] [--output <json>]\n`);
 }
 
 export function runCli(argv) {
@@ -60,6 +61,7 @@ export function runCli(argv) {
   else if (a === 'run') cmdRun(opts, fail);
   else if (a === 'signal' && b === 'export') cmdSignalExport(opts, fail);
   else if (a === 'feedback' && b === 'analyze') cmdFeedbackAnalyze(opts, fail);
+  else if (a === 'maintenance' && b === 'create') ok(cmdMaintenanceCreate(opts, fail));
   else if (a === 'productization' && b === 'init') ok(cmdProductizationInit(opts, fail));
   else if (a === 'productization' && b === 'report') ok(cmdProductizationReport(opts, fail));
   else if (a === 'release' && b === 'dry-run') cmdReleaseDryRun(opts, fail);
