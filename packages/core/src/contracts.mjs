@@ -13,7 +13,8 @@ export const CONTRACTS = {
   sanitizedSignal: 'sanitized-signal.schema.json',
   buildHandoff: 'build-handoff.contract.json',
   evalSuite: 'eval-suite.contract.json',
-  evalResult: 'eval-result.contract.json'
+  evalResult: 'eval-result.contract.json',
+  maintenanceInput: 'maintenance-input.contract.json'
 };
 
 export const SCHEMA_ERROR_CODE = 'MH_SCHEMA_VALIDATION_FAILED';

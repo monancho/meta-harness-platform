@@ -1,5 +1,13 @@
 import { VERSION } from './constants.mjs';
 import { shaFile } from './fs-utils.mjs';
+import {
+  defaultMaintenanceBacklogContent,
+  defaultMaintenanceConfigContent,
+  incidentReportTemplateContent,
+  maintenanceTaskTemplate,
+  maintenanceTaskTypesJson,
+  postmortemTemplateContent
+} from './maintenance.mjs';
 import { defaultAuditChecklistContent } from './productization.mjs';
 import { defaultReleaseGuideContent, defaultReleaseReadinessContent } from './release.mjs';
 import { targetRunnerCode } from './runner-template.mjs';
@@ -285,6 +293,15 @@ jobs:
     ['.harness/agents/adapters.yml', `schemaVersion: 1\ndefaultAdapter: shell\ninterface:\n  lifecycle: prepare-execute-collectArtifacts-summarize\n  methods: prepare, execute, collectArtifacts, summarize\nadapters:\n  shell:\n    enabled: true\n    type: local-shell-mvp\n    implementation: builtin:shell\n    status: default\n  codex:\n    enabled: true\n    type: codex-exec\n    implementation: builtin:codex\n    binary: codex\n    status: available-if-codex-cli-installed\n  claude:\n    enabled: false\n    type: claude-code\n    implementation: placeholder\n    status: disabled-placeholder\n  openhands:\n    enabled: false\n    type: openhands\n    implementation: placeholder\n    status: disabled-placeholder\n`],
     ['.harness/security/runtime-policy.yml', `phases:\n  setup:\n    network:\n      default: deny\n      allow:\n        - registry.npmjs.org\n        - api.github.com\n  worker:\n    network:\n      default: deny\n    forbiddenWrites:\n      - .env*\n      - **/*.pem\n      - **/*secret*\n      - **/*token*\n      - infra/**/production/**\n      - .github/workflows/deploy-prod.yml\n    commandPolicy:\n      default: deny\n      allow:\n        - node *\n        - npm test\n        - npm run *\n        - bash ./tests/*\n        - make *\n      deny:\n        - git push*\n        - npm publish*\n        - docker login*\n        - rm -rf .git*\n`],
     ['.harness/budgets.yml', `budgets:\n  default:\n    maxRuntimeMinutes: 20\n    maxRetries: 1\n    maxChangedFiles: 20\n    maxPatchLines: 800\n`],
+    ['.harness/maintenance/config.yml', defaultMaintenanceConfigContent()],
+    ['.harness/maintenance/task-types.json', jsonContent(maintenanceTaskTypesJson())],
+    ['.harness/maintenance/backlog.items.json', defaultMaintenanceBacklogContent()],
+    ['.harness/maintenance/templates/dependency.task-template.json', maintenanceTaskTemplate('dependency')],
+    ['.harness/maintenance/templates/security.task-template.json', maintenanceTaskTemplate('security')],
+    ['.harness/maintenance/templates/bugfix.task-template.json', maintenanceTaskTemplate('bugfix')],
+    ['.harness/maintenance/templates/incident.task-template.json', maintenanceTaskTemplate('incident')],
+    ['docs/operations/incident-report.md', incidentReportTemplateContent()],
+    ['docs/operations/postmortem.md', postmortemTemplateContent()],
     ['.harness/productization/audit-checklist.yml', defaultAuditChecklistContent()],
     ['.harness/release/release-readiness.yml', defaultReleaseReadinessContent()],
     ['docs/operations/release.md', defaultReleaseGuideContent()],

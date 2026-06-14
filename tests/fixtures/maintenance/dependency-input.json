@@ -1,0 +1,14 @@
+{
+  "kind": "dependency",
+  "id": "MAINT-DEP-042",
+  "title": "Update workspace dependencies",
+  "summary": "Update dependency versions, keep lockfile changes scoped, and verify the target test suite.",
+  "priority": "P2",
+  "packageName": "workspace",
+  "acceptanceCriteria": [
+    {
+      "id": "MAINT-DEP-042-AC-001",
+      "text": "Dependency updates are captured in package manifests or lockfiles and tests pass."
+    }
+  ]
+}
