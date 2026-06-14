@@ -16,6 +16,7 @@
 8. artifact collection
 9. Codex adapter
 10. GitHub PR loop
+11. GitHub Actions execution profile skeleton
 
 ## 내부 패키지 구조
 
@@ -60,3 +61,27 @@ reported as conflicts instead of being updated.
 | GitHub Action Runner | `.github/workflows/harness-run.yml` |
 | Eval Registry | `meta-harness-platform/evals/` |
 | Sanitized Feedback | `.harness/feedback/` |
+
+## L3 GitHub Actions Profile
+
+Factory bootstrap generates `.github/workflows/harness-run.yml` as a shared,
+managed-block workflow. It has no `push` or `pull_request` trigger, so remote
+harness execution is disabled for automatic CI by default. Operators can start
+it manually with `workflow_dispatch` and must set the `enabled` input to `true`.
+
+The workflow accepts:
+
+- `task_path`: target repo task packet path, for example `.harness/tasks/example.task.json`
+- `adapter`: `shell` or `codex`
+- `execution_profile`: currently `L3_GITHUB_ACTION`
+
+The job wraps the target repo runner, uploads `patch.diff`, `run-result.json`,
+and `summary.md`, and appends the generated `summary.md` to the GitHub Actions
+step summary. Required default permission is only `contents: read`, because the
+skeleton checks out code and uploads artifacts but does not write branches,
+checks, pull request comments, or repository contents.
+
+PR comments/checks are intentionally staged behind later hardening. Those
+features require write-scoped permissions such as `pull-requests: write`,
+`checks: write`, or `contents: write`, and need additional guardrails for forked
+PRs, token exposure, patch provenance, and comment spam/idempotency.

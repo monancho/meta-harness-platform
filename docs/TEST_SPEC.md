@@ -141,3 +141,14 @@ node ./bin/mh.mjs run --target <target-repo> --task .harness/tasks/BL-001.task.j
   - G1 gh PR 모드로 branch, commit, PR 생성을 시도한다.
   - `gh`가 없으면 설치 또는 인증 방법과 `--create` 없는 G0 재실행 방법을 안내하며 실패한다.
   - G2 GitHub Actions PR loop는 후속 단계로 문서화되어야 한다.
+
+## T-100 GitHub Actions Execution Profile
+
+- `factory bootstrap`은 `.github/workflows/harness-run.yml`을 생성해야 한다.
+- workflow는 자동 `push`/`pull_request` trigger 없이 `workflow_dispatch`로만 시작되어야 한다.
+- `workflow_dispatch`는 `task_path`, `adapter`, `execution_profile` 입력을 가져야 한다.
+- workflow는 기본적으로 `enabled: false` 입력으로 비활성화되어야 하고, 수동 실행 시 `true`로 바꿀 수 있어야 한다.
+- 기본 permissions는 `contents: read`로 제한한다.
+- workflow는 harness runner 실행 후 `patch.diff`, `run-result.json`, `summary.md`를 artifact로 업로드해야 한다.
+- workflow summary는 local run의 `summary.md` 내용을 반영해야 한다.
+- PR comments/checks/branch writes는 write 권한과 hardening이 필요하므로 후속 단계로 남겨야 한다.

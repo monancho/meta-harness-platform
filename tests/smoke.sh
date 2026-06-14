@@ -44,12 +44,33 @@ NODE
 node "$ROOT/bin/mh.mjs" plan freeze --target "$TARGET" --approved
 node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET"
 node "$ROOT/bin/mh.mjs" manifest check --target "$TARGET"
+test -f "$TARGET/.github/workflows/harness-run.yml"
 grep -q "defaultAdapter: shell" "$TARGET/.harness/agents/adapters.yml"
 grep -q "lifecycle: prepare-execute-collectArtifacts-summarize" "$TARGET/.harness/agents/adapters.yml"
 grep -q "implementation: builtin:shell" "$TARGET/.harness/agents/adapters.yml"
 grep -q "implementation: builtin:codex" "$TARGET/.harness/agents/adapters.yml"
 grep -q "status: available-if-codex-cli-installed" "$TARGET/.harness/agents/adapters.yml"
 grep -q "status: disabled-placeholder" "$TARGET/.harness/agents/adapters.yml"
+grep -q "L3_GITHUB_ACTION:" "$TARGET/.harness/execution-profiles.yml"
+grep -q "workflow: .github/workflows/harness-run.yml" "$TARGET/.harness/execution-profiles.yml"
+grep -q "trigger: workflow_dispatch" "$TARGET/.harness/execution-profiles.yml"
+grep -q "PR comments, checks, branch writes" "$TARGET/.harness/execution-profiles.yml"
+grep -q "workflow_dispatch:" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "task_path:" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "adapter:" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "execution_profile:" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "default: L3_GITHUB_ACTION" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "default: false" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "contents: read" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "actions/upload-artifact@v4" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "patch.diff" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "run-result.json" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "summary.md" "$TARGET/.github/workflows/harness-run.yml"
+grep -q "GITHUB_STEP_SUMMARY" "$TARGET/.github/workflows/harness-run.yml"
+if grep -q "^  push:" "$TARGET/.github/workflows/harness-run.yml" || grep -q "^  pull_request:" "$TARGET/.github/workflows/harness-run.yml"; then
+  echo "[error] harness-run workflow must stay manual-only" >&2
+  exit 1
+fi
 node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapter shell
 
 if MH_CODEX_BINARY="$TMP/missing-codex" node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapter codex >"$TMP/codex-missing.out" 2>"$TMP/codex-missing.err"; then
@@ -266,6 +287,8 @@ if (files.get('AGENTS.md')?.mergeStrategy !== 'managed-blocks') throw new Error(
 if (!files.get('AGENTS.md')?.managedBlocks?.some(block => block.id === 'target-factory-instructions')) throw new Error('AGENTS.md missing managed block metadata');
 if (files.get('.github/workflows/ci.yml')?.ownership !== 'shared') throw new Error('GitHub workflow must be shared');
 if (!files.get('.github/workflows/ci.yml')?.managedBlocks?.some(block => block.id === 'ci-workflow')) throw new Error('GitHub workflow missing managed block metadata');
+if (files.get('.github/workflows/harness-run.yml')?.ownership !== 'shared') throw new Error('harness-run workflow must be shared');
+if (!files.get('.github/workflows/harness-run.yml')?.managedBlocks?.some(block => block.id === 'harness-run-workflow')) throw new Error('harness-run workflow missing managed block metadata');
 if (files.get('infra/caddy/Caddyfile')?.mergeStrategy !== 'propose-only') throw new Error('infra/caddy must be propose-only');
 for (const item of manifest.managedFiles) {
   if (/^\.env(?:\.|$)|secret|token|\.pem$/i.test(item.path)) throw new Error(`secret-like path included: ${item.path}`);

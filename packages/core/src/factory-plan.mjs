@@ -67,10 +67,101 @@ A task is complete when:
 `],
     ['CLAUDE.md', `@AGENTS.md\n`],
     ['.github/workflows/ci.yml', `# BEGIN META-HARNESS MANAGED BLOCK: ci-workflow\nname: ci\non:\n  pull_request:\n  push:\n    branches: [main]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - uses: actions/setup-node@v4\n        with:\n          node-version: 22\n      - run: npm test\n# END META-HARNESS MANAGED BLOCK: ci-workflow\n`],
+    ['.github/workflows/harness-run.yml', `# BEGIN META-HARNESS MANAGED BLOCK: harness-run-workflow\nname: harness-run
+
+on:
+  workflow_dispatch:
+    inputs:
+      task_path:
+        description: Task packet path relative to the target repo
+        required: true
+        default: .harness/tasks/example.task.json
+      adapter:
+        description: Agent adapter to execute
+        required: true
+        type: choice
+        default: shell
+        options:
+          - shell
+          - codex
+      execution_profile:
+        description: Execution profile marker for this CI wrapper
+        required: true
+        type: choice
+        default: L3_GITHUB_ACTION
+        options:
+          - L3_GITHUB_ACTION
+      enabled:
+        description: Set true to run; false keeps the profile disabled by default
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  harness-run:
+    if: \${{ inputs.enabled == true }}
+    runs-on: ubuntu-latest
+    env:
+      MH_EXECUTION_PROFILE: \${{ inputs.execution_profile }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Run harness task
+        run: node .harness/bin/runner.mjs --task "\${{ inputs.task_path }}" --adapter "\${{ inputs.adapter }}"
+
+      - name: Locate latest run
+        if: always()
+        id: latest-run
+        shell: bash
+        run: |
+          latest="$(find .harness/runs -mindepth 1 -maxdepth 1 -type d -name 'run-*' -printf '%T@ %p\n' 2>/dev/null | sort -n | tail -n 1 | cut -d' ' -f2-)"
+          if [ -n "$latest" ]; then
+            echo "path=$latest" >> "$GITHUB_OUTPUT"
+            echo "id=$(basename "$latest")" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Mirror local run summary
+        if: always() && steps.latest-run.outputs.path != ''
+        shell: bash
+        run: |
+          {
+            echo "## Harness Run"
+            echo ""
+            echo "- Run ID: \${{ steps.latest-run.outputs.id }}"
+            echo "- Task: \${{ inputs.task_path }}"
+            echo "- Adapter: \${{ inputs.adapter }}"
+            echo "- Execution profile: \${{ inputs.execution_profile }}"
+            echo ""
+            if [ -f "\${{ steps.latest-run.outputs.path }}/summary.md" ]; then
+              cat "\${{ steps.latest-run.outputs.path }}/summary.md"
+            else
+              echo "summary.md was not produced."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload harness run artifacts
+        if: always() && steps.latest-run.outputs.path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: harness-run-\${{ steps.latest-run.outputs.id }}
+          if-no-files-found: warn
+          path: |
+            \${{ steps.latest-run.outputs.path }}/patch.diff
+            \${{ steps.latest-run.outputs.path }}/run-result.json
+            \${{ steps.latest-run.outputs.path }}/summary.md
+# END META-HARNESS MANAGED BLOCK: harness-run-workflow
+`],
     ['Makefile', `dev:\n\t@echo \"dev placeholder\"\n\npreview:\n\t@echo \"preview placeholder\"\n\ntest:\n\tnpm test\n\nlint:\n\tnpm run lint\n\ntypecheck:\n\tnpm run typecheck\n\nharness-run:\n\tnode .harness/bin/runner.mjs --task $(TASK) --adapter $(ADAPTER)\n`],
     ['.harness/bin/runner.mjs', targetRunnerCode(), { executable: true }],
     ['.harness/factory.yml', `schemaVersion: 1\nfactory:\n  id: ${projectId}\n  version: 0.1.0\n  generatedBy: meta-harness-platform-starter\n  generatorVersion: ${VERSION}\ngeneratedFrom:\n  buildHandoff: .harness/planning/build-handoff.json\n  buildHandoffHash: sha256:${shaFile(handoffPath)}\ncapabilities:\n  planning: true\n  bootstrap: true\n  mvpBuild: true\n  localWorktreeRunner: true\n  localTaskKubernetes: false\n  githubActions: true\n`],
-    ['.harness/execution-profiles.yml', `defaultProfile: L0_LOCAL_WORKTREE\nprofiles:\n  L0_LOCAL_WORKTREE:\n    isolation:\n      filesystem: git-worktree-or-fallback\n      network: inherited-restricted\n      secrets: filtered-env\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n  L1_CONTAINER_WORKER:\n    enabled: false\n  L2_KIND_NAMESPACE:\n    enabled: false\n  L3_GITHUB_ACTION:\n    enabled: false\n`],
+    ['.harness/execution-profiles.yml', `defaultProfile: L0_LOCAL_WORKTREE\nprofiles:\n  L0_LOCAL_WORKTREE:\n    enabled: true\n    isolation:\n      filesystem: git-worktree-or-fallback\n      network: inherited-restricted\n      secrets: filtered-env\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n  L1_CONTAINER_WORKER:\n    enabled: false\n  L2_KIND_NAMESPACE:\n    enabled: false\n  L3_GITHUB_ACTION:\n    enabled: false\n    trigger: workflow_dispatch\n    workflow: .github/workflows/harness-run.yml\n    runner: github-hosted-ubuntu\n    wrapsProfile: L0_LOCAL_WORKTREE\n    inputs:\n      - task_path\n      - adapter\n      - execution_profile\n    permissions:\n      contents: read\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n    notes:\n      - PR comments, checks, branch writes, and remote patch application are staged behind later hardening.\n`],
     ['.harness/agents/adapters.yml', `schemaVersion: 1\ndefaultAdapter: shell\ninterface:\n  lifecycle: prepare-execute-collectArtifacts-summarize\n  methods: prepare, execute, collectArtifacts, summarize\nadapters:\n  shell:\n    enabled: true\n    type: local-shell-mvp\n    implementation: builtin:shell\n    status: default\n  codex:\n    enabled: true\n    type: codex-exec\n    implementation: builtin:codex\n    binary: codex\n    status: available-if-codex-cli-installed\n  claude:\n    enabled: false\n    type: claude-code\n    implementation: placeholder\n    status: disabled-placeholder\n  openhands:\n    enabled: false\n    type: openhands\n    implementation: placeholder\n    status: disabled-placeholder\n`],
     ['.harness/security/runtime-policy.yml', `phases:\n  setup:\n    network:\n      default: deny\n      allow:\n        - registry.npmjs.org\n        - api.github.com\n  worker:\n    network:\n      default: deny\n    forbiddenWrites:\n      - .env*\n      - **/*.pem\n      - **/*secret*\n      - **/*token*\n      - infra/**/production/**\n      - .github/workflows/deploy-prod.yml\n    commandPolicy:\n      default: deny\n      allow:\n        - node *\n        - npm test\n        - npm run *\n        - bash ./tests/*\n        - make *\n      deny:\n        - git push*\n        - npm publish*\n        - docker login*\n        - rm -rf .git*\n`],
     ['.harness/budgets.yml', `budgets:\n  default:\n    maxRuntimeMinutes: 20\n    maxRetries: 1\n    maxChangedFiles: 20\n    maxPatchLines: 800\n`],
