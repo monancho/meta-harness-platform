@@ -15,9 +15,10 @@ export function cmdFactoryBootstrap(opts, fail) {
   assertContractFile('buildHandoff', handoffPath, fail);
   const handoff = readJson(handoffPath);
   const projectId = readProjectId(target) || handoff.projectId;
+  const enableKindNamespace = opts['enable-kind-namespace'] === true || opts['execution-profile'] === 'L2_KIND_NAMESPACE';
   const generated = [];
 
-  for (const file of buildFactoryFilePlan({ projectId, handoff, handoffPath })) {
+  for (const file of buildFactoryFilePlan({ projectId, handoff, handoffPath, enableKindNamespace })) {
     const targetPath = path.join(target, file.path);
     writeText(targetPath, file.content);
     if (file.executable) fs.chmodSync(targetPath, 0o755);

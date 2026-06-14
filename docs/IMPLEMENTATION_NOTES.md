@@ -17,6 +17,7 @@
 9. Codex adapter
 10. GitHub PR loop
 11. GitHub Actions execution profile skeleton
+12. Optional kind namespace execution profile skeleton
 
 ## 내부 패키지 구조
 
@@ -85,3 +86,32 @@ PR comments/checks are intentionally staged behind later hardening. Those
 features require write-scoped permissions such as `pull-requests: write`,
 `checks: write`, or `contents: write`, and need additional guardrails for forked
 PRs, token exposure, patch provenance, and comment spam/idempotency.
+
+## L2 kind Namespace Profile
+
+`L2_KIND_NAMESPACE` is disabled by default. A normal `factory bootstrap` only
+declares the profile in `.harness/execution-profiles.yml`; it does not generate
+`infra/local-task-k8s/**`. Operators must opt in explicitly:
+
+```bash
+node ./bin/mh.mjs factory bootstrap --target ../target-project --enable-kind-namespace
+```
+
+When enabled, bootstrap generates `infra/local-task-k8s/` skeleton templates for
+namespace-per-run execution:
+
+1. create one namespace for the run
+2. run worker, preview, and QA jobs
+3. collect logs/artifacts into `.harness/runs/<run-id>/`
+4. cleanup the namespace
+
+The generated files are configuration templates only. Smoke tests verify file
+generation and lifecycle markers without requiring a live Kubernetes cluster.
+
+Cluster-per-session keeps one local kind cluster alive across runs and creates a
+fresh namespace per run. It is faster and fits repeated local QA, but stale
+cluster-level resources can leak between runs if cleanup is incomplete.
+
+Cluster-per-run creates and destroys a whole kind cluster for each run. It gives
+stronger isolation for debugging cluster-level changes, but startup is slower
+and artifact collection must happen before the cluster is destroyed.

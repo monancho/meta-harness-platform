@@ -36,7 +36,7 @@ function cmdDoctor() {
 }
 
 function usage() {
-  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir>\n  factory upgrade --target <dir> --dry-run\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex [--execution-profile L0_LOCAL_WORKTREE|L1_CONTAINER_WORKER] [--dry-run]\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n`);
+  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir> [--enable-kind-namespace]\n  factory upgrade --target <dir> --dry-run\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex [--execution-profile L0_LOCAL_WORKTREE|L1_CONTAINER_WORKER|L2_KIND_NAMESPACE] [--dry-run]\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n`);
 }
 
 export function runCli(argv) {

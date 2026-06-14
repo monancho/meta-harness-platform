@@ -152,3 +152,12 @@ node ./bin/mh.mjs run --target <target-repo> --task .harness/tasks/BL-001.task.j
 - workflow는 harness runner 실행 후 `patch.diff`, `run-result.json`, `summary.md`를 artifact로 업로드해야 한다.
 - workflow summary는 local run의 `summary.md` 내용을 반영해야 한다.
 - PR comments/checks/branch writes는 write 권한과 hardening이 필요하므로 후속 단계로 남겨야 한다.
+
+## T-110 kind Namespace Execution Profile
+
+- 기본 `factory bootstrap`은 `.harness/execution-profiles.yml`에 `L2_KIND_NAMESPACE`를 `enabled: false`로 선언해야 한다.
+- 기본 `factory bootstrap`은 `infra/local-task-k8s/**`를 생성하지 않아야 한다.
+- `factory bootstrap --enable-kind-namespace`는 `localTaskKubernetes: true`와 `L2_KIND_NAMESPACE.enabled: true`를 생성해야 한다.
+- opt-in bootstrap은 `infra/local-task-k8s/**`에 namespace, worker, preview, QA, lifecycle script skeleton을 생성해야 한다.
+- lifecycle은 namespace 생성, worker/preview/QA job 실행, artifact 수집, namespace cleanup을 명시해야 한다.
+- config-generation test는 Kubernetes cluster 또는 kubectl 실행을 요구하지 않아야 한다.
