@@ -5,6 +5,7 @@ import { cmdGithubPr } from './github-pr.mjs';
 import { cmdManifestCheck } from './manifest.mjs';
 import { cmdCompileAcceptance, cmdCompileTasks, cmdPlanFreeze, cmdPlanSynthesize, cmdScaffoldPlanning } from './planning.mjs';
 import { cmdRun } from './runner.mjs';
+import { cmdFactoryUpgrade } from './upgrade.mjs';
 
 function log(msg = '') { console.log(msg); }
 function fail(msg, code = 1) { console.error(`\n[meta-harness:error] ${msg}\n`); process.exit(code); }
@@ -35,7 +36,7 @@ function cmdDoctor() {
 }
 
 function usage() {
-  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir>\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n`);
+  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir>\n  factory upgrade --target <dir> --dry-run\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n`);
 }
 
 export function runCli(argv) {
@@ -49,6 +50,7 @@ export function runCli(argv) {
   else if (a === 'plan' && b === 'compile-tasks') ok(cmdCompileTasks(opts, fail));
   else if (a === 'plan' && b === 'freeze') ok(cmdPlanFreeze(opts, fail));
   else if (a === 'factory' && b === 'bootstrap') ok(cmdFactoryBootstrap(opts, fail));
+  else if (a === 'factory' && b === 'upgrade') ok(cmdFactoryUpgrade(opts, fail));
   else if (a === 'manifest' && b === 'check') ok(cmdManifestCheck(opts, fail));
   else if (a === 'run') cmdRun(opts, fail);
   else if (a === 'github' && b === 'pr') cmdGithubPr(opts, fail);
