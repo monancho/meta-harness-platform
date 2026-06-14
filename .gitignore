@@ -12,3 +12,11 @@ examples/generated-target-project-demo/.harness/tmp/
 .harness/agent-workspace/autoloop.lock
 .harness/agent-workspace/latest-checkpoint.txt
 INSTANT_NEXT_STEPS.md
+.harness/agent-workspace/nightly-logs/
+.tmp-*
+RUN_UNTIL_28.sh
+RUN_19_TO_28.sh
+.env
+.env.*
+*.pem
+*.key
