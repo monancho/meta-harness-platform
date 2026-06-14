@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "BL-001",
+  "taskType": "frontend-ui",
+  "priority": "P2",
+  "title": "Review task board screen",
+  "objective": "Implement backlog item BL-001: Review task board screen.",
+  "editableScope": [
+    "apps/**",
+    "packages/**",
+    "docs/**",
+    "tests/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "infra/**/production/**",
+    ".github/workflows/deploy-prod.yml"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "text": "Review task board screen 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다."
+    }
+  ],
+  "verifyCommands": [
+    "node -e \"console.log('AC-001 ok')\""
+  ],
+  "commands": {
+    "verify": [
+      "node -e \"console.log('AC-001 ok')\""
+    ]
+  },
+  "budgets": {
+    "maxRuntimeMinutes": 20,
+    "maxRetries": 1,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 800
+  },
+  "expectedArtifacts": [
+    "patch.diff",
+    "run-result.json",
+    "summary.md"
+  ]
+}
