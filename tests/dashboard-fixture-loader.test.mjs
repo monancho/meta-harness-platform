@@ -21,5 +21,10 @@ assert.equal(summary.runCount, 2);
 assert.equal(summary.artifactCount, 9);
 assert.equal(summary.managedFileCount, 3);
 assert.equal(summary.policyCount, 9);
+assert.equal(summary.patchFilesChanged, 2);
+assert.equal(summary.patchAdditions, 7);
+assert.equal(summary.patchDeletions, 1);
+assert.equal(summary.riskyPathCount, 0);
+assert.equal(fixtures.patchDiff.state, 'ready');
 
 console.log('[dashboard-fixture-loader] OK');

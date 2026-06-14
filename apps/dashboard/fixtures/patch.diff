@@ -1,0 +1,22 @@
+diff --git a/apps/web/src/generated/MH-012.ts b/apps/web/src/generated/MH-012.ts
+new file mode 100644
+index 0000000..07a5a77
+--- /dev/null
++++ b/apps/web/src/generated/MH-012.ts
+@@ -0,0 +1,6 @@
++export const taskId = 'MH-012';
++
++export function summarizeTask() {
++  return 'sanitized dashboard fixture change';
++}
++
+diff --git a/docs/IMPLEMENTATION_NOTES.md b/docs/IMPLEMENTATION_NOTES.md
+index 85b03ff..df2d070 100644
+--- a/docs/IMPLEMENTATION_NOTES.md
++++ b/docs/IMPLEMENTATION_NOTES.md
+@@ -1,4 +1,4 @@
+ # Implementation Notes
+ 
+-Older dashboard note.
++Updated dashboard note.
+ 

@@ -1,10 +1,12 @@
 import { normalizeRunResult, summarizeRunHistory } from './run-history.mjs';
+import { parsePatchDiff } from './patch-diff.mjs';
 
 const DEFAULT_FIXTURE_BASE = './fixtures';
 
 const FIXTURE_FILES = {
   runResult: 'run-result.json',
   runHistory: 'run-history.json',
+  patchDiff: 'patch.diff',
   manifest: 'manifest.lock',
   state: 'state.yml',
   taskPacket: 'task-packet.json'
@@ -14,22 +16,25 @@ export async function loadDashboardFixtures(options = {}) {
   const basePath = normalizeBasePath(options.basePath ?? DEFAULT_FIXTURE_BASE);
   const readText = options.readText ?? readTextWithFetch;
 
-  const [runResultText, runHistoryText, manifestText, stateText, taskPacketText] = await Promise.all([
+  const [runResultText, runHistoryText, patchDiffText, manifestText, stateText, taskPacketText] = await Promise.all([
     readFixture(readText, basePath, FIXTURE_FILES.runResult),
     readOptionalFixture(readText, basePath, FIXTURE_FILES.runHistory),
+    readOptionalFixture(readText, basePath, FIXTURE_FILES.patchDiff),
     readFixture(readText, basePath, FIXTURE_FILES.manifest),
     readFixture(readText, basePath, FIXTURE_FILES.state),
     readFixture(readText, basePath, FIXTURE_FILES.taskPacket)
   ]);
 
   const runResult = parseJsonFixture(FIXTURE_FILES.runResult, runResultText);
+  const taskPacket = parseJsonFixture(FIXTURE_FILES.taskPacket, taskPacketText);
   return {
     source: basePath,
     runResult,
     runHistory: parseRunHistoryFixture(runHistoryText, runResult),
+    patchDiff: parsePatchDiff(patchDiffText ?? '', { forbiddenScope: taskPacket.forbiddenScope }),
     manifest: parseJsonFixture(FIXTURE_FILES.manifest, manifestText),
     state: parseSimpleYaml(stateText),
-    taskPacket: parseJsonFixture(FIXTURE_FILES.taskPacket, taskPacketText)
+    taskPacket
   };
 }
 
@@ -50,7 +55,11 @@ export function summarizeDashboardFixtures(fixtures) {
     runCount: runSummary.runCount,
     failedRunCount: runSummary.failedCount,
     passedRunCount: runSummary.passedCount,
-    policyCount: forbiddenScope.length + editableScope.length
+    policyCount: forbiddenScope.length + editableScope.length,
+    patchFilesChanged: fixtures.patchDiff?.summary?.filesChanged ?? 0,
+    patchAdditions: fixtures.patchDiff?.summary?.additions ?? 0,
+    patchDeletions: fixtures.patchDiff?.summary?.deletions ?? 0,
+    riskyPathCount: fixtures.patchDiff?.summary?.riskyPaths?.length ?? 0
   };
 }
 

@@ -4,6 +4,7 @@ const views = [
   { id: 'project-state', label: 'Project State' },
   { id: 'runs', label: 'Runs' },
   { id: 'artifacts', label: 'Artifacts' },
+  { id: 'patch-diff', label: 'Patch Diff' },
   { id: 'policies', label: 'Policies' },
   { id: 'settings', label: 'Settings' }
 ];
@@ -73,6 +74,7 @@ function viewBody(activeView, fixtures, summary) {
   if (activeView === 'project-state') return projectStateView(fixtures, summary);
   if (activeView === 'runs') return runsView(fixtures);
   if (activeView === 'artifacts') return artifactsView(fixtures);
+  if (activeView === 'patch-diff') return patchDiffView(fixtures);
   if (activeView === 'policies') return policiesView(fixtures);
   return settingsView(fixtures);
 }
@@ -136,6 +138,111 @@ function artifactsView(fixtures) {
         ${artifacts.map(item => artifactItem(item)).join('')}
       </ul>
     </section>
+  `;
+}
+
+function patchDiffView(fixtures) {
+  const diff = fixtures.patchDiff;
+  if (!diff || diff.state === 'empty') {
+    return emptyPanel('Patch Diff', 'No patch.diff content was found in the fixture source.');
+  }
+  const summary = diff.summary;
+  return `
+    <section class="panel">
+      <div class="panel-heading">
+        <h2>Patch Diff</h2>
+        <span>${escapeHtml(diff.state)}</span>
+      </div>
+      <section class="diff-summary" aria-label="Patch summary">
+        ${metric('Files Changed', summary.filesChanged)}
+        ${metric('Additions', `+${summary.additions}`)}
+        ${metric('Deletions', `-${summary.deletions}`)}
+        ${metric('Risky Paths', summary.riskyPaths.length)}
+      </section>
+      ${summary.riskyPaths.length ? riskyPathWarnings(summary.riskyPaths) : ''}
+      ${diff.malformedLines.length ? malformedPatchWarning(diff.malformedLines) : ''}
+      ${summary.truncated ? truncationNotice(summary) : ''}
+      <div class="diff-file-list">
+        ${renderDiffFiles(diff.files, summary.maxDisplayLines).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function renderDiffFiles(files, maxDisplayLines) {
+  let remainingLines = maxDisplayLines;
+  return files.map(file => {
+    const renderedHunks = [];
+    for (const hunk of file.hunks) {
+      if (remainingLines <= 0) break;
+      const allowed = Math.max(0, remainingLines - 1);
+      const visibleLines = hunk.lines.slice(0, allowed);
+      remainingLines -= visibleLines.length + 1;
+      renderedHunks.push(diffHunk(hunk, visibleLines, visibleLines.length < hunk.lines.length));
+    }
+
+    return `
+      <article class="diff-file">
+        <header class="diff-file-header">
+          <div>
+            <strong>${escapeHtml(file.displayPath)}</strong>
+            <small>${escapeHtml(file.oldPath)} → ${escapeHtml(file.newPath)}</small>
+          </div>
+          <span><b>+${file.additions}</b> <b>-${file.deletions}</b></span>
+        </header>
+        ${file.riskyMatches.length ? fileRiskBadges(file.riskyMatches) : ''}
+        ${renderedHunks.length ? renderedHunks.join('') : '<p class="diff-empty">No hunks were parsed for this file.</p>'}
+      </article>
+    `;
+  });
+}
+
+function diffHunk(hunk, lines, truncated) {
+  return `
+    <section class="diff-hunk">
+      <div class="diff-hunk-header">${escapeHtml(hunk.header)}</div>
+      <pre class="diff-lines">${lines.map(diffLine).join('')}${truncated ? `<span class="diff-line meta">... hunk truncated</span>` : ''}</pre>
+    </section>
+  `;
+}
+
+function diffLine(line) {
+  const prefix = line.kind === 'add' ? '+' : line.kind === 'delete' ? '-' : line.kind === 'context' ? ' ' : '';
+  return `<span class="diff-line ${escapeAttribute(line.kind)}">${escapeHtml(prefix + line.text)}</span>`;
+}
+
+function riskyPathWarnings(matches) {
+  return `
+    <div class="inline-error" role="alert">
+      ${matches.map(match => `<p>Forbidden path warning: <code>${escapeHtml(match.path)}</code> matches <code>${escapeHtml(match.pattern)}</code></p>`).join('')}
+    </div>
+  `;
+}
+
+function malformedPatchWarning(lines) {
+  const visible = lines.slice(0, 5);
+  const suffix = lines.length > visible.length ? `<p>${lines.length - visible.length} more malformed lines hidden.</p>` : '';
+  return `
+    <div class="inline-warning" role="alert">
+      ${visible.map(line => `<p>Malformed patch line ${line.lineNumber}: ${escapeHtml(line.reason)}</p>`).join('')}
+      ${suffix}
+    </div>
+  `;
+}
+
+function truncationNotice(summary) {
+  return `
+    <div class="inline-warning">
+      <p>Patch display is limited to ${escapeHtml(summary.maxDisplayLines)} lines. Summary counts include the full patch.</p>
+    </div>
+  `;
+}
+
+function fileRiskBadges(matches) {
+  return `
+    <ul class="risk-badges">
+      ${matches.map(match => `<li><code>${escapeHtml(match.path)}</code> matches <code>${escapeHtml(match.pattern)}</code></li>`).join('')}
+    </ul>
   `;
 }
 

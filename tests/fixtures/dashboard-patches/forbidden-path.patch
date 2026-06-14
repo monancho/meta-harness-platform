@@ -1,0 +1,13 @@
+diff --git a/.env.example b/.env.example
+index e69de29..a4f718b 100644
+--- a/.env.example
++++ b/.env.example
+@@ -0,0 +1,2 @@
++SAFE_PLACEHOLDER=true
++SAMPLE_FLAG=true
+diff --git a/docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec.pdf b/docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec.pdf
+index e69de29..a4f718b 100644
+--- a/docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec.pdf
++++ b/docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec.pdf
+@@ -0,0 +1 @@
++binary placeholder line for parser fixture
