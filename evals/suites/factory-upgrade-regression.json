@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0.0",
+  "suiteId": "factory-upgrade-regression",
+  "title": "Factory upgrade regression eval",
+  "category": "factory-upgrade-regression",
+  "network": "none",
+  "description": "Synthetic no-network regression checks for factory upgrade surfaces.",
+  "fixtures": [
+    {
+      "id": "upgrade-contracts",
+      "type": "schema-and-docs",
+      "path": "schemas/manifest.contract.json",
+      "dataPolicy": "synthetic-only"
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "factory-upgrade-doc-and-schema-presence",
+      "title": "Upgrade contracts and docs remain discoverable",
+      "fixtureRefs": ["upgrade-contracts"],
+      "commands": [
+        {
+          "id": "check-upgrade-files",
+          "run": "node -e \"import fs from 'node:fs'; for (const file of ['packages/core/src/upgrade.mjs','schemas/manifest.contract.json','docs/GITHUB_PR_LOOP.md']) { if (!fs.existsSync(file)) throw new Error(file + ' missing'); } console.log('factory-upgrade-regression fixtures ok')\"",
+          "cwd": ".",
+          "timeoutSeconds": 20
+        }
+      ],
+      "expectedOutputs": [
+        {
+          "commandId": "check-upgrade-files",
+          "exitCode": 0,
+          "stdoutIncludes": ["factory-upgrade-regression fixtures ok"],
+          "stderrIncludes": []
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "strategy": "all-or-nothing",
+    "passThreshold": 1,
+    "metadata": {
+      "owner": "meta-harness",
+      "regressionArea": "factory-upgrade",
+      "rawProjectData": false
+    }
+  }
+}

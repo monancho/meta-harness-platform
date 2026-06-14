@@ -1,0 +1,57 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.evalResult",
+  "format": "json",
+  "required": [
+    "schemaVersion",
+    "suiteId",
+    "status",
+    "network",
+    "resultHash",
+    "summary",
+    "cases"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "minLength": 1 },
+    "suiteId": { "type": "string", "minLength": 1 },
+    "status": { "type": "string", "enum": ["passed", "failed"] },
+    "network": { "type": "string", "enum": ["none", "optional", "required"] },
+    "resultHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "summary": {
+      "type": "object",
+      "required": ["totalCases", "passedCases", "failedCases", "score"],
+      "properties": {
+        "totalCases": { "type": "number" },
+        "passedCases": { "type": "number" },
+        "failedCases": { "type": "number" },
+        "score": { "type": "number" }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["caseId", "status", "commands"],
+        "properties": {
+          "caseId": { "type": "string", "minLength": 1 },
+          "status": { "type": "string", "enum": ["passed", "failed"] },
+          "commands": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["commandId", "status", "exitCode", "stdoutHash", "stderrHash"],
+              "properties": {
+                "commandId": { "type": "string", "minLength": 1 },
+                "status": { "type": "string", "enum": ["passed", "failed"] },
+                "exitCode": { "type": "number" },
+                "stdoutHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+                "stderrHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+                "expectationErrors": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,7 +10,9 @@ export const CONTRACTS = {
   manifest: 'manifest.contract.json',
   taskPacket: 'task-packet.contract.json',
   runResult: 'run-result.contract.json',
-  buildHandoff: 'build-handoff.contract.json'
+  buildHandoff: 'build-handoff.contract.json',
+  evalSuite: 'eval-suite.contract.json',
+  evalResult: 'eval-result.contract.json'
 };
 
 export const SCHEMA_ERROR_CODE = 'MH_SCHEMA_VALIDATION_FAILED';

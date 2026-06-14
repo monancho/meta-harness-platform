@@ -10,6 +10,9 @@ rm -rf "$TMP"
 mkdir -p "$TMP"
 
 node "$ROOT/bin/mh.mjs" doctor
+node "$ROOT/bin/mh.mjs" eval list | grep -q "local-smoke"
+node "$ROOT/bin/mh.mjs" eval run --suite local-smoke --no-network --output "$TMP/local-smoke-eval-result.json"
+node "$ROOT/tests/eval-registry.test.mjs"
 node "$ROOT/tests/dashboard-fixture-loader.test.mjs"
 node "$ROOT/tests/dashboard-run-history.test.mjs"
 node "$ROOT/tests/dashboard-patch-diff.test.mjs"
