@@ -23,7 +23,8 @@ export function cmdRun(opts, fail) {
   assertContractFile('taskPacket', taskPath, fail);
   const adapter = opts.adapter || 'shell';
   const before = listRunResultFiles(target);
-  execSync(`node ${JSON.stringify(runner)} --task ${JSON.stringify(task)} --adapter ${JSON.stringify(adapter)}`, { cwd: target, stdio: 'inherit' });
+  const cleanupArg = opts.cleanup === undefined ? '' : ` --cleanup ${JSON.stringify(String(opts.cleanup))}`;
+  execSync(`node ${JSON.stringify(runner)} --task ${JSON.stringify(task)} --adapter ${JSON.stringify(adapter)}${cleanupArg}`, { cwd: target, stdio: 'inherit' });
   const after = [...listRunResultFiles(target)].filter(file => !before.has(file)).sort();
   const resultPath = after.at(-1);
   if (!resultPath) fail('run-result.json not found after harness run');

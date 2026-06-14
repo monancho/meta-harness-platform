@@ -75,5 +75,49 @@ test -f "$RUN_DIR/patch.diff"
 test -f "$RUN_DIR/run-result.json"
 test -f "$RUN_DIR/summary.md"
 
+GIT_TARGET="$TMP/git-target-project"
+node "$ROOT/bin/mh.mjs" scaffold planning --target "$GIT_TARGET" --project-id smoke-git-demo
+node "$ROOT/bin/mh.mjs" plan synthesize --target "$GIT_TARGET" --input "$ROOT/examples/demo-answers.json"
+node "$ROOT/bin/mh.mjs" plan compile-acceptance --target "$GIT_TARGET"
+node "$ROOT/bin/mh.mjs" plan freeze --target "$GIT_TARGET" --approved
+node "$ROOT/bin/mh.mjs" factory bootstrap --target "$GIT_TARGET"
+git -C "$GIT_TARGET" init -q
+git -C "$GIT_TARGET" config user.email "smoke@example.invalid"
+git -C "$GIT_TARGET" config user.name "Smoke Test"
+git -C "$GIT_TARGET" add .
+git -C "$GIT_TARGET" commit -q -m "initial target factory"
+
+node "$ROOT/bin/mh.mjs" run --target "$GIT_TARGET" --task .harness/tasks/example.task.json --adapter shell --cleanup false
+GIT_RUN_RESULT="$(find "$GIT_TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+GIT_RUN_ID="$(node --input-type=module - "$GIT_RUN_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.execution?.mode !== 'git-worktree') throw new Error('expected git-worktree execution mode');
+console.log(result.runId);
+NODE
+)"
+[[ "$GIT_RUN_ID" =~ ^run-[0-9]{14}-[0-9]{3}-[a-f0-9]{6}-ISSUE-001$ ]]
+test -f "$GIT_TARGET/.harness/runs/$GIT_RUN_ID/run-result.json"
+test -d "$GIT_TARGET/.harness/tmp/worktrees/$GIT_RUN_ID"
+test -f "$GIT_TARGET/.harness/tmp/worktrees/$GIT_RUN_ID/apps/web/src/generated/ISSUE-001.ts"
+test ! -f "$GIT_TARGET/apps/web/src/generated/ISSUE-001.ts"
+grep -q "diff --git a/apps/web/src/generated/ISSUE-001.ts b/apps/web/src/generated/ISSUE-001.ts" "$GIT_TARGET/.harness/runs/$GIT_RUN_ID/patch.diff"
+git -C "$GIT_TARGET" worktree remove --force "$GIT_TARGET/.harness/tmp/worktrees/$GIT_RUN_ID"
+test -f "$GIT_TARGET/.harness/runs/$GIT_RUN_ID/run-result.json"
+
+node "$ROOT/bin/mh.mjs" run --target "$GIT_TARGET" --task .harness/tasks/example.task.json --adapter shell
+GIT_CLEAN_RESULT="$(find "$GIT_TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json ! -path "$GIT_TARGET/.harness/runs/$GIT_RUN_ID/run-result.json" | sort | tail -n 1)"
+GIT_CLEAN_RUN_ID="$(node --input-type=module - "$GIT_CLEAN_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.execution?.mode !== 'git-worktree') throw new Error('expected git-worktree execution mode');
+console.log(result.runId);
+NODE
+)"
+[[ "$GIT_CLEAN_RUN_ID" =~ ^run-[0-9]{14}-[0-9]{3}-[a-f0-9]{6}-ISSUE-001$ ]]
+test "$GIT_CLEAN_RUN_ID" != "$GIT_RUN_ID"
+test -f "$GIT_TARGET/.harness/runs/$GIT_CLEAN_RUN_ID/run-result.json"
+test ! -e "$GIT_TARGET/.harness/tmp/worktrees/$GIT_CLEAN_RUN_ID"
+
 echo "[ok] smoke test passed"
 echo "Generated target: $TARGET"
