@@ -43,6 +43,7 @@ for (const forbidden of [rawCustomerText, rawSecretLike, rawPatchLine, 'customer
 }
 assert.deepEqual(signal.reasonCodes, ['MH_SECURITY_SECRET_PATTERN', 'MH_VERIFY_FAILED']);
 assert.equal(signal.failureCategory, 'security');
+assert.equal(signal.adapter, 'shell');
 assert.equal(signal.taskType, 'feedback');
 assert.equal(signal.metricBuckets.changedFiles, '1');
 assert.equal(signal.metricBuckets.verifyChecks, '1');

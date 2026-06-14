@@ -1,0 +1,29 @@
+{
+  "schemaVersion": "1.0.0",
+  "signalId": "signal-d",
+  "sourceRunId": "run-d",
+  "generatorVersion": "1.4.0-instant-devcontainer",
+  "executionProfile": "L0_LOCAL_WORKTREE",
+  "adapter": "shell",
+  "taskType": "implementation",
+  "result": "passed",
+  "reasonCodes": [],
+  "metricBuckets": {
+    "changedFiles": "1",
+    "verifyChecks": "1",
+    "failedVerifyChecks": "0",
+    "patchLines": "1-50",
+    "artifactCount": "2-5"
+  },
+  "improvementSignals": [],
+  "privacyFlags": {
+    "excludesRawPatchContent": true,
+    "excludesRawLogs": true,
+    "excludesRawDocs": true,
+    "excludesSecrets": true,
+    "excludesCustomerText": true,
+    "containsOnlySanitizedMetrics": true,
+    "targetOwnsRawArtifacts": true
+  },
+  "createdAt": "2026-06-14T12:06:00.000Z"
+}

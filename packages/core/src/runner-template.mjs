@@ -119,6 +119,7 @@ function buildSanitizedSignal(result, patchLineCount){
     sourceRunId: String(result.runId || 'unknown'),
     generatorVersion: safeVersionToken(result.generatorVersion || 'unknown'),
     executionProfile: safeSignalCode(result.execution?.profile || 'L0_LOCAL_WORKTREE'),
+    adapter: safeMetricToken(result.adapter || 'unknown'),
     taskType: safeMetricToken(result.taskType || 'unknown'),
     result: result.status === 'failed' ? 'failed' : 'passed',
     failureCategory: ['security','schema','verification','adapter','execution'].includes(result.failureCategory) ? result.failureCategory : (result.status === 'failed' ? 'execution' : undefined),
