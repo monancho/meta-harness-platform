@@ -92,6 +92,11 @@
 ## T-070 Security Boundary Smoke
 
 - shell adapter는 `.env*`, production infra, deploy-prod workflow를 생성하거나 수정하지 않는다.
+- task packet의 `editableScope`/`forbiddenScope`가 절대 경로, 상위 경로, `.git`, `node_modules` 같은 금지 범위를 포함하면 실행 전 실패한다.
+- runner는 실행 전 `commands.verify`와 `verifyCommands`를 runtime command policy로 검사하고, `git push*`, `npm publish*`, `docker login*` 같은 deny command를 차단한다.
+- runner는 task packet, verify command, child process 환경, run artifact에서 practical secret-like pattern을 검사하거나 필터링한다.
+- 보안 게이트 실패 시 `run-result.json`은 `status: failed`, `failureCategory: security`, `reasonCode: MH_SECURITY_*`를 포함해야 한다.
+- 실행 후 `changedFiles`와 `patch.diff` 경로가 `.env*`, `infra/**/production/**`, `.github/workflows/deploy-prod.yml`에 닿으면 실패해야 한다.
 
 ## T-080 Codex Adapter
 
