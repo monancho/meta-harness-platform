@@ -2,7 +2,7 @@ import { execSync } from 'node:child_process';
 import { VERSION } from './constants.mjs';
 import { cmdFactoryBootstrap } from './bootstrap.mjs';
 import { cmdManifestCheck } from './manifest.mjs';
-import { cmdCompileAcceptance, cmdPlanFreeze, cmdPlanSynthesize, cmdScaffoldPlanning } from './planning.mjs';
+import { cmdCompileAcceptance, cmdCompileTasks, cmdPlanFreeze, cmdPlanSynthesize, cmdScaffoldPlanning } from './planning.mjs';
 import { cmdRun } from './runner.mjs';
 
 function log(msg = '') { console.log(msg); }
@@ -34,7 +34,7 @@ function cmdDoctor() {
 }
 
 function usage() {
-  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir>\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell\n`);
+  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir>\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell\n`);
 }
 
 export function runCli(argv) {
@@ -45,6 +45,7 @@ export function runCli(argv) {
   else if (a === 'scaffold' && b === 'planning') ok(cmdScaffoldPlanning(opts, fail));
   else if (a === 'plan' && b === 'synthesize') ok(cmdPlanSynthesize(opts, fail));
   else if (a === 'plan' && b === 'compile-acceptance') ok(cmdCompileAcceptance(opts, fail));
+  else if (a === 'plan' && b === 'compile-tasks') ok(cmdCompileTasks(opts, fail));
   else if (a === 'plan' && b === 'freeze') ok(cmdPlanFreeze(opts, fail));
   else if (a === 'factory' && b === 'bootstrap') ok(cmdFactoryBootstrap(opts, fail));
   else if (a === 'manifest' && b === 'check') ok(cmdManifestCheck(opts, fail));
