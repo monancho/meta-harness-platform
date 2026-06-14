@@ -3,6 +3,7 @@ import path from 'node:path';
 import { assertContractFile } from './contracts.mjs';
 import { VERSION } from './constants.mjs';
 import { abs, ensureDir, exists, readJson, shaFile, writeJson, writeText } from './fs-utils.mjs';
+import { writeManifestLock } from './manifest.mjs';
 import { assertPhase, readProjectId, setState, validateState } from './state.mjs';
 import { targetRunnerCode } from './runner-template.mjs';
 
@@ -98,10 +99,8 @@ A task is complete when:
   ensureDir(path.join(target, '.harness/runs'));
   ensureDir(path.join(target, '.harness/tmp'));
 
-  const manifestFiles = generated.map(rel => ({ path: rel, ownership: rel.includes('AGENTS.md') || rel.includes('.github') ? 'shared' : 'harness', checksum: `sha256:${shaFile(path.join(target, rel))}`, mergeStrategy: rel.includes('infra/caddy') ? 'propose-only' : 'replace-if-unchanged' }));
-  const manifestPath = path.join(target, '.harness/manifest.lock');
+  const manifestPath = writeManifestLock({ target, projectId, handoffPath, generated });
   const factoryPath = path.join(target, '.harness/factory.yml');
-  writeJson(manifestPath, { schemaVersion: 1, factoryId: projectId, generator: { name: 'meta-harness-platform-starter', version: VERSION }, source: { buildHandoff: '.harness/planning/build-handoff.json', buildHandoffHash: `sha256:${shaFile(handoffPath)}` }, files: manifestFiles });
   assertContractFile('factory', factoryPath, fail);
   assertContractFile('manifest', manifestPath, fail);
   setState(target, {

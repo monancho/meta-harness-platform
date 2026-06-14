@@ -51,6 +51,15 @@
   - `.harness/factory.yml`
   - `.harness/manifest.lock`
 
+## T-051 Manifest Ownership
+
+- `manifest.lock`은 generator version, build-handoff hash, planning answers hash, managed files를 기록해야 한다.
+- 각 managed file은 `ownership`, `checksum`, `mergeStrategy`, `conflictPolicy`를 가져야 한다.
+- `AGENTS.md`와 `.github/workflows/**`는 `ownership: shared`여야 한다.
+- `infra/caddy/**`는 `mergeStrategy: propose-only`여야 한다.
+- `.env*`, secret/token/pem 성격의 파일은 managed files에 포함되지 않아야 한다.
+- `mh manifest check --target <dir>`는 managed file checksum drift를 감지해야 한다.
+
 ## T-060 Harness Run
 
 - 명령: `mh run --target <dir> --task .harness/tasks/example.task.json --adapter shell`
