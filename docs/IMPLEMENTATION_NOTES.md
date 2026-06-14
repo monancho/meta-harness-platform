@@ -17,6 +17,22 @@
 9. Codex adapter
 10. GitHub PR loop
 
+## 내부 패키지 구조
+
+MH-001부터 단일 파일 CLI skeleton은 `packages/core` 중심 구조로 분리합니다.
+
+| 영역 | 구현 위치 |
+|---|---|
+| CLI entrypoint | `bin/mh.mjs` |
+| CLI dispatch | `packages/core/src/cli.mjs` |
+| 파일/JSON/해시 유틸리티 | `packages/core/src/fs-utils.mjs` |
+| Target state 처리 | `packages/core/src/state.mjs` |
+| Planning scaffold/synthesize/freeze | `packages/core/src/planning.mjs` |
+| Factory bootstrap | `packages/core/src/bootstrap.mjs` |
+| Run 위임과 target runner template | `packages/core/src/runner.mjs`, `packages/core/src/runner-template.mjs` |
+
+`bin/mh.mjs`는 기존 사용자 명령을 유지하는 entrypoint로 남고, 내부 구현만 core 모듈로 위임합니다.
+
 ## 다음 확장 포인트
 
 | 확장 | 구현 위치 |
