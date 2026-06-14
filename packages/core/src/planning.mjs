@@ -22,7 +22,7 @@ export function loadAnswers(inputPath, fail) {
   catch { fail(`현재 starter는 JSON input만 지원합니다: ${p}`); }
 }
 
-export function cmdScaffoldPlanning(opts) {
+export function cmdScaffoldPlanning(opts, fail) {
   const target = abs(opts.target || '../target-project');
   const projectId = opts['project-id'] || opts.projectId || 'demo';
   ensureDir(target);
@@ -32,7 +32,7 @@ export function cmdScaffoldPlanning(opts) {
 
   writeText(path.join(target, 'README.md'), `# ${projectId}\n\nPlanning-first Target Project Repo.\n\n## Current phase\n\nplanning-scaffolded\n`);
   writeText(path.join(target, '.harness/project.yml'), `schemaVersion: 1\nproject:\n  id: ${projectId}\n  name: ${projectId}\n  owner: target-repo\n  sourceOfTruth:\n    planning: docs/planning\n    agentPack: .harness/planning\n`);
-  setState(target, { projectId, phase: 'planning-scaffolded' });
+  setState(target, { projectId, phase: 'planning-scaffolded', fail });
   writeText(path.join(target, '.github/pull_request_template.md'), `## Summary\n\n## Checklist\n\n- [ ] Planning artifacts reviewed\n- [ ] Acceptance criteria are testable\n- [ ] Non-goals are clear\n`);
   writeText(path.join(target, 'docs/planning/00_IDEA_BRIEF.md'), `# 00. Idea Brief\n\n> Fill this before running planning synthesis.\n`);
   return `planning-only scaffold created: ${target}`;
@@ -109,7 +109,16 @@ export function cmdPlanFreeze(opts, fail) {
   assertContractFile('buildHandoff', handoff, fail);
   const baseline = path.join(hp, 'planning-baseline.json');
   const projectId = readProjectId(target);
-  setState(target, { projectId, phase: 'planning-frozen', extra: `  planningBaselineHash: sha256:${exists(baseline) ? shaFile(baseline) : 'missing'}\n  buildHandoffHash: sha256:${shaFile(handoff)}\n  humanApproved: true\n` });
+  setState(target, {
+    projectId,
+    phase: 'planning-frozen',
+    fail,
+    fields: {
+      buildHandoffHash: `sha256:${shaFile(handoff)}`,
+      humanApproved: true,
+      planningBaselineHash: `sha256:${exists(baseline) ? shaFile(baseline) : 'missing'}`
+    }
+  });
   validateState(target, fail);
   return 'planning baseline frozen';
 }

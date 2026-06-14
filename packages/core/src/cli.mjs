@@ -41,7 +41,7 @@ export function runCli(argv) {
   const [a, b] = opts._;
   if (!a || a === 'help' || a === '--help') usage();
   else if (a === 'doctor') cmdDoctor(opts);
-  else if (a === 'scaffold' && b === 'planning') ok(cmdScaffoldPlanning(opts));
+  else if (a === 'scaffold' && b === 'planning') ok(cmdScaffoldPlanning(opts, fail));
   else if (a === 'plan' && b === 'synthesize') ok(cmdPlanSynthesize(opts, fail));
   else if (a === 'plan' && b === 'compile-acceptance') ok(cmdCompileAcceptance(opts, fail));
   else if (a === 'plan' && b === 'freeze') ok(cmdPlanFreeze(opts, fail));

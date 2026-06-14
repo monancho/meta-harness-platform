@@ -1,8 +1,9 @@
 import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { abs, exists } from './fs-utils.mjs';
+import { abs, exists, shaFile } from './fs-utils.mjs';
 import { assertContractFile } from './contracts.mjs';
+import { assertPhase, readProjectId, setState, validateState } from './state.mjs';
 
 function listRunResultFiles(target) {
   const runsDir = path.join(target, '.harness/runs');
@@ -13,6 +14,7 @@ function listRunResultFiles(target) {
 
 export function cmdRun(opts, fail) {
   const target = abs(opts.target || '.');
+  assertPhase(target, ['factory-ready', 'runnable'], 'run', fail);
   const runner = path.join(target, '.harness/bin/runner.mjs');
   if (!exists(runner)) fail('runner not found. Run factory bootstrap first.');
   const task = opts.task || '.harness/tasks/example.task.json';
@@ -26,4 +28,13 @@ export function cmdRun(opts, fail) {
   const resultPath = after.at(-1);
   if (!resultPath) fail('run-result.json not found after harness run');
   assertContractFile('runResult', resultPath, fail);
+  setState(target, {
+    projectId: readProjectId(target),
+    phase: 'runnable',
+    fail,
+    fields: {
+      lastRunResultHash: `sha256:${shaFile(resultPath)}`
+    }
+  });
+  validateState(target, fail);
 }

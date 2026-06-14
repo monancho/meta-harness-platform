@@ -35,10 +35,13 @@
 - 기대 결과:
   - phase가 `planning-frozen`
   - buildHandoffHash가 기록됨
+  - 허용 전이는 `empty -> planning-scaffolded -> planning-frozen -> factory-ready -> runnable`이다.
+  - 각 상태 변경은 결정적 순서로 기록되고 관련 산출물 hash를 포함한다.
 
 ## T-050 Bootstrap Gate
 
 - 승인 전 bootstrap은 실패해야 한다.
+- `factory bootstrap`은 phase가 `planning-frozen`일 때만 성공해야 한다.
 - 승인 후 bootstrap은 성공해야 한다.
 - 기대 생성물:
   - `apps/web/`
@@ -52,6 +55,9 @@
 
 - 명령: `mh run --target <dir> --task .harness/tasks/example.task.json --adapter shell`
 - 기대 결과:
+  - phase가 `factory-ready` 또는 `runnable`이 아니면 실패해야 한다.
+  - 성공 후 phase가 `runnable`로 전이된다.
+  - `.harness/state.yml`에 lastRunResultHash가 기록된다.
   - `.harness/runs/<run-id>/patch.diff`
   - `.harness/runs/<run-id>/run-result.json`
   - `.harness/runs/<run-id>/summary.md`
