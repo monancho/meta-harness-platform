@@ -92,3 +92,20 @@
 ## T-070 Security Boundary Smoke
 
 - shell adapter는 `.env*`, production infra, deploy-prod workflow를 생성하거나 수정하지 않는다.
+
+## T-080 Codex Adapter
+
+- Smoke test는 실제 Codex CLI 설치를 요구하지 않는다. fake `MH_CODEX_BINARY`로 adapter lifecycle, prompt artifact, output artifact, patch collection을 검증한다.
+- Codex CLI가 없으면 `MH_CODEX_BINARY_NOT_FOUND` reasonCode와 함께 실패해야 한다.
+- 수동 확인 명령:
+
+```bash
+node ./bin/mh.mjs run --target <target-repo> --task .harness/tasks/BL-001.task.json --adapter codex
+```
+
+- 수동 확인 기대 결과:
+  - `.harness/runs/<run-id>/codex-prompt.md`
+  - `.harness/runs/<run-id>/codex-output.log`
+  - `.harness/runs/<run-id>/patch.diff`
+  - `.harness/runs/<run-id>/run-result.json`
+  - `.harness/runs/<run-id>/summary.md`

@@ -43,9 +43,22 @@ node "$ROOT/bin/mh.mjs" manifest check --target "$TARGET"
 grep -q "defaultAdapter: shell" "$TARGET/.harness/agents/adapters.yml"
 grep -q "lifecycle: prepare-execute-collectArtifacts-summarize" "$TARGET/.harness/agents/adapters.yml"
 grep -q "implementation: builtin:shell" "$TARGET/.harness/agents/adapters.yml"
-grep -q "status: disabled-until-MH-009" "$TARGET/.harness/agents/adapters.yml"
+grep -q "implementation: builtin:codex" "$TARGET/.harness/agents/adapters.yml"
+grep -q "status: available-if-codex-cli-installed" "$TARGET/.harness/agents/adapters.yml"
 grep -q "status: disabled-placeholder" "$TARGET/.harness/agents/adapters.yml"
 node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapter shell
+
+if MH_CODEX_BINARY="$TMP/missing-codex" node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapter codex >"$TMP/codex-missing.out" 2>"$TMP/codex-missing.err"; then
+  echo "[error] codex adapter unexpectedly passed with a missing codex binary" >&2
+  exit 1
+fi
+CODEX_MISSING_RESULT="$(find "$TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+node --input-type=module - "$CODEX_MISSING_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'failed') throw new Error('expected failed codex missing-binary result');
+if (result.reasonCode !== 'MH_CODEX_BINARY_NOT_FOUND') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
+NODE
 
 grep -q "phase: runnable" "$TARGET/.harness/state.yml"
 grep -Eq "lastRunResultHash: sha256:[a-f0-9]{64}" "$TARGET/.harness/state.yml"
@@ -243,6 +256,53 @@ NODE
 test "$GIT_CLEAN_RUN_ID" != "$GIT_RUN_ID"
 test -f "$GIT_TARGET/.harness/runs/$GIT_CLEAN_RUN_ID/run-result.json"
 test ! -e "$GIT_TARGET/.harness/tmp/worktrees/$GIT_CLEAN_RUN_ID"
+
+FAKE_CODEX="$TMP/fake-codex"
+cat > "$FAKE_CODEX" <<'SH'
+#!/usr/bin/env bash
+set -euo pipefail
+if [ "${1:-}" != "exec" ]; then
+  echo "unexpected codex command: $*" >&2
+  exit 9
+fi
+PROMPT="$(cat)"
+case "$PROMPT" in
+  *"Meta Harness Codex Adapter Prompt"*".harness/runs/<run-id>"*) ;;
+  *) echo "prompt missing expected AGENTS/task content" >&2; exit 8 ;;
+esac
+mkdir -p docs
+printf 'codex adapter smoke\n' > docs/codex-adapter-smoke.md
+echo "fake codex ok"
+SH
+chmod +x "$FAKE_CODEX"
+
+MH_CODEX_BINARY="$FAKE_CODEX" node "$ROOT/bin/mh.mjs" run --target "$GIT_TARGET" --task "$GENERATED_TASK" --adapter codex
+CODEX_RESULT_ONE="$(find "$GIT_TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+CODEX_RUN_ONE="$(node --input-type=module - "$CODEX_RESULT_ONE" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'passed') throw new Error(`expected passed codex result, got ${result.status}`);
+if (result.adapter !== 'codex') throw new Error(`unexpected adapter: ${result.adapter}`);
+if (!result.artifacts.includes('codex-prompt.md')) throw new Error('missing codex-prompt.md artifact');
+if (!result.artifacts.includes('codex-output.log')) throw new Error('missing codex-output.log artifact');
+if (!result.changedFiles.includes('docs/codex-adapter-smoke.md')) throw new Error(`missing changed file: ${result.changedFiles.join(',')}`);
+console.log(result.runId);
+NODE
+)"
+grep -q "diff --git a/docs/codex-adapter-smoke.md b/docs/codex-adapter-smoke.md" "$GIT_TARGET/.harness/runs/$CODEX_RUN_ONE/patch.diff"
+test -f "$GIT_TARGET/.harness/runs/$CODEX_RUN_ONE/codex-prompt.md"
+test -f "$GIT_TARGET/.harness/runs/$CODEX_RUN_ONE/codex-output.log"
+
+MH_CODEX_BINARY="$FAKE_CODEX" node "$ROOT/bin/mh.mjs" run --target "$GIT_TARGET" --task "$GENERATED_TASK" --adapter codex
+CODEX_RESULT_TWO="$(find "$GIT_TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json ! -path "$CODEX_RESULT_ONE" | sort | tail -n 1)"
+CODEX_RUN_TWO="$(node --input-type=module - "$CODEX_RESULT_TWO" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'passed') throw new Error(`expected passed codex result, got ${result.status}`);
+console.log(result.runId);
+NODE
+)"
+cmp "$GIT_TARGET/.harness/runs/$CODEX_RUN_ONE/codex-prompt.md" "$GIT_TARGET/.harness/runs/$CODEX_RUN_TWO/codex-prompt.md"
 
 echo "[ok] smoke test passed"
 echo "Generated target: $TARGET"
