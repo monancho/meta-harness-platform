@@ -13,6 +13,7 @@ node "$ROOT/bin/mh.mjs" doctor
 node "$ROOT/tests/dashboard-fixture-loader.test.mjs"
 node "$ROOT/tests/dashboard-run-history.test.mjs"
 node "$ROOT/tests/dashboard-patch-diff.test.mjs"
+node "$ROOT/tests/managed-blocks.test.mjs"
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
 
 if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then
@@ -261,7 +262,10 @@ if (!manifest.generator?.version) throw new Error('manifest missing generator.ve
 if (!manifest.source?.buildHandoffHash?.startsWith('sha256:')) throw new Error('manifest missing buildHandoffHash');
 if (!manifest.answers?.planningBaselineHash?.startsWith('sha256:')) throw new Error('manifest missing answers hash');
 if (files.get('AGENTS.md')?.ownership !== 'shared') throw new Error('AGENTS.md must be shared');
+if (files.get('AGENTS.md')?.mergeStrategy !== 'managed-blocks') throw new Error('AGENTS.md must use managed-blocks');
+if (!files.get('AGENTS.md')?.managedBlocks?.some(block => block.id === 'target-factory-instructions')) throw new Error('AGENTS.md missing managed block metadata');
 if (files.get('.github/workflows/ci.yml')?.ownership !== 'shared') throw new Error('GitHub workflow must be shared');
+if (!files.get('.github/workflows/ci.yml')?.managedBlocks?.some(block => block.id === 'ci-workflow')) throw new Error('GitHub workflow missing managed block metadata');
 if (files.get('infra/caddy/Caddyfile')?.mergeStrategy !== 'propose-only') throw new Error('infra/caddy must be propose-only');
 for (const item of manifest.managedFiles) {
   if (/^\.env(?:\.|$)|secret|token|\.pem$/i.test(item.path)) throw new Error(`secret-like path included: ${item.path}`);
@@ -307,13 +311,14 @@ import fs from 'node:fs';
 const report = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const byPath = new Map(report.files.map(item => [item.path, item]));
 if (report.mode !== 'dry-run') throw new Error('expected dry-run mode');
-if (byPath.get('AGENTS.md')?.classification !== 'changed-by-user') throw new Error('expected AGENTS.md changed-by-user');
+if (byPath.get('AGENTS.md')?.classification !== 'ignored') throw new Error('expected AGENTS.md ignored because drift is outside managed blocks');
+if (byPath.get('AGENTS.md')?.managedBlocks?.status !== 'unchanged') throw new Error('expected AGENTS.md managed blocks unchanged');
 if (byPath.get('package.json')?.classification !== 'ignored') throw new Error('expected package.json ignored');
 for (const key of ['safe-auto', 'changed-by-user', 'conflict', 'propose-only', 'ignored']) {
   if (typeof report.counts[key] !== 'number') throw new Error(`missing count for ${key}`);
 }
 NODE
-grep -q "changed-by-user: AGENTS.md" "$TARGET/.harness/upgrades/upgrade-summary.md"
+grep -q "ignored: AGENTS.md" "$TARGET/.harness/upgrades/upgrade-summary.md"
 if node "$ROOT/bin/mh.mjs" manifest check --target "$TARGET" >"$TMP/manifest-drift.out" 2>"$TMP/manifest-drift.err"; then
   echo "[error] manifest check did not detect managed file drift" >&2
   exit 1
