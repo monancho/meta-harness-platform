@@ -1,12 +1,12 @@
 # Final Verification Report
 
-## 1. Branch
+## 1. 작업 브랜치
 
 ```text
 release/final-cleanup-20260614-152148
 ```
 
-All cleanup and documentation work was performed on this local release branch. The branch was not pushed and was not merged into `main`.
+모든 cleanup과 documentation 작업은 이 local release branch에서 수행했습니다. 이 브랜치는 push하지 않았고 `main`에 merge하지 않았습니다.
 
 ## 2. Backup Tag
 
@@ -14,9 +14,9 @@ All cleanup and documentation work was performed on this local release branch. T
 release-cleanup-before-20260614-152434
 ```
 
-The tag was created before release cleanup changes and confirmed with `git tag --list release-cleanup-before-20260614-152434`.
+release cleanup 변경 전에 tag를 만들었고, `git tag --list release-cleanup-before-20260614-152434`로 확인했습니다.
 
-## 3. Verification Commands Run
+## 3. 실행한 검증 명령
 
 ```bash
 git branch --show-current
@@ -30,28 +30,28 @@ npm run demo:e2e
 node ./scripts/agent/guard-diff.mjs
 ```
 
-`npm run dashboard:preview` starts a long-running local server, so it was run briefly, confirmed to print `Meta Harness dashboard preview: http://localhost:4173`, and then stopped.
+`npm run dashboard:preview`는 장시간 실행되는 local server이므로 잠깐 실행해 `Meta Harness dashboard preview: http://localhost:4173` 출력을 확인한 뒤 종료했습니다.
 
-## 4. Passed Verification
+## 4. 통과한 검증
 
-- `npm run doctor`: passed.
-- `npm run verify`: passed after the AGENTS readiness phrase fix described below.
-- `npm run smoke`: passed.
-- `npm run dashboard:preview`: executable; emitted the expected local preview URL.
-- `npm run demo:e2e`: passed.
-- `node ./scripts/agent/guard-diff.mjs`: passed.
+- `npm run doctor`: passed
+- `npm run verify`: 아래 AGENTS readiness phrase 수정 후 passed
+- `npm run smoke`: passed
+- `npm run dashboard:preview`: 실행 가능, expected local preview URL 출력 확인
+- `npm run demo:e2e`: passed
+- `node ./scripts/agent/guard-diff.mjs`: passed
 
-## 5. Failed Then Fixed
+## 5. 실패했다가 수정한 항목
 
-- Initial `npm run verify` failed because `scripts/agent/validate-agent-ready.mjs` expects AGENTS.md to contain the phrase `Planning-first`. The AGENTS.md operations rewrite preserved the concept but not the exact phrase.
-- Fix: restored the exact readiness contract language in AGENTS.md and included the completed `MH-001` through `MH-028` task queue context.
-- No test was weakened and no smoke contract was bypassed.
+- 최초 `npm run verify`는 `scripts/agent/validate-agent-ready.mjs`가 AGENTS.md에서 `Planning-first` 문구를 기대해 실패했습니다. AGENTS.md 운영 문서 전환 과정에서 개념은 유지했지만 정확한 문구가 빠졌습니다.
+- 수정: AGENTS.md에 exact readiness contract language를 복원하고 완료된 `MH-001`부터 `MH-028`까지의 task queue context를 포함했습니다.
+- test를 약화하지 않았고 smoke contract를 우회하지 않았습니다.
 
-## 6. Deleted Or Ignored Runtime Artifacts
+## 6. 삭제 또는 Ignore 처리한 Runtime Artifact
 
-No ambiguous files were deleted.
+애매한 파일은 삭제하지 않았습니다.
 
-Ignore rules were reinforced for:
+아래 ignore rule을 보강했습니다.
 
 - `.harness/runs/`
 - `.harness/tmp/`
@@ -67,46 +67,46 @@ Ignore rules were reinforced for:
 - `*.pem`
 - `*.key`
 
-Additional cleanup notes are recorded in [Release Cleanup Notes](release-cleanup-notes.md).
+추가 cleanup note는 [Release Cleanup Notes](release-cleanup-notes.md)에 기록했습니다.
 
-## 7. Intentional Artifacts Left In Place
+## 7. 의도적으로 남긴 산출물
 
-- `apps/dashboard/package-lock.json`: left untracked and untouched. The dashboard currently runs through `apps/dashboard/preview.mjs`; there is no documented `apps/dashboard/package.json` runtime path. Review before deciding whether to track or remove this file.
-- `INSTANT_NEXT_STEPS.md`: ignored build-process note, left untouched if present.
-- `.harness/agent-workspace/auto-runs/`: ignored local automation history, left untouched.
-- `.harness/agent-workspace/nightly-logs/`: ignored local runtime history, left untouched.
+- `apps/dashboard/package-lock.json`: untracked 상태로 유지했습니다. dashboard는 현재 `apps/dashboard/preview.mjs`로 실행되며 문서화된 runtime path에 `apps/dashboard/package.json`이 없습니다. track/remove 결정 전에 검토가 필요합니다.
+- `INSTANT_NEXT_STEPS.md`: ignored build-process note로, 존재하더라도 건드리지 않았습니다.
+- `.harness/agent-workspace/auto-runs/`: ignored local automation history로 유지했습니다.
+- `.harness/agent-workspace/nightly-logs/`: ignored local runtime history로 유지했습니다.
 
-## 8. Remaining Limits
+## 8. 남은 한계
 
-- This is still an MVP platform skeleton, not production multi-tenant orchestration.
-- Dashboard preview is dependency-free static preview infrastructure, not a production dashboard service.
-- GitHub Actions, container worker, and kind execution profiles are skeleton/extension paths built around the same task packet contract.
-- The untracked `apps/dashboard/package-lock.json` needs human review before merge.
+- 이 repo는 여전히 MVP platform skeleton이며 production multi-tenant orchestration이 아닙니다.
+- Dashboard preview는 dependency-free static preview infrastructure이며 production dashboard service가 아닙니다.
+- GitHub Actions, container worker, kind execution profile은 같은 task packet contract를 기반으로 한 skeleton/extension path입니다.
+- untracked `apps/dashboard/package-lock.json`은 merge 전 human review가 필요합니다.
 
-## 9. Before Merging To main
+## 9. main 병합 전 확인 사항
 
-The user should verify:
+사용자는 다음을 확인해야 합니다.
 
-- The release branch is still `release/final-cleanup-20260614-152148`.
-- `apps/dashboard/package-lock.json` should remain untracked, be deleted, or become a tracked dashboard lockfile.
-- The new docs structure is acceptable and does not conflict with preferred Korean/English documentation strategy.
-- Final commands still pass in the user's environment.
-- No runtime logs, secrets, or target-owned artifacts are staged.
+- release branch가 여전히 `release/final-cleanup-20260614-152148`인지
+- `apps/dashboard/package-lock.json`을 untracked로 유지할지, 삭제할지, tracked dashboard lockfile로 만들지
+- 새 docs 구조가 원하는 한국어/영어 문서 전략과 맞는지
+- 최종 명령이 사용자 환경에서도 통과하는지
+- runtime log, secret, target-owned artifact가 staged 상태가 아닌지
 
-## 10. Rollback Method
+## 10. Rollback 방법
 
-To inspect or restore the pre-cleanup state:
+pre-cleanup 상태를 확인하거나 복구하려면:
 
 ```bash
 git show release-cleanup-before-20260614-152434
 git switch release/final-cleanup-20260614-152148
 ```
 
-To abandon the release cleanup branch locally after saving anything needed:
+release cleanup branch를 local에서 버리려면 필요한 내용을 보관한 뒤:
 
 ```bash
 git switch main
 git branch -D release/final-cleanup-20260614-152148
 ```
 
-Do not delete the backup tag until the cleanup branch has been reviewed and merged or intentionally discarded.
+cleanup branch가 review 및 merge되거나 명시적으로 폐기되기 전에는 backup tag를 삭제하지 않습니다.

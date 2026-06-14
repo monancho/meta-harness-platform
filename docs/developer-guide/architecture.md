@@ -1,6 +1,6 @@
 # Architecture
 
-Meta Harness Platform is organized around a small CLI and core package.
+Meta Harness Platform은 작은 CLI와 core package를 중심으로 구성됩니다.
 
 ```text
 bin/mh.mjs
@@ -22,13 +22,12 @@ templates/
 tests/
 ```
 
-The main lifecycle is:
+주요 lifecycle은 다음과 같습니다.
 
 ```text
 empty -> planning-scaffolded -> planning-frozen -> factory-ready -> runnable -> github-connected -> release-ready
 ```
 
-Meta owns templates, schemas, policies, and sanitized signals. Target repos own raw planning data, source code, infrastructure, logs, and run artifacts.
+Meta는 template, schema, policy, sanitized signal을 소유합니다. Target repo는 raw planning data, source code, infrastructure, log, run artifact를 소유합니다.
 
-Detailed diagrams: [Architecture Diagrams](../architecture/DIAGRAMS.md).
-
+상세 diagram: [Architecture Diagrams](../architecture/DIAGRAMS.md).

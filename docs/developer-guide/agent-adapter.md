@@ -1,16 +1,15 @@
 # Agent Adapter
 
-Agent adapters provide a normalized execution boundary for different workers.
+Agent adapter는 서로 다른 worker를 위한 표준 실행 경계를 제공합니다.
 
-Current direction:
+현재 방향:
 
-1. Shell adapter as deterministic local baseline.
-2. Local git worktree runner for L0 isolation.
-3. Codex adapter skeleton and missing-binary path.
-4. GitHub PR loop skeleton.
-5. Container and kind execution profile skeletons.
+1. deterministic local baseline으로 Shell adapter 사용
+2. L0 isolation을 위한 local git worktree runner
+3. Codex adapter skeleton과 missing-binary path
+4. GitHub PR loop skeleton
+5. Container와 kind execution profile skeleton
 
-A task packet remains the contract regardless of adapter. It carries editable scope, forbidden scope, verification commands, budgets, acceptance criteria, and expected artifacts.
+adapter가 달라도 task packet이 계약입니다. task packet은 editable scope, forbidden scope, verification command, budget, acceptance criteria, expected artifact를 포함합니다.
 
-Do not weaken task scope checks to make an adapter pass. Adapter failures should be reported as structured run results or explicit CLI errors.
-
+adapter를 통과시키기 위해 task scope check를 약화하지 않습니다. adapter failure는 structured run result나 명시적인 CLI error로 보고해야 합니다.

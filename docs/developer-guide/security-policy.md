@@ -1,26 +1,25 @@
 # Security Policy
 
-Security is enforced through task packet scope, runtime policy, and repository ignore rules.
+보안은 task packet scope, runtime policy, repository ignore rule을 통해 적용됩니다.
 
-## Never Commit
+## 절대 커밋하지 않을 것
 
-- `.env` or `.env.*`
-- secrets, tokens, PEM files, private keys
-- production deploy workflows or production credentials
-- runtime logs and run artifacts
-- raw Target Repo project data copied into Meta
+- `.env` 또는 `.env.*`
+- secret, token, PEM file, private key
+- production deploy workflow 또는 production credential
+- runtime log와 run artifact
+- Meta로 복사된 raw Target Repo project data
 
 ## Scope Rules
 
-Workers must respect:
+worker는 다음을 지켜야 합니다.
 
 - `task.editableScope`
 - `task.forbiddenScope`
 - runtime policy forbidden paths
 
-Common forbidden paths include production infra, deploy-prod workflows, secret-like files, and long-lived credentials.
+일반적인 forbidden path에는 production infra, deploy-prod workflow, secret-like file, long-lived credential이 포함됩니다.
 
 ## Sanitized Learning Only
 
-Meta can store generalized signals such as failure categories, reason codes, runtime buckets, retry counts, template improvement signals, generator versions, and execution profiles. It must not store raw PRDs, code, logs, or business documents from a Target Repo.
-
+Meta는 failure category, reason code, runtime bucket, retry count, template improvement signal, generator version, execution profile 같은 일반화된 signal만 저장할 수 있습니다. Target Repo의 raw PRD, code, log, business document는 저장하면 안 됩니다.

@@ -1,27 +1,27 @@
 # Meta Harness Platform
 
-Meta Harness Platform is a repo-resident project factory for AI-assisted software delivery. It creates and verifies the factory that lives inside a Target Project Repo: planning contracts, task packets, scoped runners, security gates, run artifacts, dashboard fixtures, and maintenance reports.
+Meta Harness Platform은 AI-assisted software delivery를 위한 repo-resident 프로젝트 공장입니다. Target Project Repo 안에 들어갈 개발 공장을 생성하고 검증합니다. 그 공장은 planning contract, task packet, scoped runner, security gate, run artifact, dashboard fixture, maintenance report를 포함합니다.
 
-The ownership rule is the core of the project:
+핵심 소유권 원칙은 다음과 같습니다.
 
 ```text
-Meta Harness Platform owns templates, generators, schemas, policies, evals, and sanitized improvement signals.
-Target Project Repo owns planning docs, application code, infrastructure, run logs, and artifacts.
+Meta Harness Platform은 template, generator, schema, policy, eval, sanitized improvement signal을 소유한다.
+Target Project Repo는 planning docs, application code, infrastructure, run logs, artifacts를 소유한다.
 ```
 
-## What This Repo Provides
+## 이 레포가 제공하는 것
 
-- `mh` CLI lifecycle commands under `bin/mh.mjs` and `packages/core`.
-- Planning-first Target Project Factory bootstrap.
-- Task packet contracts with editable scope, forbidden scope, verification commands, budgets, and expected artifacts.
-- L0 local git worktree runner with fallback behavior for non-git demos.
-- Agent adapter, execution profile, GitHub PR loop, container, kind, eval, release, and maintenance skeletons.
-- Dependency-free dashboard preview served by `apps/dashboard/preview.mjs`.
-- Smoke and demo scripts that run without relying on external services.
+- `bin/mh.mjs`와 `packages/core` 기반의 `mh` CLI lifecycle 명령
+- planning-first Target Project Factory bootstrap
+- editable scope, forbidden scope, verification command, budget, expected artifact를 가진 task packet contract
+- non-git demo fallback을 포함한 L0 local git worktree runner
+- agent adapter, execution profile, GitHub PR loop, container, kind, eval, release, maintenance skeleton
+- `apps/dashboard/preview.mjs`로 실행되는 dependency-free dashboard preview
+- 외부 서비스 없이 실행 가능한 smoke/demo script
 
-## Quick Start
+## 빠른 시작
 
-Use Node 20 or newer. The repository is designed to work inside the included Dev Container, but the core scripts are plain Node and Bash.
+Node 20 이상을 사용합니다. 이 저장소는 포함된 Dev Container에서 동작하도록 설계되어 있지만, 핵심 script는 일반 Node와 Bash로 실행됩니다.
 
 ```bash
 npm run doctor
@@ -29,46 +29,46 @@ npm run verify
 npm run smoke
 ```
 
-Run the dashboard preview:
+Dashboard preview 실행:
 
 ```bash
 npm run dashboard:preview
 ```
 
-Then open `http://localhost:4173`. The preview server is `apps/dashboard/preview.mjs`; it serves only `apps/dashboard/**` and reads sanitized fixtures from `apps/dashboard/fixtures`.
+브라우저에서 `http://localhost:4173`을 엽니다. preview server는 `apps/dashboard/preview.mjs`이며, `apps/dashboard/**`만 serve하고 `apps/dashboard/fixtures`의 sanitized fixture를 읽습니다.
 
-Run the offline end-to-end demo:
+오프라인 end-to-end demo 실행:
 
 ```bash
 npm run demo:e2e
 ```
 
-The demo creates a generated Target Project in a temporary output directory and validates planning docs, factory bootstrap output, task packet shape, and run artifacts.
+이 demo는 임시 출력 디렉터리에 generated Target Project를 만들고, planning docs, factory bootstrap output, task packet shape, run artifacts를 검증합니다.
 
-## Main Commands
+## 주요 명령
 
-These commands are defined in the root `package.json`.
+아래 명령은 root `package.json`에 정의되어 있습니다.
 
 | Command | Purpose |
 |---|---|
-| `npm run doctor` | Check local Node/Git/Make environment. |
-| `npm run verify` | Run agent-ready validation, syntax checks, and smoke tests. |
-| `npm run smoke` | Run the full smoke suite. |
-| `npm run dashboard:preview` | Start the local dependency-free dashboard preview server. |
-| `npm run demo:e2e` | Run the offline end-to-end demo. |
-| `npm run agent:status` | Show the MH-001 through MH-028 task completion state. |
+| `npm run doctor` | local Node/Git/Make 환경 확인 |
+| `npm run verify` | agent-ready validation, syntax check, smoke test 실행 |
+| `npm run smoke` | 전체 smoke suite 실행 |
+| `npm run dashboard:preview` | local dependency-free dashboard preview server 시작 |
+| `npm run demo:e2e` | 오프라인 end-to-end demo 실행 |
+| `npm run agent:status` | MH-001부터 MH-028까지의 task completion 상태 확인 |
 
-## Documentation Map
+## 문서 지도
 
-User-facing guides:
+사용자 가이드:
 
-- [Getting Started](docs/user-guide/getting-started.md)
-- [Target Project Creation](docs/user-guide/target-project.md)
-- [Agent Task Runs](docs/user-guide/agent-task-run.md)
+- [시작하기](docs/user-guide/getting-started.md)
+- [Target Project 생성](docs/user-guide/target-project.md)
+- [Agent Task 실행](docs/user-guide/agent-task-run.md)
 - [Dashboard Preview](docs/user-guide/dashboard-preview.md)
 - [Troubleshooting](docs/user-guide/troubleshooting.md)
 
-Developer guides:
+개발자 가이드:
 
 - [Architecture](docs/developer-guide/architecture.md)
 - [Agent Adapter](docs/developer-guide/agent-adapter.md)
@@ -76,27 +76,26 @@ Developer guides:
 - [Security Policy](docs/developer-guide/security-policy.md)
 - [Testing](docs/developer-guide/testing.md)
 
-History and release notes:
+개발 히스토리와 release note:
 
-- [MH-001 to MH-028 Summary](docs/development-history/mh-001-to-mh-028-summary.md)
-- [Design Decisions](docs/development-history/design-decisions.md)
+- [MH-001부터 MH-028까지 요약](docs/development-history/mh-001-to-mh-028-summary.md)
+- [주요 설계 결정](docs/development-history/design-decisions.md)
 - [Release Cleanup Notes](docs/development-history/release-cleanup-notes.md)
 
-Portfolio material:
+포트폴리오 자료:
 
-- [Case Study Draft](docs/portfolio/case-study.md)
-- [Demo Script Draft](docs/portfolio/demo-script.md)
-- [Portfolio Summary Draft](docs/portfolio/portfolio-summary.md)
+- [Case Study 초안](docs/portfolio/case-study.md)
+- [Demo Script 초안](docs/portfolio/demo-script.md)
+- [Portfolio Summary 초안](docs/portfolio/portfolio-summary.md)
 
-Existing detailed references remain available under `docs/`, including [Dashboard](docs/DASHBOARD.md), [End-to-End Demo](docs/E2E_DEMO.md), [Test Spec](docs/TEST_SPEC.md), [Portfolio](docs/PORTFOLIO.md), and [Architecture Diagrams](docs/architecture/DIAGRAMS.md).
+기존 상세 참고 문서도 `docs/` 아래에 유지됩니다. [Dashboard](docs/DASHBOARD.md), [End-to-End Demo](docs/E2E_DEMO.md), [Test Spec](docs/TEST_SPEC.md), [Portfolio](docs/PORTFOLIO.md), [Architecture Diagrams](docs/architecture/DIAGRAMS.md)를 참고하세요.
 
-## Operational Rules
+## 운영 규칙
 
-- Do not work directly on `main` for release cleanup or hardening.
-- Do not push, publish, deploy, or merge without explicit user request.
-- Do not commit `.env*`, secrets, keys, runtime logs, or run artifacts.
-- Keep Target Repo raw project data out of Meta.
-- Prefer small commits: cleanup notes, operations guidance, docs, and verification report.
+- release cleanup 또는 hardening 작업은 `main`에서 직접 하지 않습니다.
+- 사용자 명시 요청 없이 push, publish, deploy, merge하지 않습니다.
+- `.env*`, secret, key, runtime log, run artifact를 커밋하지 않습니다.
+- Target Repo의 raw project data를 Meta에 저장하지 않습니다.
+- cleanup notes, operations guidance, docs, verification report처럼 작은 단위로 커밋합니다.
 
-See [AGENTS.md](AGENTS.md) for the full maintenance instructions.
-
+전체 유지보수 지침은 [AGENTS.md](AGENTS.md)를 따릅니다.
