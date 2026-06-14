@@ -1,6 +1,7 @@
 import { VERSION } from './constants.mjs';
 import { shaFile } from './fs-utils.mjs';
 import { defaultAuditChecklistContent } from './productization.mjs';
+import { defaultReleaseGuideContent, defaultReleaseReadinessContent } from './release.mjs';
 import { targetRunnerCode } from './runner-template.mjs';
 
 function jsonContent(obj) {
@@ -285,6 +286,8 @@ jobs:
     ['.harness/security/runtime-policy.yml', `phases:\n  setup:\n    network:\n      default: deny\n      allow:\n        - registry.npmjs.org\n        - api.github.com\n  worker:\n    network:\n      default: deny\n    forbiddenWrites:\n      - .env*\n      - **/*.pem\n      - **/*secret*\n      - **/*token*\n      - infra/**/production/**\n      - .github/workflows/deploy-prod.yml\n    commandPolicy:\n      default: deny\n      allow:\n        - node *\n        - npm test\n        - npm run *\n        - bash ./tests/*\n        - make *\n      deny:\n        - git push*\n        - npm publish*\n        - docker login*\n        - rm -rf .git*\n`],
     ['.harness/budgets.yml', `budgets:\n  default:\n    maxRuntimeMinutes: 20\n    maxRetries: 1\n    maxChangedFiles: 20\n    maxPatchLines: 800\n`],
     ['.harness/productization/audit-checklist.yml', defaultAuditChecklistContent()],
+    ['.harness/release/release-readiness.yml', defaultReleaseReadinessContent()],
+    ['docs/operations/release.md', defaultReleaseGuideContent()],
     ['.harness/tasks/example.task.json', jsonContent({
       schemaVersion: '1.0.0',
       taskId: 'ISSUE-001',
