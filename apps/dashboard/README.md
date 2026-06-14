@@ -15,10 +15,11 @@ Then open `http://localhost:4173`.
 The preview serves only `apps/dashboard/**`. The UI reads local fixture files from `apps/dashboard/fixtures`:
 
 - `run-result.json`
+- `run-history.json`
 - `manifest.lock`
 - `state.yml`
 - `task-packet.json`
 
 ## Views
 
-The skeleton includes placeholder views for Project State, Runs, Artifacts, Policies, and Settings. Later dashboard tasks can replace the static fixtures with target repository data or run history APIs without changing the smoke-test path.
+The Runs view lists status, task id, adapter, duration, and timestamp from normalized `.harness/runs/<run-id>/run-result.json` data. The Artifacts view shows patch, summary, test-report, screenshot, and arbitrary artifact file names or links. Parser tests use sanitized run directories under `tests/fixtures/dashboard-runs` so smoke tests do not need external services or target-owned run artifacts.

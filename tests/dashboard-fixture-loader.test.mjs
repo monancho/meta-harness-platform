@@ -16,7 +16,9 @@ assert.equal(fixtures.manifest.generator.version, '1.4.0-instant-devcontainer');
 assert.equal(fixtures.state.phase, 'runnable');
 assert.equal(fixtures.taskPacket.taskId, 'MH-011');
 assert.equal(summary.projectId, 'dashboard-demo');
-assert.equal(summary.artifactCount, 3);
+assert.equal(summary.lastRunStatus, 'failed');
+assert.equal(summary.runCount, 2);
+assert.equal(summary.artifactCount, 9);
 assert.equal(summary.managedFileCount, 3);
 assert.equal(summary.policyCount, 9);
 

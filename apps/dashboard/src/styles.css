@@ -222,6 +222,95 @@ dd {
   gap: 10px;
 }
 
+.list a {
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.list a:hover {
+  text-decoration: underline;
+}
+
+.list small {
+  color: var(--muted);
+  display: block;
+  font-size: 12px;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+}
+
+.run-table {
+  border: 1px solid #e5eaf0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.run-row {
+  align-items: center;
+  background: #ffffff;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 0.8fr 0.9fr 0.8fr 0.8fr minmax(190px, 1.3fr);
+  padding: 12px;
+}
+
+.run-row + .run-row {
+  border-top: 1px solid #e5eaf0;
+}
+
+.run-head {
+  background: #f8fafc;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.status-text {
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.status-text.passed {
+  background: #dff7ed;
+  color: #065f46;
+}
+
+.status-text.failed {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-text.unknown {
+  background: #e5eaf0;
+  color: #334155;
+}
+
+.state-panel p {
+  color: var(--muted);
+  margin-bottom: 0;
+}
+
+.inline-error {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 6px;
+  color: #9a3412;
+  margin-bottom: 14px;
+  padding: 10px 12px;
+}
+
+.inline-error p {
+  margin: 0;
+}
+
+.inline-error p + p {
+  margin-top: 6px;
+}
+
 code {
   color: var(--warn);
   font-family: "SFMono-Regular", Consolas, monospace;
@@ -256,6 +345,14 @@ code {
   .details,
   .two-column {
     grid-template-columns: 1fr;
+  }
+
+  .run-row {
+    grid-template-columns: 1fr;
+  }
+
+  .run-head {
+    display: none;
   }
 
   .content {

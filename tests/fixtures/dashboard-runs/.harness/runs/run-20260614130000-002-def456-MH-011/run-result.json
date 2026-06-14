@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0.0",
+  "runId": "run-20260614130000-002-def456-MH-011",
+  "adapter": "codex",
+  "taskId": "MH-011",
+  "status": "failed",
+  "reasonCode": "MH_CODEX_EXEC_FAILED",
+  "message": "Sanitized failure fixture.",
+  "changedFiles": [],
+  "verify": [
+    {
+      "command": "codex exec --cd . --yolo -",
+      "status": "failed",
+      "durationMs": 2300
+    }
+  ],
+  "artifacts": [
+    "patch.diff",
+    "summary.md",
+    "run-result.json",
+    "codex-output.log"
+  ],
+  "startedAt": "2026-06-14T13:00:00.000Z",
+  "durationMs": 2300,
+  "execution": {
+    "profile": "L0_LOCAL_WORKTREE",
+    "mode": "git-worktree",
+    "worktreePath": ".harness/tmp/worktrees/run-20260614130000-002-def456-MH-011"
+  }
+}
