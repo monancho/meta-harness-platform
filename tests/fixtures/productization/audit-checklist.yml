@@ -1,0 +1,44 @@
+schemaVersion: 1
+policy:
+  autoFixDefault: false
+  output: .harness/productization/productization-report.md
+categories:
+  - id: ux
+    title: UX
+  - id: a11y
+    title: Accessibility
+  - id: responsive
+    title: Responsive
+  - id: performance
+    title: Performance
+  - id: security
+    title: Security
+  - id: content
+    title: Content
+  - id: release-readiness
+    title: Release Readiness
+checks:
+  - id: ux-critical-flow
+    category: ux
+    title: Primary flow has a complete happy path.
+    severity: high
+    status: pass
+    evidence: [preview-smoke]
+    backlogTitle: Harden primary flow
+    backlogAction: Add a scoped task for unresolved UX gaps.
+  - id: a11y-keyboard-screenreader
+    category: a11y
+    title: Keyboard and screen reader pass is complete.
+    severity: high
+    status: fail
+    evidence: [manual-audit]
+    backlogTitle: Harden keyboard and screen reader support
+    backlogAction: Add semantic labels, focus coverage, and regression checks.
+  - id: responsive-core-viewports
+    category: responsive
+    title: Core viewports render without layout overlap.
+    severity: medium
+    status: todo
+    evidence: []
+    backlogTitle: Harden responsive viewport coverage
+    backlogAction: Capture mobile and desktop screenshots before release.

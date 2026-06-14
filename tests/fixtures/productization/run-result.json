@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0.0",
+  "runId": "run-20260614000000-001-PROD-AUDIT",
+  "taskId": "PROD-AUDIT",
+  "adapter": "shell",
+  "status": "passed",
+  "artifacts": [
+    "patch.diff",
+    "run-result.json",
+    "summary.md"
+  ],
+  "changedFiles": []
+}
