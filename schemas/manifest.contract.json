@@ -2,7 +2,7 @@
   "schemaVersion": "1.0.0",
   "contractId": "mh.manifest",
   "format": "json",
-  "required": ["schemaVersion", "factoryId", "generator", "source", "files"],
+  "required": ["schemaVersion", "factoryId", "generator", "source", "answers", "managedFiles"],
   "properties": {
     "schemaVersion": { "type": "number" },
     "factoryId": { "type": "string", "minLength": 1 },
@@ -22,16 +22,46 @@
         "buildHandoffHash": { "type": "string", "pattern": "^sha256:" }
       }
     },
-    "files": {
+    "answers": {
+      "type": "object",
+      "required": ["planningAnswers"],
+      "properties": {
+        "planningAnswers": { "type": "string", "minLength": 1 },
+        "planningBaseline": { "type": "string", "minLength": 1 },
+        "planningBaselineHash": { "type": "string", "pattern": "^sha256:" }
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "conflictPolicy": { "type": "string", "minLength": 1 }
+      }
+    },
+    "managedFiles": {
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["path", "ownership", "checksum", "mergeStrategy"],
+        "required": ["path", "ownership", "checksum", "mergeStrategy", "conflictPolicy"],
         "properties": {
           "path": { "type": "string", "minLength": 1 },
           "ownership": { "type": "string", "enum": ["harness", "shared", "target"] },
           "checksum": { "type": "string", "pattern": "^sha256:" },
-          "mergeStrategy": { "type": "string", "minLength": 1 }
+          "mergeStrategy": { "type": "string", "enum": ["replace-if-unchanged", "managed-blocks", "propose-only"] },
+          "conflictPolicy": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "ownership", "checksum", "mergeStrategy", "conflictPolicy"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "ownership": { "type": "string", "enum": ["harness", "shared", "target"] },
+          "checksum": { "type": "string", "pattern": "^sha256:" },
+          "mergeStrategy": { "type": "string", "enum": ["replace-if-unchanged", "managed-blocks", "propose-only"] },
+          "conflictPolicy": { "type": "string", "minLength": 1 }
         }
       }
     }
