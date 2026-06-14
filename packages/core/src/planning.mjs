@@ -1,6 +1,7 @@
 import path from 'node:path';
+import { assertContractFile } from './contracts.mjs';
 import { abs, ensureDir, exists, readJson, writeJson, writeText, shaFile } from './fs-utils.mjs';
-import { readProjectId, setState, statePath } from './state.mjs';
+import { readProjectId, setState, statePath, validateState } from './state.mjs';
 
 export function loadAnswers(inputPath, fail) {
   const defaults = {
@@ -75,7 +76,9 @@ export function cmdPlanSynthesize(opts, fail) {
   writeJson(path.join(hp, 'backlog.items.json'), { backlog });
   writeJson(path.join(hp, 'traceability.json'), { links: reqs.map((r, i) => ({ requirementId: r.id, acceptanceCriteriaId: ac[i].id, backlogItemId: backlog[i].id })) });
   writeText(path.join(hp, 'non-goals.policy.yml'), `nonGoals:\n${answers.nonGoals.map(x => `  - ${x}`).join('\n')}\n`);
-  writeJson(path.join(hp, 'build-handoff.json'), handoff);
+  const handoffPath = path.join(hp, 'build-handoff.json');
+  writeJson(handoffPath, handoff);
+  assertContractFile('buildHandoff', handoffPath, fail);
   return 'planning docs and agent-pack generated';
 }
 
@@ -103,8 +106,10 @@ export function cmdPlanFreeze(opts, fail) {
   const hp = path.join(target, '.harness/planning');
   const handoff = path.join(hp, 'build-handoff.json');
   if (!exists(handoff)) fail('build-handoff.json이 없습니다. 먼저 plan synthesize를 실행하세요.');
+  assertContractFile('buildHandoff', handoff, fail);
   const baseline = path.join(hp, 'planning-baseline.json');
   const projectId = readProjectId(target);
   setState(target, { projectId, phase: 'planning-frozen', extra: `  planningBaselineHash: sha256:${exists(baseline) ? shaFile(baseline) : 'missing'}\n  buildHandoffHash: sha256:${shaFile(handoff)}\n  humanApproved: true\n` });
+  validateState(target, fail);
   return 'planning baseline frozen';
 }

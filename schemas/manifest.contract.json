@@ -1,0 +1,39 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.manifest",
+  "format": "json",
+  "required": ["schemaVersion", "factoryId", "generator", "source", "files"],
+  "properties": {
+    "schemaVersion": { "type": "number" },
+    "factoryId": { "type": "string", "minLength": 1 },
+    "generator": {
+      "type": "object",
+      "required": ["name", "version"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "version": { "type": "string", "minLength": 1 }
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["buildHandoff", "buildHandoffHash"],
+      "properties": {
+        "buildHandoff": { "type": "string", "minLength": 1 },
+        "buildHandoffHash": { "type": "string", "pattern": "^sha256:" }
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "ownership", "checksum", "mergeStrategy"],
+        "properties": {
+          "path": { "type": "string", "minLength": 1 },
+          "ownership": { "type": "string", "enum": ["harness", "shared", "target"] },
+          "checksum": { "type": "string", "pattern": "^sha256:" },
+          "mergeStrategy": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

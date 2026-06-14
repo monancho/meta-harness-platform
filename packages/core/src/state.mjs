@@ -1,5 +1,6 @@
 import path from 'node:path';
 import { readText, writeText } from './fs-utils.mjs';
+import { assertContractFile } from './contracts.mjs';
 
 export function statePath(target) {
   return path.join(target, '.harness/state.yml');
@@ -14,6 +15,10 @@ export function getPhase(target) {
 export function setState(target, { projectId, phase, extra = '' }) {
   const content = `schemaVersion: 1\nprojectState:\n  projectId: ${projectId}\n  phase: ${phase}\n  updatedAt: ${new Date().toISOString()}\n${extra}`;
   writeText(statePath(target), content);
+}
+
+export function validateState(target, fail) {
+  assertContractFile('state', statePath(target), fail);
 }
 
 export function readProjectId(target) {

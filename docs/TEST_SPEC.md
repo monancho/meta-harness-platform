@@ -56,6 +56,12 @@
   - `.harness/runs/<run-id>/run-result.json`
   - `.harness/runs/<run-id>/summary.md`
 
+## T-061 Schema Validation
+
+- `factory bootstrap`은 `.harness/planning/build-handoff.json`을 검증한 뒤 실행한다.
+- `mh run`은 task packet을 검증한 뒤 실행하고, 생성된 `run-result.json`을 검증한다.
+- 필수 필드가 빠진 입력은 `MH_SCHEMA_VALIDATION_FAILED` 코드와 함께 실패해야 한다.
+
 ## T-070 Security Boundary Smoke
 
 - shell adapter는 `.env*`, production infra, deploy-prod workflow를 생성하거나 수정하지 않는다.

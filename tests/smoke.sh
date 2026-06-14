@@ -16,6 +16,19 @@ node "$ROOT/bin/mh.mjs" plan freeze --target "$TARGET" --approved
 node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET"
 node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/example.task.json --adapter shell
 
+INVALID_TASK="$TMP/invalid.task.json"
+cat > "$INVALID_TASK" <<'JSON'
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "BROKEN-001"
+}
+JSON
+if node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$INVALID_TASK" --adapter shell >"$TMP/invalid.out" 2>"$TMP/invalid.err"; then
+  echo "[error] invalid task packet unexpectedly passed" >&2
+  exit 1
+fi
+grep -q "MH_SCHEMA_VALIDATION_FAILED" "$TMP/invalid.err"
+
 test -f "$TARGET/.harness/factory.yml"
 test -f "$TARGET/.harness/manifest.lock"
 test -d "$TARGET/.harness/runs"
