@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "1.0.0",
+  "runIdPattern": "^run-[0-9]{14}-[0-9]{3}-[a-f0-9]{6}-BL-001$",
+  "adapter": "shell",
+  "taskId": "BL-001",
+  "taskType": "frontend-ui",
+  "status": "passed",
+  "changedFiles": [
+    "apps/web/src/generated/BL-001.ts"
+  ],
+  "artifactsInclude": [
+    "patch.diff",
+    "run-result.json",
+    "summary.md",
+    "sanitized-signal.json"
+  ],
+  "executionProfile": "L0_LOCAL_WORKTREE"
+}

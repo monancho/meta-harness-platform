@@ -23,6 +23,22 @@ node "$ROOT/tests/feedback-analyzer.test.mjs"
 node "$ROOT/tests/productization-report.test.mjs"
 node "$ROOT/tests/release-harness.test.mjs"
 node "$ROOT/tests/maintenance-harness.test.mjs"
+test -x "$ROOT/examples/e2e-demo/run-demo.sh"
+test -f "$ROOT/examples/e2e-demo/demo-answers.json"
+test -f "$ROOT/examples/e2e-demo/expected/planning-docs/03_PRD.md"
+test -f "$ROOT/examples/e2e-demo/expected/planning-docs/11_ACCEPTANCE_CRITERIA.md"
+test -f "$ROOT/examples/e2e-demo/expected/planning-docs/14_BUILD_HANDOFF.md"
+test -f "$ROOT/examples/e2e-demo/expected/build-handoff.json"
+test -f "$ROOT/examples/e2e-demo/expected/example-task.BL-001.task.json"
+test -f "$ROOT/examples/e2e-demo/expected/run-artifacts/run-result.shape.json"
+node --input-type=module - "$ROOT/examples/e2e-demo/expected/run-artifacts/run-result.shape.json" <<'NODE'
+import fs from 'node:fs';
+const shape = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+for (const artifact of ['patch.diff', 'run-result.json', 'summary.md', 'sanitized-signal.json']) {
+  if (!shape.artifactsInclude.includes(artifact)) throw new Error(`e2e demo shape missing ${artifact}`);
+}
+if (shape.status !== 'passed' || shape.adapter !== 'shell') throw new Error('e2e demo shape must document a passed shell run');
+NODE
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
 
 if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then

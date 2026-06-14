@@ -16,6 +16,7 @@
     "agent:start": "bash ./scripts/agent/start-task.sh MH-001",
     "devcontainer:check": "bash ./scripts/devcontainer/check-env.sh",
     "verify": "bash ./scripts/agent/verify-after-task.sh",
+    "demo:e2e": "bash ./examples/e2e-demo/run-demo.sh",
     "task:mh001": "bash ./scripts/agent/task-cycle.sh MH-001",
     "task:mh002": "bash ./scripts/agent/task-cycle.sh MH-002",
     "agent:status": "bash ./scripts/agent/status.sh",

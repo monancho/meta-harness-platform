@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectId": "offline-portfolio-task-board",
+  "projectName": "Offline Portfolio Task Board",
+  "stack": {
+    "frontend": "React",
+    "backend": "Node/Fastify",
+    "database": "SQLite",
+    "packageManager": "pnpm"
+  },
+  "firstVerticalSlice": {
+    "id": "BL-001",
+    "requirementId": "REQ-001",
+    "title": "Review task board screen",
+    "taskType": "frontend-ui",
+    "acceptanceCriteria": [
+      "AC-001"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "text": "Review task board screen",
+      "priority": "must"
+    },
+    {
+      "id": "REQ-002",
+      "text": "Task status cards",
+      "priority": "should"
+    },
+    {
+      "id": "REQ-003",
+      "text": "Artifact link capture",
+      "priority": "should"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirementId": "REQ-001",
+      "text": "Review task board screen 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-002",
+      "requirementId": "REQ-002",
+      "text": "Task status cards 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-003",
+      "requirementId": "REQ-003",
+      "text": "Artifact link capture 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    }
+  ],
+  "screenSpecs": [
+    {
+      "id": "SCREEN-001",
+      "name": "Review Board",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "success"
+      ],
+      "responsive": [
+        "mobile",
+        "tablet",
+        "desktop"
+      ]
+    }
+  ],
+  "nonGoals": [
+    "Hosted deployment",
+    "External API integration",
+    "Production credentials"
+  ]
+}

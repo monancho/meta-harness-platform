@@ -1,0 +1,11 @@
+diff --git a/apps/web/src/generated/BL-001.ts b/apps/web/src/generated/BL-001.ts
+new file mode 100644
+--- /dev/null
++++ b/apps/web/src/generated/BL-001.ts
+@@ -0,0 +1,6 @@
++export const generatedTask = {
++  taskId: "BL-001",
++  objective: "Implement backlog item BL-001: Review task board screen.",
++  generatedBy: "shell-adapter",
++  generatedAt: "<dynamic ISO timestamp>"
++};
