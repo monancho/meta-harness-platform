@@ -24,9 +24,11 @@ export function cmdRun(opts, fail) {
   const adapter = opts.adapter || 'shell';
   const before = listRunResultFiles(target);
   const cleanupArg = opts.cleanup === undefined ? '' : ` --cleanup ${JSON.stringify(String(opts.cleanup))}`;
+  const profileArg = opts['execution-profile'] ? ` --execution-profile ${JSON.stringify(String(opts['execution-profile']))}` : '';
+  const dryRunArg = opts['dry-run'] ? ' --dry-run' : '';
   let runnerError = null;
   try {
-    execSync(`node ${JSON.stringify(runner)} --task ${JSON.stringify(task)} --adapter ${JSON.stringify(adapter)}${cleanupArg}`, { cwd: target, stdio: 'inherit' });
+    execSync(`node ${JSON.stringify(runner)} --task ${JSON.stringify(task)} --adapter ${JSON.stringify(adapter)}${profileArg}${dryRunArg}${cleanupArg}`, { cwd: target, stdio: 'inherit' });
   } catch (error) {
     runnerError = error;
   }
