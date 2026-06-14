@@ -79,6 +79,10 @@ function validateValue(value, schema, location, errors) {
     errors.push(`${location} must match ${schema.pattern}`);
   }
 
+  if (schema.minItems && Array.isArray(value) && value.length < schema.minItems) {
+    errors.push(`${location} must have at least ${schema.minItems} item(s)`);
+  }
+
   if (schema.type === 'object') {
     const required = schema.required || [];
     for (const key of required) {

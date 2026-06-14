@@ -100,6 +100,95 @@ export function cmdCompileAcceptance(opts, fail) {
   return 'acceptance criteria compiled to verification-map';
 }
 
+function nonEmptyArray(value) {
+  return Array.isArray(value) && value.length > 0;
+}
+
+function defaultEditableScope() {
+  return ['apps/**', 'packages/**', 'docs/**', 'tests/**'];
+}
+
+function defaultForbiddenScope() {
+  return ['.env*', 'infra/**/production/**', '.github/workflows/deploy-prod.yml'];
+}
+
+function defaultBudgets() {
+  return {
+    maxRuntimeMinutes: 20,
+    maxRetries: 1,
+    maxChangedFiles: 20,
+    maxPatchLines: 800
+  };
+}
+
+function taskFileName(taskId) {
+  return `${String(taskId).replace(/[^a-zA-Z0-9_-]/g, '-')}.task.json`;
+}
+
+export function cmdCompileTasks(opts, fail) {
+  const target = abs(opts.target || '../target-project');
+  const hp = path.join(target, '.harness/planning');
+  const backlogPath = path.join(hp, 'backlog.items.json');
+  const acPath = path.join(hp, 'acceptance-criteria.json');
+  const verificationPath = path.join(hp, 'verification-map.json');
+  if (!exists(backlogPath)) fail('backlog.items.json이 없습니다. 먼저 plan synthesize를 실행하세요.');
+  if (!exists(acPath)) fail('acceptance-criteria.json이 없습니다. 먼저 plan synthesize를 실행하세요.');
+  if (!exists(verificationPath)) fail('verification-map.json이 없습니다. 먼저 plan compile-acceptance를 실행하세요.');
+
+  const backlog = readJson(backlogPath).backlog || [];
+  const acceptanceCriteria = readJson(acPath).acceptanceCriteria || [];
+  const verificationMap = readJson(verificationPath).verificationMap || [];
+  if (!nonEmptyArray(backlog)) fail('backlog.items.json에 backlog 항목이 없습니다.');
+  if (!nonEmptyArray(acceptanceCriteria)) fail('acceptance-criteria.json에 acceptanceCriteria가 없습니다.');
+
+  const criteriaById = new Map(acceptanceCriteria.map(item => [item.id, item]));
+  const verificationByAcId = new Map(verificationMap.map(item => [item.acceptanceCriteriaId, item]));
+  const outDir = path.join(target, '.harness/tasks');
+  ensureDir(outDir);
+
+  const written = [];
+  for (const item of backlog) {
+    if (!item.id) fail('backlog item에 id가 없습니다.');
+    if (!item.title) fail(`backlog item ${item.id}에 title이 없습니다.`);
+    if (!nonEmptyArray(item.acceptanceCriteria)) {
+      fail(`backlog item ${item.id}에 acceptanceCriteria가 없습니다. 각 task packet은 검증 가능한 acceptance criteria가 필요합니다.`);
+    }
+
+    const resolvedCriteria = item.acceptanceCriteria.map(id => {
+      const criterion = criteriaById.get(id);
+      if (!criterion) fail(`backlog item ${item.id}가 존재하지 않는 acceptance criteria를 참조합니다: ${id}`);
+      if (!criterion.text) fail(`acceptance criteria ${id}에 text가 없습니다.`);
+      return { id: criterion.id, text: criterion.text };
+    });
+    const verifyCommands = item.acceptanceCriteria.map(id => verificationByAcId.get(id)?.suggestedCommand).filter(Boolean);
+    if (!nonEmptyArray(verifyCommands)) {
+      fail(`backlog item ${item.id}에 연결된 verify command가 없습니다. plan compile-acceptance 결과를 확인하세요.`);
+    }
+
+    const taskPacket = {
+      schemaVersion: '1.0.0',
+      taskId: item.id,
+      taskType: item.taskType || 'implementation',
+      priority: item.priority || 'P2',
+      title: item.title,
+      objective: item.objective || `Implement backlog item ${item.id}: ${item.title}.`,
+      editableScope: nonEmptyArray(item.editableScope) ? item.editableScope : defaultEditableScope(),
+      forbiddenScope: nonEmptyArray(item.forbiddenScope) ? item.forbiddenScope : defaultForbiddenScope(),
+      acceptanceCriteria: resolvedCriteria,
+      verifyCommands,
+      commands: { verify: verifyCommands },
+      budgets: item.budgets || defaultBudgets(),
+      expectedArtifacts: nonEmptyArray(item.expectedArtifacts) ? item.expectedArtifacts : ['patch.diff', 'run-result.json', 'summary.md']
+    };
+    const outPath = path.join(outDir, taskFileName(item.id));
+    writeJson(outPath, taskPacket);
+    assertContractFile('taskPacket', outPath, fail);
+    written.push(path.relative(target, outPath));
+  }
+
+  return `compiled ${written.length} task packet(s): ${written.join(', ')}`;
+}
+
 export function cmdPlanFreeze(opts, fail) {
   const target = abs(opts.target || '../target-project');
   if (!opts.approved) fail('planning freeze requires --approved');

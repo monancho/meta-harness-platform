@@ -89,11 +89,15 @@ A task is complete when:
     schemaVersion: '1.0.0',
     taskId: 'ISSUE-001',
     taskType: 'frontend-ui',
+    priority: 'P2',
+    title: 'Harness run loop proof task',
     objective: 'Create a small generated frontend feature file to prove the harness run loop.',
     editableScope: ['apps/web/src/**', 'packages/shared/**', 'docs/**', 'tests/**'],
     forbiddenScope: ['.env*', 'infra/**/production/**', '.github/workflows/deploy-prod.yml'],
     acceptanceCriteria: [{ id: 'AC-001', text: 'The harness run creates patch.diff, run-result.json, and summary.md.' }],
+    verifyCommands: ["node -e \"console.log('lint ok')\"", "node -e \"console.log('typecheck ok')\"", "node -e \"console.log('test ok')\""],
     commands: { verify: ["node -e \"console.log('lint ok')\"", "node -e \"console.log('typecheck ok')\"", "node -e \"console.log('test ok')\""] },
+    budgets: { maxRuntimeMinutes: 20, maxRetries: 1, maxChangedFiles: 20, maxPatchLines: 800 },
     expectedArtifacts: ['patch.diff', 'run-result.json', 'summary.md']
   });
   ensureDir(path.join(target, '.harness/runs'));

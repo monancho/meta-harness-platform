@@ -29,6 +29,18 @@
   - `.harness/planning/verification-map.json`
   - `.harness/planning/acceptance-tests.generated.json`
 
+## T-031 Task Packet Compiler
+
+- 명령: `mh plan compile-tasks --target <dir>`
+- 입력:
+  - `.harness/planning/backlog.items.json`
+  - `.harness/planning/acceptance-criteria.json`
+  - `.harness/planning/verification-map.json`
+- 기대 결과:
+  - `.harness/tasks/*.task.json` 생성
+  - task packet은 `objective`, `editableScope`, `forbiddenScope`, `acceptanceCriteria`, `verifyCommands`, `budgets`, `expectedArtifacts`를 포함한다.
+  - backlog item의 acceptance criteria가 비어 있거나 존재하지 않는 ID를 참조하면 명확한 오류로 실패해야 한다.
+
 ## T-040 Freeze Gate
 
 - 명령: `mh plan freeze --target <dir> --approved`
@@ -62,7 +74,7 @@
 
 ## T-060 Harness Run
 
-- 명령: `mh run --target <dir> --task .harness/tasks/example.task.json --adapter shell`
+- 명령: `mh run --target <dir> --task .harness/tasks/BL-001.task.json --adapter shell`
 - 기대 결과:
   - phase가 `factory-ready` 또는 `runnable`이 아니면 실패해야 한다.
   - 성공 후 phase가 `runnable`로 전이된다.
