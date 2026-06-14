@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "1.0.0",
+  "generator": {
+    "name": "meta-harness-platform",
+    "version": "1.4.0-instant-devcontainer"
+  },
+  "source": {
+    "buildHandoffHash": "sha256:1111111111111111111111111111111111111111111111111111111111111111"
+  },
+  "answers": {
+    "planningBaselineHash": "sha256:2222222222222222222222222222222222222222222222222222222222222222"
+  },
+  "managedFiles": [
+    {
+      "path": "AGENTS.md",
+      "ownership": "shared",
+      "mergeStrategy": "three-way",
+      "conflictPolicy": "manual-review"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "ownership": "shared",
+      "mergeStrategy": "three-way",
+      "conflictPolicy": "manual-review"
+    },
+    {
+      "path": "infra/caddy/Caddyfile",
+      "ownership": "target",
+      "mergeStrategy": "propose-only",
+      "conflictPolicy": "manual-review"
+    }
+  ]
+}

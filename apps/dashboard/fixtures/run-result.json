@@ -1,0 +1,26 @@
+{
+  "schemaVersion": "1.0.0",
+  "runId": "run-20260614120000-001-a1b2c3-MH-011",
+  "taskId": "MH-011",
+  "status": "passed",
+  "adapter": "shell",
+  "reasonCode": null,
+  "execution": {
+    "mode": "local-worktree",
+    "profile": "L0"
+  },
+  "artifacts": [
+    {
+      "path": ".harness/runs/run-20260614120000-001-a1b2c3-MH-011/patch.diff",
+      "kind": "patch"
+    },
+    {
+      "path": ".harness/runs/run-20260614120000-001-a1b2c3-MH-011/summary.md",
+      "kind": "summary"
+    },
+    {
+      "path": ".harness/runs/run-20260614120000-001-a1b2c3-MH-011/run-result.json",
+      "kind": "result"
+    }
+  ]
+}

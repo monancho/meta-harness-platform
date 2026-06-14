@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-011",
+  "taskType": "dashboard",
+  "priority": "P2",
+  "title": "React Dashboard skeleton",
+  "objective": "Create the initial dashboard app skeleton for local fixture visualization.",
+  "editableScope": [
+    "apps/dashboard/**",
+    "docs/**",
+    "tests/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-011-AC-01",
+      "text": "Dashboard workspace exists."
+    }
+  ],
+  "verifyCommands": [
+    "bash ./tests/smoke.sh"
+  ]
+}
