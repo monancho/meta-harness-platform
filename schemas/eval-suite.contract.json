@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.evalSuite",
+  "format": "json",
+  "required": [
+    "schemaVersion",
+    "suiteId",
+    "title",
+    "category",
+    "network",
+    "fixtures",
+    "cases",
+    "scoring"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "minLength": 1 },
+    "suiteId": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "category": { "type": "string", "minLength": 1 },
+    "network": { "type": "string", "enum": ["none", "optional", "required"] },
+    "description": { "type": "string" },
+    "fixtures": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "path", "dataPolicy"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "type": { "type": "string", "minLength": 1 },
+          "path": { "type": "string", "minLength": 1 },
+          "dataPolicy": { "type": "string", "enum": ["synthetic-only", "sanitized-only"] }
+        }
+      }
+    },
+    "cases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["caseId", "title", "fixtureRefs", "commands", "expectedOutputs"],
+        "properties": {
+          "caseId": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "fixtureRefs": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+          "commands": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["id", "run"],
+              "properties": {
+                "id": { "type": "string", "minLength": 1 },
+                "run": { "type": "string", "minLength": 1 },
+                "cwd": { "type": "string" },
+                "timeoutSeconds": { "type": "number" }
+              }
+            }
+          },
+          "expectedOutputs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": ["commandId", "exitCode"],
+              "properties": {
+                "commandId": { "type": "string", "minLength": 1 },
+                "exitCode": { "type": "number" },
+                "stdoutIncludes": { "type": "array", "items": { "type": "string" } },
+                "stderrIncludes": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          }
+        }
+      }
+    },
+    "scoring": {
+      "type": "object",
+      "required": ["strategy", "passThreshold", "metadata"],
+      "properties": {
+        "strategy": { "type": "string", "enum": ["all-or-nothing", "weighted"] },
+        "passThreshold": { "type": "number" },
+        "metadata": {
+          "type": "object",
+          "required": ["owner", "regressionArea", "rawProjectData"],
+          "properties": {
+            "owner": { "type": "string", "minLength": 1 },
+            "regressionArea": { "type": "string", "minLength": 1 },
+            "rawProjectData": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}

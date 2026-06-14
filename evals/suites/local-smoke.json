@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0.0",
+  "suiteId": "local-smoke",
+  "title": "Local smoke eval",
+  "category": "local-smoke",
+  "network": "none",
+  "description": "Synthetic no-network checks for the local CLI and eval registry wiring.",
+  "fixtures": [
+    {
+      "id": "repo-cli",
+      "type": "workspace",
+      "path": ".",
+      "dataPolicy": "synthetic-only"
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "local-smoke-cli-list",
+      "title": "Eval registry lists built-in suites",
+      "fixtureRefs": ["repo-cli"],
+      "commands": [
+        {
+          "id": "list-evals",
+          "run": "node ./bin/mh.mjs eval list",
+          "cwd": ".",
+          "timeoutSeconds": 20
+        }
+      ],
+      "expectedOutputs": [
+        {
+          "commandId": "list-evals",
+          "exitCode": 0,
+          "stdoutIncludes": ["local-smoke", "factory-upgrade-regression"],
+          "stderrIncludes": []
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "strategy": "all-or-nothing",
+    "passThreshold": 1,
+    "metadata": {
+      "owner": "meta-harness",
+      "regressionArea": "cli-registry",
+      "rawProjectData": false
+    }
+  }
+}

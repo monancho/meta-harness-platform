@@ -1,0 +1,48 @@
+{
+  "schemaVersion": "1.0.0",
+  "suiteId": "acceptance-regression",
+  "title": "Acceptance regression eval",
+  "category": "acceptance-regression",
+  "network": "none",
+  "description": "Synthetic no-network checks for acceptance compiler contracts and fixtures.",
+  "fixtures": [
+    {
+      "id": "acceptance-contracts",
+      "type": "schema",
+      "path": "schemas/task-packet.contract.json",
+      "dataPolicy": "synthetic-only"
+    }
+  ],
+  "cases": [
+    {
+      "caseId": "acceptance-contract-presence",
+      "title": "Acceptance and task packet contracts remain discoverable",
+      "fixtureRefs": ["acceptance-contracts"],
+      "commands": [
+        {
+          "id": "check-acceptance-files",
+          "run": "node -e \"import fs from 'node:fs'; for (const file of ['packages/core/src/planning.mjs','schemas/task-packet.contract.json','schemas/build-handoff.contract.json']) { if (!fs.existsSync(file)) throw new Error(file + ' missing'); } console.log('acceptance-regression fixtures ok')\"",
+          "cwd": ".",
+          "timeoutSeconds": 20
+        }
+      ],
+      "expectedOutputs": [
+        {
+          "commandId": "check-acceptance-files",
+          "exitCode": 0,
+          "stdoutIncludes": ["acceptance-regression fixtures ok"],
+          "stderrIncludes": []
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "strategy": "all-or-nothing",
+    "passThreshold": 1,
+    "metadata": {
+      "owner": "meta-harness",
+      "regressionArea": "acceptance-compiler",
+      "rawProjectData": false
+    }
+  }
+}
