@@ -1,6 +1,7 @@
 import path from 'node:path';
 import { VERSION } from './constants.mjs';
-import { exists, readJson, shaFile, writeJson } from './fs-utils.mjs';
+import { exists, readJson, readText, shaFile, writeJson } from './fs-utils.mjs';
+import { managedBlockMetadata } from './managed-blocks.mjs';
 
 export const DEFAULT_CONFLICT_POLICY = 'fail-on-drift';
 
@@ -43,13 +44,17 @@ export function conflictPolicyForManagedPath(rel) {
 
 export function createManagedFileEntry(target, rel) {
   const normalized = normalizeRelPath(rel);
-  return {
+  const entry = {
     path: normalized,
     ownership: ownershipForManagedPath(normalized),
     checksum: `sha256:${shaFile(path.join(target, normalized))}`,
     mergeStrategy: mergeStrategyForManagedPath(normalized),
     conflictPolicy: conflictPolicyForManagedPath(normalized)
   };
+  if (entry.mergeStrategy === 'managed-blocks') {
+    entry.managedBlocks = managedBlockMetadata(readText(path.join(target, normalized), ''));
+  }
+  return entry;
 }
 
 export function buildManifest({ target, projectId, handoffPath, generated, answersPath }) {

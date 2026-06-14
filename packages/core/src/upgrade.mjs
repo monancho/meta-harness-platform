@@ -1,7 +1,8 @@
 import path from 'node:path';
 import { VERSION } from './constants.mjs';
 import { buildFactoryFilePlan } from './factory-plan.mjs';
-import { abs, ensureDir, exists, readJson, sha, shaFile, writeJson, writeText } from './fs-utils.mjs';
+import { abs, ensureDir, exists, readJson, readText, sha, shaFile, writeJson, writeText } from './fs-utils.mjs';
+import { replaceManagedBlocks } from './managed-blocks.mjs';
 import { DEFAULT_CONFLICT_POLICY } from './manifest.mjs';
 import { readProjectId } from './state.mjs';
 
@@ -24,6 +25,68 @@ function classify({ fileExists, baselineChecksum, currentChecksum, templateCheck
   if (!currentMatchesBaseline && templateMatchesBaseline) return 'changed-by-user';
   if (currentMatchesBaseline && !templateMatchesBaseline) return 'safe-auto';
   return 'conflict';
+}
+
+function blockChecksumsMatchBaseline(blocks, manifestBlocks) {
+  if (!Array.isArray(manifestBlocks) || manifestBlocks.length === 0) return null;
+  const baseline = new Map(manifestBlocks.map(block => [block.id, block.checksum]));
+  if (blocks.length !== baseline.size) return false;
+  return blocks.every(block => baseline.get(block.id) === block.currentChecksum);
+}
+
+function templateBlockChecksumsMatchBaseline(blocks, manifestBlocks) {
+  if (!Array.isArray(manifestBlocks) || manifestBlocks.length === 0) return null;
+  const baseline = new Map(manifestBlocks.map(block => [block.id, block.checksum]));
+  if (blocks.length !== baseline.size) return false;
+  return blocks.every(block => baseline.get(block.id) === block.templateChecksum);
+}
+
+function classifyManagedBlocks({ fileExists, currentContent, templateContent, baselineChecksum, currentChecksum, templateChecksum, manifestBlocks }) {
+  if (!fileExists) return { classification: 'conflict', managedBlocks: { status: 'missing-target' } };
+  if (!templateContent) return { classification: 'ignored', managedBlocks: { status: 'template-missing' } };
+
+  const replaced = replaceManagedBlocks(currentContent, templateContent);
+  if (!replaced.ok) {
+    return {
+      classification: 'conflict',
+      managedBlocks: {
+        status: 'invalid',
+        code: replaced.code,
+        stage: replaced.stage,
+        message: replaced.message
+      }
+    };
+  }
+
+  const currentMatchesBaseline = currentChecksum === baselineChecksum;
+  const templateMatchesBaseline = templateChecksum === baselineChecksum;
+  const currentBlocksMatchBaseline = blockChecksumsMatchBaseline(replaced.blocks, manifestBlocks) ?? currentMatchesBaseline;
+  const templateBlocksMatchBaseline = templateBlockChecksumsMatchBaseline(replaced.blocks, manifestBlocks) ?? templateMatchesBaseline;
+  const candidateChecksum = `sha256:${sha(replaced.content)}`;
+  const status = replaced.content === currentContent ? 'unchanged' : 'replace-managed-blocks';
+
+  if (replaced.content === currentContent) {
+    return {
+      classification: 'ignored',
+      managedBlocks: { status, candidateChecksum, blocks: replaced.blocks }
+    };
+  }
+  if (currentBlocksMatchBaseline && !templateBlocksMatchBaseline) {
+    return {
+      classification: 'safe-auto',
+      managedBlocks: { status, candidateChecksum, blocks: replaced.blocks }
+    };
+  }
+  if (!currentBlocksMatchBaseline && templateBlocksMatchBaseline) {
+    return {
+      classification: 'changed-by-user',
+      managedBlocks: { status: 'changed-managed-block', candidateChecksum, blocks: replaced.blocks }
+    };
+  }
+  return {
+    classification: 'conflict',
+    managedBlocks: { status: 'changed-managed-block-and-template', candidateChecksum, blocks: replaced.blocks }
+  };
 }
 
 function buildSummary(report) {
@@ -83,7 +146,19 @@ export function planFactoryUpgradeDryRun({ target }) {
       const currentChecksum = fileExists ? `sha256:${shaFile(targetPath)}` : null;
       const templateChecksum = template ? `sha256:${sha(template.content)}` : null;
       const mergeStrategy = item.mergeStrategy || 'replace-if-unchanged';
-      const classification = classify({
+      const currentContent = fileExists && mergeStrategy === 'managed-blocks' ? readText(targetPath) : null;
+      const managedDecision = mergeStrategy === 'managed-blocks'
+        ? classifyManagedBlocks({
+            fileExists,
+            currentContent,
+            templateContent: template?.content || null,
+            baselineChecksum: item.checksum,
+            currentChecksum,
+            templateChecksum,
+            manifestBlocks: item.managedBlocks
+          })
+        : null;
+      const classification = managedDecision?.classification || classify({
         fileExists,
         baselineChecksum: item.checksum,
         currentChecksum,
@@ -102,7 +177,12 @@ export function planFactoryUpgradeDryRun({ target }) {
           current: currentChecksum,
           template: templateChecksum
         },
-        reason: reasonForClassification(classification, { fileExists, templateExists: Boolean(template) })
+        managedBlocks: managedDecision?.managedBlocks,
+        reason: reasonForClassification(classification, {
+          fileExists,
+          templateExists: Boolean(template),
+          managedBlocks: managedDecision?.managedBlocks
+        })
       };
     });
 
@@ -129,9 +209,14 @@ export function planFactoryUpgradeDryRun({ target }) {
   };
 }
 
-function reasonForClassification(classification, { fileExists, templateExists }) {
+function reasonForClassification(classification, { fileExists, templateExists, managedBlocks }) {
   if (!fileExists) return 'managed file is missing from target repo';
   if (!templateExists) return 'managed file is not produced by the current factory templates';
+  if (managedBlocks?.status === 'invalid') return `managed block validation failed: ${managedBlocks.code}`;
+  if (managedBlocks?.status === 'unchanged') return 'managed blocks already match the current template; user-owned content outside blocks is preserved';
+  if (managedBlocks?.status === 'replace-managed-blocks') return 'only managed block content would be replaced; user-owned content outside blocks is preserved';
+  if (managedBlocks?.status === 'changed-managed-block') return 'target managed block differs from the manifest baseline, while template block is unchanged';
+  if (managedBlocks?.status === 'changed-managed-block-and-template') return 'target and template managed blocks both differ from the manifest baseline';
   if (classification === 'ignored') return 'target and current template match the manifest baseline';
   if (classification === 'changed-by-user') return 'target file differs from the manifest baseline, while template is unchanged';
   if (classification === 'safe-auto') return 'target file is unchanged and current template differs from baseline';
