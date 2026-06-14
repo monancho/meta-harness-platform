@@ -21,6 +21,7 @@ node "$ROOT/tests/kind-namespace-profile.test.mjs"
 node "$ROOT/tests/sanitized-signal.test.mjs"
 node "$ROOT/tests/feedback-analyzer.test.mjs"
 node "$ROOT/tests/productization-report.test.mjs"
+node "$ROOT/tests/release-harness.test.mjs"
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
 
 if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then
@@ -299,6 +300,31 @@ fi
 grep -q "acceptanceCriteria가 없습니다" "$TMP/compile-bad.err"
 
 test -f "$TARGET/.harness/factory.yml"
+test -f "$TARGET/.harness/release/release-readiness.yml"
+test -f "$TARGET/docs/operations/release.md"
+grep -q "id: tests" "$TARGET/.harness/release/release-readiness.yml"
+grep -q "id: build" "$TARGET/.harness/release/release-readiness.yml"
+grep -q "id: migration-notes" "$TARGET/.harness/release/release-readiness.yml"
+grep -q "id: rollback-plan" "$TARGET/.harness/release/release-readiness.yml"
+grep -q "id: env-checklist" "$TARGET/.harness/release/release-readiness.yml"
+grep -q "id: artifact-availability" "$TARGET/.harness/release/release-readiness.yml"
+grep -q "does not deploy" "$TARGET/docs/operations/release.md"
+node "$ROOT/bin/mh.mjs" release dry-run --target "$TARGET" >"$TMP/release-dry-run.out"
+test -f "$TARGET/.harness/release/release-package-manifest.json"
+grep -q "Release Dry Run" "$TMP/release-dry-run.out"
+grep -q "Deployment performed: false" "$TMP/release-dry-run.out"
+grep -q "Required next actions" "$TMP/release-dry-run.out"
+node --input-type=module - "$TARGET/.harness/release/release-package-manifest.json" <<'NODE'
+import fs from 'node:fs';
+const manifest = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (manifest.mode !== 'dry-run') throw new Error('expected dry-run release package manifest');
+if (manifest.deploymentPerformed !== false) throw new Error('release dry-run must not deploy');
+if (manifest.gates.length !== 6) throw new Error(`unexpected release gate count: ${manifest.gates.length}`);
+for (const id of ['tests', 'build', 'migration-notes', 'rollback-plan', 'env-checklist', 'artifact-availability']) {
+  if (!manifest.gates.some(gate => gate.id === id)) throw new Error(`missing release gate: ${id}`);
+}
+if (!manifest.nextActions.some(item => item.gate === 'tests')) throw new Error('expected next action for tests gate');
+NODE
 test -f "$TARGET/.harness/productization/audit-checklist.yml"
 grep -q "autoFixDefault: false" "$TARGET/.harness/productization/audit-checklist.yml"
 grep -q "category: ux" "$TARGET/.harness/productization/audit-checklist.yml"
