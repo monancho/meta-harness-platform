@@ -182,74 +182,161 @@ function cleanupWorktree(targetRoot, tmpDir, mode){
   }
   fs.rmSync(tmpDir, { recursive: true, force: true });
 }
+function readAdaptersConfig(targetRoot){
+  const configPath = path.join(targetRoot,'.harness','agents','adapters.yml');
+  const config = {
+    defaultAdapter: 'shell',
+    adapters: {
+      shell: { enabled: true, type: 'local-shell-mvp', implementation: 'builtin:shell' },
+      codex: { enabled: false, type: 'codex-exec', implementation: 'placeholder' },
+      claude: { enabled: false, type: 'claude-code', implementation: 'placeholder' },
+      openhands: { enabled: false, type: 'openhands', implementation: 'placeholder' }
+    }
+  };
+  if (!fs.existsSync(configPath)) return config;
+  const lines = fs.readFileSync(configPath,'utf8').split(/\\r?\\n/);
+  let inAdapters = false;
+  let current = null;
+  for (const line of lines) {
+    if (/^defaultAdapter:\\s*/.test(line)) {
+      config.defaultAdapter = line.split(':').slice(1).join(':').trim();
+      continue;
+    }
+    if (/^adapters:\\s*$/.test(line)) { inAdapters = true; current = null; continue; }
+    if (!inAdapters) continue;
+    const adapterMatch = line.match(/^\\s{2}([a-zA-Z0-9_-]+):\\s*$/);
+    if (adapterMatch) {
+      current = adapterMatch[1];
+      config.adapters[current] = config.adapters[current] || {};
+      continue;
+    }
+    const propMatch = line.match(/^\\s{4}([a-zA-Z0-9_-]+):\\s*(.*)$/);
+    if (current && propMatch) {
+      const key = propMatch[1];
+      const rawValue = propMatch[2].trim().replace(/^["']|["']$/g, '');
+      config.adapters[current][key] = rawValue === 'true' ? true : rawValue === 'false' ? false : rawValue;
+    }
+  }
+  return config;
+}
+function assertAdapterInterface(name, adapterModule){
+  const methods = ['prepare','execute','collectArtifacts','summarize'];
+  for (const method of methods) {
+    if (typeof adapterModule?.[method] !== 'function') throw new Error('adapter '+name+' missing method: '+method);
+  }
+}
+function createDisabledAdapter(name){
+  return {
+    prepare(){ throw new Error('adapter '+name+' is disabled placeholder only'); },
+    execute(){ throw new Error('adapter '+name+' is disabled placeholder only'); },
+    collectArtifacts(){ throw new Error('adapter '+name+' is disabled placeholder only'); },
+    summarize(){ throw new Error('adapter '+name+' is disabled placeholder only'); }
+  };
+}
+const shellAdapter = {
+  prepare(ctx){
+    const changedPath = path.join('apps','web','src','generated',safe(ctx.task.taskId || 'task') + '.ts');
+    const preflight = validateTaskSecurity(ctx.task, ctx.runtimePolicy, [changedPath]);
+    if (!preflight.ok) return { ok:false, changedPath, mode:'not-started', reasonCode:preflight.reasonCode, message:preflight.message };
+
+    let executionDir = ctx.targetRoot;
+    let mode = 'fallback';
+    if (isGitRepo(ctx.targetRoot)) {
+      try {
+        execSync('git worktree add --detach '+JSON.stringify(ctx.tmpDir)+' HEAD', { cwd: ctx.targetRoot, stdio: ['ignore','pipe','pipe'] });
+        executionDir = ctx.tmpDir;
+        mode = 'git-worktree';
+      } catch {
+        ensureDir(ctx.tmpDir);
+      }
+    } else {
+      ensureDir(ctx.tmpDir);
+    }
+
+    const content = \`export const generatedTask = {
+  taskId: "\${ctx.task.taskId || 'unknown'}",
+  objective: "\${String(ctx.task.objective || '').replace(/"/g, '\\\\"')}",
+  generatedBy: "shell-adapter",
+  generatedAt: "\${new Date().toISOString()}"
+};
+\`;
+    return { ok:true, changedPath, executionDir, mode, content };
+  },
+  execute(ctx, prepared){
+    write(path.join(prepared.executionDir, prepared.changedPath), prepared.content);
+    return { verify: (ctx.task.commands?.verify || []).map(command => run(command, prepared.executionDir)) };
+  },
+  collectArtifacts(ctx, prepared, executed){
+    const patch = prepared.mode === 'git-worktree'
+      ? collectGitPatch(prepared.executionDir, prepared.changedPath, prepared.content)
+      : createPatchForFile(prepared.changedPath, prepared.content);
+    const changedFiles = prepared.mode === 'git-worktree' ? changedFilesFromStatus(prepared.executionDir) : [prepared.changedPath];
+    const changedCheck = checkChangedFiles(changedFiles.length ? changedFiles : [prepared.changedPath], ctx.task, ctx.runtimePolicy);
+    return { patch, changedFiles: changedFiles.length ? changedFiles : [prepared.changedPath], changedCheck, verify: executed.verify };
+  },
+  summarize(ctx, prepared, collected){
+    const failed = collected.verify.filter(x => x.status !== 'passed');
+    return writeRunArtifacts({
+      runDir: ctx.runDir,
+      runId: ctx.runId,
+      adapter: ctx.adapterName,
+      task: ctx.task,
+      status: failed.length || !collected.changedCheck.ok ? 'failed' : 'passed',
+      reasonCode: !collected.changedCheck.ok ? collected.changedCheck.reasonCode : (failed.length ? 'MH_VERIFY_FAILED' : undefined),
+      message: !collected.changedCheck.ok ? collected.changedCheck.message : undefined,
+      changedFiles: collected.changedFiles,
+      verify: collected.verify,
+      patch: collected.patch,
+      mode: prepared.mode,
+      tmpDir: ctx.tmpDir,
+      targetRoot: ctx.targetRoot
+    });
+  }
+};
+const ADAPTER_IMPLEMENTATIONS = {
+  shell: shellAdapter,
+  codex: createDisabledAdapter('codex'),
+  claude: createDisabledAdapter('claude'),
+  openhands: createDisabledAdapter('openhands')
+};
 
 const opts = parse(process.argv.slice(2));
 const taskPath = opts.task || '.harness/tasks/example.task.json';
-const adapter = opts.adapter || 'shell';
 if(!fs.existsSync(taskPath)){ console.error('[runner:error] task file not found: '+taskPath); process.exit(1); }
 const task = readJson(taskPath);
 const targetRoot = process.cwd();
 const { runId, runDir, tmpDir } = createRunLayout(targetRoot, task.taskId || 'task');
 ensureDir(runDir); ensureDir(path.dirname(tmpDir));
 const runtimePolicy = readRuntimePolicy(targetRoot);
-const changedPath = path.join('apps','web','src','generated',safe(task.taskId || 'task') + '.ts');
-const preflight = validateTaskSecurity(task, runtimePolicy, [changedPath]);
-if (!preflight.ok) {
-  writeRunArtifacts({ runDir, runId, adapter, task, status:'failed', reasonCode:preflight.reasonCode, message:preflight.message, mode:'not-started', tmpDir, targetRoot });
-  console.error('[runner:security] '+preflight.reasonCode+': '+preflight.message);
+const adapterConfig = readAdaptersConfig(targetRoot);
+const adapterName = opts.adapter || adapterConfig.defaultAdapter || 'shell';
+const selectedAdapterConfig = adapterConfig.adapters?.[adapterName];
+const adapterModule = ADAPTER_IMPLEMENTATIONS[adapterName];
+if (!selectedAdapterConfig || !adapterModule) {
+  writeRunArtifacts({ runDir, runId, adapter: adapterName, task, status:'failed', reasonCode:'MH_ADAPTER_NOT_FOUND', message:'adapter is not configured: '+adapterName, mode:'not-started', tmpDir, targetRoot });
+  console.error('[runner:adapter] MH_ADAPTER_NOT_FOUND: adapter is not configured: '+adapterName);
+  process.exit(1);
+}
+assertAdapterInterface(adapterName, adapterModule);
+if (selectedAdapterConfig.enabled !== true) {
+  writeRunArtifacts({ runDir, runId, adapter: adapterName, task, status:'failed', reasonCode:'MH_ADAPTER_DISABLED', message:'adapter is disabled placeholder only: '+adapterName, mode:'not-started', tmpDir, targetRoot });
+  console.error('[runner:adapter] MH_ADAPTER_DISABLED: adapter is disabled placeholder only: '+adapterName);
   process.exit(1);
 }
 
-let executionDir = targetRoot;
-let mode = 'fallback';
-if (isGitRepo(targetRoot)) {
-  try {
-    execSync('git worktree add --detach '+JSON.stringify(tmpDir)+' HEAD', { cwd: targetRoot, stdio: ['ignore','pipe','pipe'] });
-    executionDir = tmpDir;
-    mode = 'git-worktree';
-  } catch (error) {
-    mode = 'fallback';
-    ensureDir(tmpDir);
-  }
-} else {
-  ensureDir(tmpDir);
+const ctx = { runId, runDir, tmpDir, task, targetRoot, runtimePolicy, adapterName, adapterConfig: selectedAdapterConfig };
+const prepared = adapterModule.prepare(ctx);
+if (!prepared.ok) {
+  writeRunArtifacts({ runDir, runId, adapter: adapterName, task, status:'failed', reasonCode:prepared.reasonCode, message:prepared.message, mode:prepared.mode || 'not-started', tmpDir, targetRoot });
+  console.error('[runner:security] '+prepared.reasonCode+': '+prepared.message);
+  process.exit(1);
 }
-
-const content = \`export const generatedTask = {
-  taskId: "\${task.taskId || 'unknown'}",
-  objective: "\${String(task.objective || '').replace(/"/g, '\\\\"')}",
-  generatedBy: "shell-adapter",
-  generatedAt: "\${new Date().toISOString()}"
-};
-\`;
-write(path.join(executionDir, changedPath), content);
-
-const patch = mode === 'git-worktree'
-  ? collectGitPatch(executionDir, changedPath, content)
-  : createPatchForFile(changedPath, content);
-
-const verify = (task.commands?.verify || []).map(command => run(command, executionDir));
-const failed = verify.filter(x => x.status !== 'passed');
-const changedFiles = mode === 'git-worktree' ? changedFilesFromStatus(executionDir) : [changedPath];
-const changedCheck = checkChangedFiles(changedFiles.length ? changedFiles : [changedPath], task, runtimePolicy);
-const result = writeRunArtifacts({
-  runDir,
-  runId,
-  adapter,
-  task,
-  status: failed.length || !changedCheck.ok ? 'failed' : 'passed',
-  reasonCode: !changedCheck.ok ? changedCheck.reasonCode : (failed.length ? 'MH_VERIFY_FAILED' : undefined),
-  message: !changedCheck.ok ? changedCheck.message : undefined,
-  changedFiles: changedFiles.length ? changedFiles : [changedPath],
-  verify,
-  patch,
-  mode,
-  tmpDir,
-  targetRoot
-});
+const executed = adapterModule.execute(ctx, prepared);
+const collected = adapterModule.collectArtifacts(ctx, prepared, executed);
+const result = adapterModule.summarize(ctx, prepared, collected);
 
 if (opts.cleanup !== 'false') {
-  cleanupWorktree(targetRoot, tmpDir, mode);
+  cleanupWorktree(targetRoot, tmpDir, prepared.mode);
 }
 if (result.status === 'failed' && result.reasonCode && result.reasonCode.startsWith('MH_SECURITY_')) {
   console.error('[runner:security] '+result.reasonCode+': '+(result.message || 'security policy failed'));

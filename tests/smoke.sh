@@ -40,6 +40,11 @@ NODE
 node "$ROOT/bin/mh.mjs" plan freeze --target "$TARGET" --approved
 node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET"
 node "$ROOT/bin/mh.mjs" manifest check --target "$TARGET"
+grep -q "defaultAdapter: shell" "$TARGET/.harness/agents/adapters.yml"
+grep -q "lifecycle: prepare-execute-collectArtifacts-summarize" "$TARGET/.harness/agents/adapters.yml"
+grep -q "implementation: builtin:shell" "$TARGET/.harness/agents/adapters.yml"
+grep -q "status: disabled-until-MH-009" "$TARGET/.harness/agents/adapters.yml"
+grep -q "status: disabled-placeholder" "$TARGET/.harness/agents/adapters.yml"
 node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapter shell
 
 grep -q "phase: runnable" "$TARGET/.harness/state.yml"
