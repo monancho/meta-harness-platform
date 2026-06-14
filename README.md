@@ -204,9 +204,12 @@ planning scaffold
 → acceptance compile
 → planning freeze
 → factory bootstrap
+→ factory upgrade --dry-run
 → shell adapter run
 → patch.diff / run-result.json / summary.md 생성
 ```
+
+Upgrade dry-run은 Target Repo의 `.harness/manifest.lock`을 기준으로 managed file의 baseline checksum, 현재 target checksum, 현재 factory template checksum을 비교합니다. 결과는 target 파일을 수정하지 않고 `.harness/upgrades/upgrade-report.json`과 `.harness/upgrades/upgrade-summary.md`에 기록됩니다.
 
 ## 9. 최종 산출물
 

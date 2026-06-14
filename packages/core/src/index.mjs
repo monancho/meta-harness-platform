@@ -6,3 +6,4 @@ export * as planning from './planning.mjs';
 export * as bootstrap from './bootstrap.mjs';
 export * as manifest from './manifest.mjs';
 export * as runner from './runner.mjs';
+export * as upgrade from './upgrade.mjs';

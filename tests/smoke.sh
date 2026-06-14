@@ -269,6 +269,51 @@ for (const item of manifest.managedFiles) {
 }
 NODE
 printf '\n# drift\n' >> "$TARGET/AGENTS.md"
+node --input-type=module - "$TARGET" "$TMP/upgrade-managed-before.json" <<'NODE'
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+const target = process.argv[2];
+const out = process.argv[3];
+const manifest = JSON.parse(fs.readFileSync(path.join(target, '.harness/manifest.lock'), 'utf8'));
+const hashes = {};
+for (const item of manifest.managedFiles) {
+  const filePath = path.join(target, item.path);
+  hashes[item.path] = fs.existsSync(filePath)
+    ? crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex')
+    : null;
+}
+fs.writeFileSync(out, JSON.stringify(hashes, null, 2) + '\n');
+NODE
+node "$ROOT/bin/mh.mjs" factory upgrade --target "$TARGET" --dry-run
+test -f "$TARGET/.harness/upgrades/upgrade-report.json"
+test -f "$TARGET/.harness/upgrades/upgrade-summary.md"
+node --input-type=module - "$TARGET" "$TMP/upgrade-managed-before.json" <<'NODE'
+import crypto from 'node:crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+const target = process.argv[2];
+const before = JSON.parse(fs.readFileSync(process.argv[3], 'utf8'));
+for (const [rel, expected] of Object.entries(before)) {
+  const filePath = path.join(target, rel);
+  const actual = fs.existsSync(filePath)
+    ? crypto.createHash('sha256').update(fs.readFileSync(filePath)).digest('hex')
+    : null;
+  if (actual !== expected) throw new Error(`dry-run modified managed file: ${rel}`);
+}
+NODE
+node --input-type=module - "$TARGET/.harness/upgrades/upgrade-report.json" <<'NODE'
+import fs from 'node:fs';
+const report = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+const byPath = new Map(report.files.map(item => [item.path, item]));
+if (report.mode !== 'dry-run') throw new Error('expected dry-run mode');
+if (byPath.get('AGENTS.md')?.classification !== 'changed-by-user') throw new Error('expected AGENTS.md changed-by-user');
+if (byPath.get('package.json')?.classification !== 'ignored') throw new Error('expected package.json ignored');
+for (const key of ['safe-auto', 'changed-by-user', 'conflict', 'propose-only', 'ignored']) {
+  if (typeof report.counts[key] !== 'number') throw new Error(`missing count for ${key}`);
+}
+NODE
+grep -q "changed-by-user: AGENTS.md" "$TARGET/.harness/upgrades/upgrade-summary.md"
 if node "$ROOT/bin/mh.mjs" manifest check --target "$TARGET" >"$TMP/manifest-drift.out" 2>"$TMP/manifest-drift.err"; then
   echo "[error] manifest check did not detect managed file drift" >&2
   exit 1

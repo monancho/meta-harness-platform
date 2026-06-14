@@ -115,6 +115,20 @@ node ./bin/mh.mjs run --target <target-repo> --task .harness/tasks/BL-001.task.j
   - `.harness/runs/<run-id>/run-result.json`
   - `.harness/runs/<run-id>/summary.md`
 
+## T-085 Upgrade Dry-run
+
+- 명령: `mh factory upgrade --target <dir> --dry-run`
+- 입력:
+  - `.harness/manifest.lock`
+  - `.harness/planning/build-handoff.json`
+  - 현재 Meta Harness factory templates
+- 기대 결과:
+  - target의 managed files를 직접 수정하지 않는다.
+  - `.harness/upgrades/upgrade-report.json`을 생성한다.
+  - `.harness/upgrades/upgrade-summary.md`를 생성한다.
+  - 각 managed file을 `safe-auto`, `changed-by-user`, `conflict`, `propose-only`, `ignored` 중 하나로 분류한다.
+  - target 파일 checksum, manifest baseline checksum, 현재 template checksum을 비교 기준으로 기록한다.
+
 ## T-090 GitHub PR Loop Skeleton
 
 - 명령: `mh github pr --target <dir> --run <run-id>`
