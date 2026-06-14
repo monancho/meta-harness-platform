@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "signalId": "signal-c",
+  "sourceRunId": "run-c",
+  "generatorVersion": "1.4.0-instant-devcontainer",
+  "executionProfile": "L0_LOCAL_WORKTREE",
+  "adapter": "codex",
+  "taskType": "feedback",
+  "result": "failed",
+  "failureCategory": "adapter",
+  "reasonCodes": [
+    "MH_CODEX_BINARY_NOT_FOUND"
+  ],
+  "metricBuckets": {
+    "changedFiles": "0",
+    "verifyChecks": "0",
+    "failedVerifyChecks": "0",
+    "patchLines": "0",
+    "artifactCount": "2-5"
+  },
+  "improvementSignals": [
+    "reason:MH_CODEX_BINARY_NOT_FOUND"
+  ],
+  "privacyFlags": {
+    "excludesRawPatchContent": true,
+    "excludesRawLogs": true,
+    "excludesRawDocs": true,
+    "excludesSecrets": true,
+    "excludesCustomerText": true,
+    "containsOnlySanitizedMetrics": true,
+    "targetOwnsRawArtifacts": true
+  },
+  "createdAt": "2026-06-14T12:04:00.000Z"
+}

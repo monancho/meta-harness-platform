@@ -87,6 +87,7 @@ export function buildSanitizedSignal(runResult, options = {}) {
     sourceRunId: String(runResult.runId || 'unknown'),
     generatorVersion: safeVersion(runResult.generatorVersion || options.generatorVersion || VERSION),
     executionProfile: safeReasonCode(runResult.execution?.profile || options.executionProfile || 'L0_LOCAL_WORKTREE'),
+    adapter: safeToken(runResult.adapter || options.adapter || 'unknown'),
     taskType: safeToken(runResult.taskType || options.taskType || 'unknown'),
     result: status,
     failureCategory,

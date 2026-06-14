@@ -21,6 +21,7 @@
     "sourceRunId": { "type": "string", "minLength": 1 },
     "generatorVersion": { "type": "string", "minLength": 1 },
     "executionProfile": { "type": "string", "minLength": 1 },
+    "adapter": { "type": "string", "minLength": 1 },
     "taskType": { "type": "string", "minLength": 1 },
     "result": { "type": "string", "enum": ["passed", "failed"] },
     "failureCategory": { "type": "string" },

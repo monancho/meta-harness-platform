@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0.0",
+  "signalId": "signal-a",
+  "sourceRunId": "run-a",
+  "generatorVersion": "1.4.0-instant-devcontainer",
+  "executionProfile": "L0_LOCAL_WORKTREE",
+  "adapter": "shell",
+  "taskType": "implementation",
+  "result": "failed",
+  "failureCategory": "verification",
+  "reasonCodes": [
+    "MH_VERIFY_FAILED"
+  ],
+  "metricBuckets": {
+    "changedFiles": "2-5",
+    "verifyChecks": "2-5",
+    "failedVerifyChecks": "1",
+    "patchLines": "51-250",
+    "artifactCount": "2-5"
+  },
+  "improvementSignals": [
+    "reason:MH_VERIFY_FAILED"
+  ],
+  "privacyFlags": {
+    "excludesRawPatchContent": true,
+    "excludesRawLogs": true,
+    "excludesRawDocs": true,
+    "excludesSecrets": true,
+    "excludesCustomerText": true,
+    "containsOnlySanitizedMetrics": true,
+    "targetOwnsRawArtifacts": true
+  },
+  "createdAt": "2026-06-14T12:00:00.000Z"
+}

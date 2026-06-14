@@ -174,3 +174,14 @@ node ./bin/mh.mjs run --target <target-repo> --task .harness/tasks/BL-001.task.j
   - signal은 raw patch content, raw verify output, raw logs, raw docs, secret-like values, customer-specific text를 포함하지 않는다.
   - Target Repo는 `patch.diff`, `run-result.json`, `summary.md`, raw adapter logs 같은 원본 artifact를 계속 소유한다.
   - Meta가 ingest할 수 있는 것은 `sanitized-signal.json`처럼 reason code, failure category, bucketized metric, privacy flag만 담은 신호로 제한한다.
+
+## T-130 Feedback Pattern Analyzer
+
+- 명령: `mh feedback analyze --input <sanitized-signal-dir> --output <analysis-dir>`
+- 입력:
+  - `sanitized-signal.json` 파일을 포함한 디렉터리 트리
+- 기대 결과:
+  - analyzer는 `failureCategory`, `reasonCode`, `executionProfile`, `adapter`, `generatorVersion` 축으로 실패 패턴을 그룹화한다.
+  - `<analysis-dir>/failure-taxonomy.json`과 `<analysis-dir>/failure-taxonomy.md`를 생성한다.
+  - `<analysis-dir>/improvement-proposals/*.md`는 모두 `candidate-only` 상태이며 eval regression 검증 전에는 템플릿, 프롬프트, 정책, gate 변경으로 채택할 수 없다.
+  - output은 sanitized signal 필드만 사용하며 raw PRD, raw code, raw logs, raw patch content, secrets, customer text를 포함하지 않는다.

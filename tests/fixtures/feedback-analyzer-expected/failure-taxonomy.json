@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "1.0.0",
+  "analyzerVersion": "test-version",
+  "groupBy": [
+    "failureCategory",
+    "reasonCode",
+    "profile",
+    "adapter",
+    "generatorVersion"
+  ],
+  "input": {
+    "directory": "__INPUT_DIR__",
+    "signalCount": 4,
+    "failedSignalCount": 3
+  },
+  "privacyBoundary": {
+    "usesOnlySanitizedSignals": true,
+    "excludesRawProjectContent": true,
+    "targetOwnsRawArtifacts": true
+  },
+  "groups": [
+    {
+      "groupId": "verification__mh_verify_failed__l0_local_worktree__shell__1.4.0-instant-devcontainer",
+      "count": 2,
+      "failureCategory": "verification",
+      "reasonCode": "MH_VERIFY_FAILED",
+      "profile": "L0_LOCAL_WORKTREE",
+      "adapter": "shell",
+      "generatorVersion": "1.4.0-instant-devcontainer",
+      "taskTypes": [
+        "frontend-ui",
+        "implementation"
+      ],
+      "signalIds": [
+        "signal-a",
+        "signal-b"
+      ],
+      "improvementSignals": [
+        "reason:MH_VERIFY_FAILED"
+      ],
+      "metricBuckets": {
+        "changedFiles": {
+          "1": 1,
+          "2-5": 1
+        },
+        "verifyChecks": {
+          "2-5": 2
+        },
+        "failedVerifyChecks": {
+          "1": 2
+        },
+        "patchLines": {
+          "1-50": 1,
+          "51-250": 1
+        },
+        "artifactCount": {
+          "2-5": 2
+        }
+      },
+      "proposalStatus": "candidate-only",
+      "requiresValidation": "eval-regression",
+      "proposalPath": "improvement-proposals/verification__mh_verify_failed__l0_local_worktree__shell__1.4.0-instant-devcontainer.md"
+    },
+    {
+      "groupId": "adapter__mh_codex_binary_not_found__l0_local_worktree__codex__1.4.0-instant-devcontainer",
+      "count": 1,
+      "failureCategory": "adapter",
+      "reasonCode": "MH_CODEX_BINARY_NOT_FOUND",
+      "profile": "L0_LOCAL_WORKTREE",
+      "adapter": "codex",
+      "generatorVersion": "1.4.0-instant-devcontainer",
+      "taskTypes": [
+        "feedback"
+      ],
+      "signalIds": [
+        "signal-c"
+      ],
+      "improvementSignals": [
+        "reason:MH_CODEX_BINARY_NOT_FOUND"
+      ],
+      "metricBuckets": {
+        "changedFiles": {
+          "0": 1
+        },
+        "verifyChecks": {
+          "0": 1
+        },
+        "failedVerifyChecks": {
+          "0": 1
+        },
+        "patchLines": {
+          "0": 1
+        },
+        "artifactCount": {
+          "2-5": 1
+        }
+      },
+      "proposalStatus": "candidate-only",
+      "requiresValidation": "eval-regression",
+      "proposalPath": "improvement-proposals/adapter__mh_codex_binary_not_found__l0_local_worktree__codex__1.4.0-instant-devcontainer.md"
+    }
+  ]
+}

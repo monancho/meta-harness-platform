@@ -19,6 +19,7 @@ node "$ROOT/tests/dashboard-patch-diff.test.mjs"
 node "$ROOT/tests/managed-blocks.test.mjs"
 node "$ROOT/tests/kind-namespace-profile.test.mjs"
 node "$ROOT/tests/sanitized-signal.test.mjs"
+node "$ROOT/tests/feedback-analyzer.test.mjs"
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
 
 if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then
