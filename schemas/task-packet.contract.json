@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.taskPacket",
+  "format": "json",
+  "required": [
+    "schemaVersion",
+    "taskId",
+    "taskType",
+    "objective",
+    "editableScope",
+    "forbiddenScope",
+    "acceptanceCriteria",
+    "commands"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "minLength": 1 },
+    "taskId": { "type": "string", "minLength": 1 },
+    "taskType": { "type": "string", "minLength": 1 },
+    "priority": { "type": "string" },
+    "title": { "type": "string" },
+    "objective": { "type": "string", "minLength": 1 },
+    "editableScope": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "forbiddenScope": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "commands": {
+      "type": "object",
+      "required": ["verify"],
+      "properties": {
+        "verify": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "expectedArtifacts": { "type": "array", "items": { "type": "string" } }
+  }
+}

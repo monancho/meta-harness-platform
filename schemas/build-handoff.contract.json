@@ -1,0 +1,69 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.buildHandoff",
+  "format": "json",
+  "required": [
+    "schemaVersion",
+    "projectId",
+    "projectName",
+    "stack",
+    "firstVerticalSlice",
+    "requirements",
+    "acceptanceCriteria",
+    "screenSpecs",
+    "nonGoals"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "minLength": 1 },
+    "projectId": { "type": "string", "minLength": 1 },
+    "projectName": { "type": "string", "minLength": 1 },
+    "stack": {
+      "type": "object",
+      "required": ["frontend", "backend", "database", "packageManager"],
+      "properties": {
+        "frontend": { "type": "string", "minLength": 1 },
+        "backend": { "type": "string", "minLength": 1 },
+        "database": { "type": "string", "minLength": 1 },
+        "packageManager": { "type": "string", "minLength": 1 }
+      }
+    },
+    "firstVerticalSlice": {
+      "type": "object",
+      "required": ["id", "requirementId", "title", "taskType", "acceptanceCriteria"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "requirementId": { "type": "string", "minLength": 1 },
+        "title": { "type": "string", "minLength": 1 },
+        "taskType": { "type": "string", "minLength": 1 },
+        "acceptanceCriteria": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "text", "priority"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "priority": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "acceptanceCriteria": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "requirementId", "text", "verification"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "requirementId": { "type": "string", "minLength": 1 },
+          "text": { "type": "string", "minLength": 1 },
+          "verification": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "screenSpecs": { "type": "array", "items": { "type": "object", "required": ["id", "name"] } },
+    "nonGoals": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+  }
+}

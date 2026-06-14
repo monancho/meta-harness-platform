@@ -1,0 +1,28 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.state",
+  "format": "yaml",
+  "required": ["schemaVersion", "projectState"],
+  "properties": {
+    "schemaVersion": { "type": "number" },
+    "projectState": {
+      "type": "object",
+      "required": ["projectId", "phase", "updatedAt"],
+      "properties": {
+        "projectId": { "type": "string", "minLength": 1 },
+        "phase": {
+          "type": "string",
+          "enum": [
+            "planning-scaffolded",
+            "planning-frozen",
+            "factory-ready",
+            "runnable",
+            "github-connected",
+            "release-ready"
+          ]
+        },
+        "updatedAt": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

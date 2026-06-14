@@ -1,8 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { assertContractFile } from './contracts.mjs';
 import { VERSION } from './constants.mjs';
 import { abs, ensureDir, exists, readJson, shaFile, writeJson, writeText } from './fs-utils.mjs';
-import { getPhase, readProjectId, setState } from './state.mjs';
+import { getPhase, readProjectId, setState, validateState } from './state.mjs';
 import { targetRunnerCode } from './runner-template.mjs';
 
 export function cmdFactoryBootstrap(opts, fail) {
@@ -12,6 +13,7 @@ export function cmdFactoryBootstrap(opts, fail) {
   const hp = path.join(target, '.harness/planning');
   const handoffPath = path.join(hp, 'build-handoff.json');
   if (!exists(handoffPath)) fail('build-handoff.json이 없습니다.');
+  assertContractFile('buildHandoff', handoffPath, fail);
   const handoff = readJson(handoffPath);
   const projectId = readProjectId(target) || handoff.projectId;
   const generated = [];
@@ -98,7 +100,12 @@ A task is complete when:
   ensureDir(path.join(target, '.harness/tmp'));
 
   const manifestFiles = generated.map(rel => ({ path: rel, ownership: rel.includes('AGENTS.md') || rel.includes('.github') ? 'shared' : 'harness', checksum: `sha256:${shaFile(path.join(target, rel))}`, mergeStrategy: rel.includes('infra/caddy') ? 'propose-only' : 'replace-if-unchanged' }));
-  writeJson(path.join(target, '.harness/manifest.lock'), { schemaVersion: 1, factoryId: projectId, generator: { name: 'meta-harness-platform-starter', version: VERSION }, source: { buildHandoff: '.harness/planning/build-handoff.json', buildHandoffHash: `sha256:${shaFile(handoffPath)}` }, files: manifestFiles });
+  const manifestPath = path.join(target, '.harness/manifest.lock');
+  const factoryPath = path.join(target, '.harness/factory.yml');
+  writeJson(manifestPath, { schemaVersion: 1, factoryId: projectId, generator: { name: 'meta-harness-platform-starter', version: VERSION }, source: { buildHandoff: '.harness/planning/build-handoff.json', buildHandoffHash: `sha256:${shaFile(handoffPath)}` }, files: manifestFiles });
+  assertContractFile('factory', factoryPath, fail);
+  assertContractFile('manifest', manifestPath, fail);
   setState(target, { projectId, phase: 'factory-ready', extra: `  factoryManifestHash: sha256:${shaFile(path.join(target, '.harness/manifest.lock'))}\n` });
+  validateState(target, fail);
   return `Project Factory bootstrapped: ${target}`;
 }
