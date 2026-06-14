@@ -10,6 +10,7 @@
     "mh": "node ./bin/mh.mjs",
     "doctor": "node ./bin/mh.mjs doctor",
     "smoke": "bash ./tests/smoke.sh",
+    "dashboard:preview": "node ./apps/dashboard/preview.mjs",
     "agent:tasks": "node -e \"console.log(require('fs').readFileSync('.harness/agent-workspace/backlog.yml','utf8'))\"",
     "agent:ready": "node ./scripts/agent/validate-agent-ready.mjs",
     "agent:start": "bash ./scripts/agent/start-task.sh MH-001",

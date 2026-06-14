@@ -10,6 +10,7 @@ rm -rf "$TMP"
 mkdir -p "$TMP"
 
 node "$ROOT/bin/mh.mjs" doctor
+node "$ROOT/tests/dashboard-fixture-loader.test.mjs"
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
 
 if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then
