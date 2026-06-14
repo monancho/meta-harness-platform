@@ -8,3 +8,4 @@ export * as manifest from './manifest.mjs';
 export * as runner from './runner.mjs';
 export * as upgrade from './upgrade.mjs';
 export * as evals from './evals.mjs';
+export * as sanitizedSignal from './sanitized-signal.mjs';

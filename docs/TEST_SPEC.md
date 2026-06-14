@@ -161,3 +161,16 @@ node ./bin/mh.mjs run --target <target-repo> --task .harness/tasks/BL-001.task.j
 - opt-in bootstrap은 `infra/local-task-k8s/**`에 namespace, worker, preview, QA, lifecycle script skeleton을 생성해야 한다.
 - lifecycle은 namespace 생성, worker/preview/QA job 실행, artifact 수집, namespace cleanup을 명시해야 한다.
 - config-generation test는 Kubernetes cluster 또는 kubectl 실행을 요구하지 않아야 한다.
+
+## T-120 Sanitized Signal Export
+
+- 명령: `mh signal export --target <dir> --run <run-id>`
+- 입력:
+  - Target-owned `.harness/runs/<run-id>/run-result.json`
+  - 선택적으로 같은 run directory의 `patch.diff`
+- 기대 결과:
+  - `.harness/runs/<run-id>/sanitized-signal.json`이 생성된다.
+  - signal은 `generatorVersion`, `executionProfile`, `taskType`, `result`, `failureCategory`, `reasonCodes`, metric bucket, privacy flag를 포함한다.
+  - signal은 raw patch content, raw verify output, raw logs, raw docs, secret-like values, customer-specific text를 포함하지 않는다.
+  - Target Repo는 `patch.diff`, `run-result.json`, `summary.md`, raw adapter logs 같은 원본 artifact를 계속 소유한다.
+  - Meta가 ingest할 수 있는 것은 `sanitized-signal.json`처럼 reason code, failure category, bucketized metric, privacy flag만 담은 신호로 제한한다.

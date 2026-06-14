@@ -179,7 +179,7 @@ A task is complete when:
 - acceptance criteria are satisfied
 - lint/typecheck/test pass or failure is reported clearly
 - no forbidden path is modified
-- patch.diff, run-result.json, and summary.md are produced
+- patch.diff, run-result.json, summary.md, and sanitized-signal.json are produced
 <!-- END META-HARNESS MANAGED BLOCK: target-factory-instructions -->
 `],
     ['CLAUDE.md', `@AGENTS.md\n`],
@@ -273,12 +273,13 @@ jobs:
             \${{ steps.latest-run.outputs.path }}/patch.diff
             \${{ steps.latest-run.outputs.path }}/run-result.json
             \${{ steps.latest-run.outputs.path }}/summary.md
+            \${{ steps.latest-run.outputs.path }}/sanitized-signal.json
 # END META-HARNESS MANAGED BLOCK: harness-run-workflow
 `],
     ['Makefile', `dev:\n\t@echo \"dev placeholder\"\n\npreview:\n\t@echo \"preview placeholder\"\n\ntest:\n\tnpm test\n\nlint:\n\tnpm run lint\n\ntypecheck:\n\tnpm run typecheck\n\nharness-run:\n\tnode .harness/bin/runner.mjs --task $(TASK) --adapter $(ADAPTER)\n`],
     ['.harness/bin/runner.mjs', targetRunnerCode(), { executable: true }],
     ['.harness/factory.yml', `schemaVersion: 1\nfactory:\n  id: ${projectId}\n  version: 0.1.0\n  generatedBy: meta-harness-platform-starter\n  generatorVersion: ${VERSION}\ngeneratedFrom:\n  buildHandoff: .harness/planning/build-handoff.json\n  buildHandoffHash: sha256:${shaFile(handoffPath)}\ncapabilities:\n  planning: true\n  bootstrap: true\n  mvpBuild: true\n  localWorktreeRunner: true\n  localTaskKubernetes: ${boolText(enableKindNamespace)}\n  githubActions: true\n`],
-    ['.harness/execution-profiles.yml', `defaultProfile: L0_LOCAL_WORKTREE\nprofiles:\n  L0_LOCAL_WORKTREE:\n    enabled: true\n    isolation:\n      filesystem: git-worktree-or-fallback\n      network: inherited-restricted\n      secrets: filtered-env\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n  L1_CONTAINER_WORKER:\n    enabled: false\n  L2_KIND_NAMESPACE:\n    enabled: ${boolText(enableKindNamespace)}\n    optInFlag: --enable-kind-namespace\n    templates: infra/local-task-k8s\n    cluster: kind\n    lifecycle:\n      - create namespace per run\n      - run worker job\n      - run preview job\n      - run QA job\n      - collect artifacts\n      - cleanup namespace\n    notes:\n      - Disabled by default; generated Kubernetes templates require explicit bootstrap opt-in.\n      - Skeleton only; config generation and tests do not require a live Kubernetes cluster.\n  L3_GITHUB_ACTION:\n    enabled: false\n    trigger: workflow_dispatch\n    workflow: .github/workflows/harness-run.yml\n    runner: github-hosted-ubuntu\n    wrapsProfile: L0_LOCAL_WORKTREE\n    inputs:\n      - task_path\n      - adapter\n      - execution_profile\n    permissions:\n      contents: read\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n    notes:\n      - PR comments, checks, branch writes, and remote patch application are staged behind later hardening.\n`],
+    ['.harness/execution-profiles.yml', `defaultProfile: L0_LOCAL_WORKTREE\nprofiles:\n  L0_LOCAL_WORKTREE:\n    enabled: true\n    isolation:\n      filesystem: git-worktree-or-fallback\n      network: inherited-restricted\n      secrets: filtered-env\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n      - sanitized-signal.json\n  L1_CONTAINER_WORKER:\n    enabled: false\n  L2_KIND_NAMESPACE:\n    enabled: ${boolText(enableKindNamespace)}\n    optInFlag: --enable-kind-namespace\n    templates: infra/local-task-k8s\n    cluster: kind\n    lifecycle:\n      - create namespace per run\n      - run worker job\n      - run preview job\n      - run QA job\n      - collect artifacts\n      - cleanup namespace\n    notes:\n      - Disabled by default; generated Kubernetes templates require explicit bootstrap opt-in.\n      - Skeleton only; config generation and tests do not require a live Kubernetes cluster.\n  L3_GITHUB_ACTION:\n    enabled: false\n    trigger: workflow_dispatch\n    workflow: .github/workflows/harness-run.yml\n    runner: github-hosted-ubuntu\n    wrapsProfile: L0_LOCAL_WORKTREE\n    inputs:\n      - task_path\n      - adapter\n      - execution_profile\n    permissions:\n      contents: read\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n      - sanitized-signal.json\n    notes:\n      - PR comments, checks, branch writes, and remote patch application are staged behind later hardening.\n`],
     ['.harness/agents/adapters.yml', `schemaVersion: 1\ndefaultAdapter: shell\ninterface:\n  lifecycle: prepare-execute-collectArtifacts-summarize\n  methods: prepare, execute, collectArtifacts, summarize\nadapters:\n  shell:\n    enabled: true\n    type: local-shell-mvp\n    implementation: builtin:shell\n    status: default\n  codex:\n    enabled: true\n    type: codex-exec\n    implementation: builtin:codex\n    binary: codex\n    status: available-if-codex-cli-installed\n  claude:\n    enabled: false\n    type: claude-code\n    implementation: placeholder\n    status: disabled-placeholder\n  openhands:\n    enabled: false\n    type: openhands\n    implementation: placeholder\n    status: disabled-placeholder\n`],
     ['.harness/security/runtime-policy.yml', `phases:\n  setup:\n    network:\n      default: deny\n      allow:\n        - registry.npmjs.org\n        - api.github.com\n  worker:\n    network:\n      default: deny\n    forbiddenWrites:\n      - .env*\n      - **/*.pem\n      - **/*secret*\n      - **/*token*\n      - infra/**/production/**\n      - .github/workflows/deploy-prod.yml\n    commandPolicy:\n      default: deny\n      allow:\n        - node *\n        - npm test\n        - npm run *\n        - bash ./tests/*\n        - make *\n      deny:\n        - git push*\n        - npm publish*\n        - docker login*\n        - rm -rf .git*\n`],
     ['.harness/budgets.yml', `budgets:\n  default:\n    maxRuntimeMinutes: 20\n    maxRetries: 1\n    maxChangedFiles: 20\n    maxPatchLines: 800\n`],
@@ -291,11 +292,11 @@ jobs:
       objective: 'Create a small generated frontend feature file to prove the harness run loop.',
       editableScope: ['apps/web/src/**', 'packages/shared/**', 'docs/**', 'tests/**'],
       forbiddenScope: ['.env*', 'infra/**/production/**', '.github/workflows/deploy-prod.yml'],
-      acceptanceCriteria: [{ id: 'AC-001', text: 'The harness run creates patch.diff, run-result.json, and summary.md.' }],
+      acceptanceCriteria: [{ id: 'AC-001', text: 'The harness run creates patch.diff, run-result.json, summary.md, and sanitized-signal.json.' }],
       verifyCommands: ["node -e \"console.log('lint ok')\"", "node -e \"console.log('typecheck ok')\"", "node -e \"console.log('test ok')\""],
       commands: { verify: ["node -e \"console.log('lint ok')\"", "node -e \"console.log('typecheck ok')\"", "node -e \"console.log('test ok')\""] },
       budgets: { maxRuntimeMinutes: 20, maxRetries: 1, maxChangedFiles: 20, maxPatchLines: 800 },
-      expectedArtifacts: ['patch.diff', 'run-result.json', 'summary.md']
+      expectedArtifacts: ['patch.diff', 'run-result.json', 'summary.md', 'sanitized-signal.json']
     })]
   ];
   if (enableKindNamespace) files.push(...buildKindNamespaceFiles());

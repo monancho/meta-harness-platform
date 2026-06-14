@@ -72,6 +72,77 @@ function stableStringify(value){
   }
   return JSON.stringify(value);
 }
+function countBucket(count){
+  const n = Number.isFinite(count) && count >= 0 ? count : 0;
+  if (n === 0) return '0';
+  if (n === 1) return '1';
+  if (n <= 5) return '2-5';
+  if (n <= 20) return '6-20';
+  return '21-plus';
+}
+function lineBucket(count){
+  const n = Number.isFinite(count) && count >= 0 ? count : 0;
+  if (n === 0) return '0';
+  if (n <= 50) return '1-50';
+  if (n <= 250) return '51-250';
+  if (n <= 1000) return '251-1000';
+  return '1001-plus';
+}
+function safeMetricToken(value, fallback = 'unknown'){
+  const normalized = String(value || '').trim();
+  return /^[a-z0-9][a-z0-9_-]{0,63}$/.test(normalized) ? normalized : fallback;
+}
+function safeVersionToken(value){
+  const normalized = String(value || '').trim();
+  return /^[A-Za-z0-9][A-Za-z0-9._-]{0,79}$/.test(normalized) ? normalized : 'unknown';
+}
+function safeSignalCode(value){
+  const normalized = String(value || '').trim();
+  return /^[A-Z0-9][A-Z0-9_:-]{0,79}$/.test(normalized) ? normalized : 'MH_REASON_UNCLASSIFIED';
+}
+function readGeneratorVersion(targetRoot){
+  const factoryPath = path.join(targetRoot,'.harness','factory.yml');
+  if (!fs.existsSync(factoryPath)) return 'unknown';
+  const match = fs.readFileSync(factoryPath,'utf8').match(/^\\s*generatorVersion:\\s*(\\S+)\\s*$/m);
+  return match ? match[1].replace(/^["']|["']$/g, '') : 'unknown';
+}
+function buildSanitizedSignal(result, patchLineCount){
+  const verify = Array.isArray(result.verify) ? result.verify : [];
+  const failedVerify = verify.filter(item => item?.status === 'failed').length;
+  const reasonCodes = [...new Set([
+    result.reasonCode,
+    failedVerify > 0 ? 'MH_VERIFY_FAILED' : null
+  ].filter(Boolean).map(safeSignalCode))];
+  return {
+    schemaVersion: '1.0.0',
+    signalId: 'signal-' + crypto.createHash('sha256').update((result.runId || 'unknown')+':'+(result.startedAt || '')).digest('hex').slice(0,16),
+    sourceRunId: String(result.runId || 'unknown'),
+    generatorVersion: safeVersionToken(result.generatorVersion || 'unknown'),
+    executionProfile: safeSignalCode(result.execution?.profile || 'L0_LOCAL_WORKTREE'),
+    taskType: safeMetricToken(result.taskType || 'unknown'),
+    result: result.status === 'failed' ? 'failed' : 'passed',
+    failureCategory: ['security','schema','verification','adapter','execution'].includes(result.failureCategory) ? result.failureCategory : (result.status === 'failed' ? 'execution' : undefined),
+    reasonCodes,
+    metricBuckets: {
+      changedFiles: countBucket(Array.isArray(result.changedFiles) ? result.changedFiles.length : 0),
+      verifyChecks: countBucket(verify.length),
+      failedVerifyChecks: countBucket(failedVerify),
+      patchLines: lineBucket(patchLineCount),
+      artifactCount: countBucket(Array.isArray(result.artifacts) ? result.artifacts.length : 0)
+    },
+    improvementSignals: reasonCodes.length ? reasonCodes.map(code => 'reason:'+code) : [],
+    privacyFlags: {
+      excludesRawPatchContent: true,
+      excludesRawLogs: true,
+      excludesRawDocs: true,
+      excludesSecrets: true,
+      excludesCustomerText: true,
+      containsOnlySanitizedMetrics: true,
+      targetOwnsRawArtifacts: true
+    },
+    createdAt: new Date().toISOString()
+  };
+}
 function buildCodexPrompt({ task, agentsText }){
   return [
     '# Meta Harness Codex Adapter Prompt',
@@ -274,12 +345,14 @@ function writeRunArtifacts({ runDir, runId, adapter, task, status, failureCatego
   const safeMessage = redactSecretLike(message || '');
   const safePatch = redactSecretLike(patch);
   write(path.join(runDir,'patch.diff'), safePatch);
-  const artifacts = [...new Set(['patch.diff','run-result.json','summary.md', ...extraArtifacts])];
+  const artifacts = [...new Set(['patch.diff','run-result.json','summary.md','sanitized-signal.json', ...extraArtifacts])];
   const result = {
     schemaVersion: '1.0.0',
     runId,
     adapter,
     taskId: task.taskId,
+    taskType: task.taskType || 'unknown',
+    generatorVersion: readGeneratorVersion(targetRoot),
     status,
     failureCategory: failureCategory || failureCategoryFor(reasonCode, status),
     reasonCode,
@@ -301,6 +374,7 @@ function writeRunArtifacts({ runDir, runId, adapter, task, status, failureCatego
     result.message = 'run artifacts contain secret-like content: '+artifactSecret;
   }
   write(path.join(runDir,'run-result.json'), JSON.stringify(result,null,2)+'\\n');
+  write(path.join(runDir,'sanitized-signal.json'), JSON.stringify(buildSanitizedSignal(result, safePatch.split(/\\r?\\n/).length - 1),null,2)+'\\n');
   write(path.join(runDir,'summary.md'), \`# Harness Run Summary
 
 - Run ID: \${runId}

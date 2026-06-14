@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0.0",
+  "contractId": "mh.sanitizedSignal",
+  "format": "json",
+  "required": [
+    "schemaVersion",
+    "signalId",
+    "sourceRunId",
+    "generatorVersion",
+    "executionProfile",
+    "taskType",
+    "result",
+    "reasonCodes",
+    "metricBuckets",
+    "privacyFlags",
+    "createdAt"
+  ],
+  "properties": {
+    "schemaVersion": { "type": "string", "minLength": 1 },
+    "signalId": { "type": "string", "minLength": 1 },
+    "sourceRunId": { "type": "string", "minLength": 1 },
+    "generatorVersion": { "type": "string", "minLength": 1 },
+    "executionProfile": { "type": "string", "minLength": 1 },
+    "taskType": { "type": "string", "minLength": 1 },
+    "result": { "type": "string", "enum": ["passed", "failed"] },
+    "failureCategory": { "type": "string" },
+    "reasonCodes": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "metricBuckets": {
+      "type": "object",
+      "required": [
+        "changedFiles",
+        "verifyChecks",
+        "failedVerifyChecks",
+        "patchLines",
+        "artifactCount"
+      ],
+      "properties": {
+        "changedFiles": { "type": "string", "minLength": 1 },
+        "verifyChecks": { "type": "string", "minLength": 1 },
+        "failedVerifyChecks": { "type": "string", "minLength": 1 },
+        "patchLines": { "type": "string", "minLength": 1 },
+        "artifactCount": { "type": "string", "minLength": 1 }
+      }
+    },
+    "improvementSignals": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "privacyFlags": {
+      "type": "object",
+      "required": [
+        "excludesRawPatchContent",
+        "excludesRawLogs",
+        "excludesRawDocs",
+        "excludesSecrets",
+        "excludesCustomerText",
+        "containsOnlySanitizedMetrics",
+        "targetOwnsRawArtifacts"
+      ],
+      "properties": {
+        "excludesRawPatchContent": { "type": "boolean" },
+        "excludesRawLogs": { "type": "boolean" },
+        "excludesRawDocs": { "type": "boolean" },
+        "excludesSecrets": { "type": "boolean" },
+        "excludesCustomerText": { "type": "boolean" },
+        "containsOnlySanitizedMetrics": { "type": "boolean" },
+        "targetOwnsRawArtifacts": { "type": "boolean" }
+      }
+    },
+    "createdAt": { "type": "string", "minLength": 1 }
+  }
+}
