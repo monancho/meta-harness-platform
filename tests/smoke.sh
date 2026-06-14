@@ -10,11 +10,27 @@ mkdir -p "$TMP"
 
 node "$ROOT/bin/mh.mjs" doctor
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
+
+if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then
+  echo "[error] factory bootstrap before planning freeze unexpectedly passed" >&2
+  exit 1
+fi
+grep -q "factory bootstrap requires phase=planning-frozen" "$TMP/bootstrap-before-freeze.err"
+
+if node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/example.task.json --adapter shell >"$TMP/run-before-ready.out" 2>"$TMP/run-before-ready.err"; then
+  echo "[error] run before factory-ready unexpectedly passed" >&2
+  exit 1
+fi
+grep -q "run requires phase=factory-ready|runnable" "$TMP/run-before-ready.err"
+
 node "$ROOT/bin/mh.mjs" plan synthesize --target "$TARGET" --input "$ROOT/examples/demo-answers.json"
 node "$ROOT/bin/mh.mjs" plan compile-acceptance --target "$TARGET"
 node "$ROOT/bin/mh.mjs" plan freeze --target "$TARGET" --approved
 node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET"
 node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/example.task.json --adapter shell
+
+grep -q "phase: runnable" "$TARGET/.harness/state.yml"
+grep -Eq "lastRunResultHash: sha256:[a-f0-9]{64}" "$TARGET/.harness/state.yml"
 
 INVALID_TASK="$TMP/invalid.task.json"
 cat > "$INVALID_TASK" <<'JSON'

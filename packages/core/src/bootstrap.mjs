@@ -3,13 +3,12 @@ import path from 'node:path';
 import { assertContractFile } from './contracts.mjs';
 import { VERSION } from './constants.mjs';
 import { abs, ensureDir, exists, readJson, shaFile, writeJson, writeText } from './fs-utils.mjs';
-import { getPhase, readProjectId, setState, validateState } from './state.mjs';
+import { assertPhase, readProjectId, setState, validateState } from './state.mjs';
 import { targetRunnerCode } from './runner-template.mjs';
 
 export function cmdFactoryBootstrap(opts, fail) {
   const target = abs(opts.target || '../target-project');
-  const phase = getPhase(target);
-  if (phase !== 'planning-frozen') fail(`factory bootstrap requires phase=planning-frozen. current=${phase || 'unknown'}`);
+  assertPhase(target, ['planning-frozen'], 'factory bootstrap', fail);
   const hp = path.join(target, '.harness/planning');
   const handoffPath = path.join(hp, 'build-handoff.json');
   if (!exists(handoffPath)) fail('build-handoff.json이 없습니다.');
@@ -105,7 +104,14 @@ A task is complete when:
   writeJson(manifestPath, { schemaVersion: 1, factoryId: projectId, generator: { name: 'meta-harness-platform-starter', version: VERSION }, source: { buildHandoff: '.harness/planning/build-handoff.json', buildHandoffHash: `sha256:${shaFile(handoffPath)}` }, files: manifestFiles });
   assertContractFile('factory', factoryPath, fail);
   assertContractFile('manifest', manifestPath, fail);
-  setState(target, { projectId, phase: 'factory-ready', extra: `  factoryManifestHash: sha256:${shaFile(path.join(target, '.harness/manifest.lock'))}\n` });
+  setState(target, {
+    projectId,
+    phase: 'factory-ready',
+    fail,
+    fields: {
+      factoryManifestHash: `sha256:${shaFile(path.join(target, '.harness/manifest.lock'))}`
+    }
+  });
   validateState(target, fail);
   return `Project Factory bootstrapped: ${target}`;
 }

@@ -21,7 +21,23 @@
             "release-ready"
           ]
         },
-        "updatedAt": { "type": "string", "minLength": 1 }
+        "updatedAt": { "type": "string", "minLength": 1 },
+        "transitionFrom": {
+          "type": "string",
+          "enum": [
+            "empty",
+            "planning-scaffolded",
+            "planning-frozen",
+            "factory-ready",
+            "runnable"
+          ]
+        },
+        "transitionHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "planningBaselineHash": { "type": "string", "pattern": "^sha256:([a-f0-9]{64}|missing)$" },
+        "buildHandoffHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "factoryManifestHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "lastRunResultHash": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+        "humanApproved": { "type": "boolean" }
       }
     }
   }
