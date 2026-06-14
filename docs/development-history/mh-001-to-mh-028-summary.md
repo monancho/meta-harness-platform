@@ -1,24 +1,23 @@
-# MH-001 To MH-028 Completion Summary
+# MH-001부터 MH-028까지 완료 요약
 
-The MH-001 through MH-028 task queue brought the repository from starter skeleton to MVP release candidate.
+MH-001부터 MH-028까지의 task queue는 repository를 starter skeleton에서 MVP release candidate 상태로 끌어올렸습니다.
 
-## Completed Areas
+## 완료된 영역
 
-- Repository structure and agent-ready workspace.
-- Schema contracts and validation engine.
-- Factory state machine and planning-first gate.
-- Manifest ownership and generated file tracking.
-- L0 git worktree runner with fallback mode.
-- Task packet compiler and security policy baseline.
-- Agent adapter layer, Codex adapter skeleton, and GitHub PR loop skeleton.
-- Dashboard skeleton with run history, artifact, and patch diff views.
-- Upgrade dry-run and managed block update strategy.
-- GitHub Actions, container worker, and kind execution profile skeletons.
-- Eval registry, sanitized signal exporter, and feedback pattern analyzer.
-- Productization audit, release harness, and maintenance harness skeletons.
-- End-to-end demo project, portfolio landing material, demo script, and README polish.
+- repository structure와 agent-ready workspace
+- schema contract와 validation engine
+- factory state machine과 planning-first gate
+- manifest ownership과 generated file tracking
+- fallback mode를 포함한 L0 git worktree runner
+- task packet compiler와 security policy baseline
+- agent adapter layer, Codex adapter skeleton, GitHub PR loop skeleton
+- run history, artifact, patch diff view를 가진 dashboard skeleton
+- upgrade dry-run과 managed block update strategy
+- GitHub Actions, container worker, kind execution profile skeleton
+- eval registry, sanitized signal exporter, feedback pattern analyzer
+- productization audit, release harness, maintenance harness skeleton
+- end-to-end demo project, portfolio landing material, demo script, README polish
 
-## Current State
+## 현재 상태
 
-The platform is an MVP skeleton, not production orchestration. Its strongest path is deterministic local verification and documented extension points.
-
+이 platform은 MVP skeleton이며 production orchestration이 아닙니다. 가장 강한 경로는 deterministic local verification과 문서화된 extension point입니다.

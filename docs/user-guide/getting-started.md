@@ -1,17 +1,17 @@
-# Getting Started
+# 시작하기
 
-Meta Harness Platform is the Meta repo. It creates and validates a Target Project Factory, but it does not own the target project's raw planning data, code, logs, or artifacts.
+Meta Harness Platform은 Meta repo입니다. Target Project Factory를 생성하고 검증하지만, target project의 raw planning data, code, log, artifact는 소유하지 않습니다.
 
-## Prerequisites
+## 준비물
 
-- Node.js 20 or newer
+- Node.js 20 이상
 - Git
 - Bash
-- Make for the local doctor check
+- local doctor check용 Make
 
-## First Checks
+## 첫 확인
 
-Run from the repository root:
+repository root에서 실행합니다.
 
 ```bash
 npm run doctor
@@ -19,13 +19,12 @@ npm run verify
 npm run smoke
 ```
 
-`npm run verify` calls the agent verification script and includes the smoke path. `npm run smoke` is useful when you want the smoke suite alone.
+`npm run verify`는 agent verification script를 실행하고 smoke path를 포함합니다. smoke suite만 따로 확인하려면 `npm run smoke`를 사용합니다.
 
-## Recommended First Reading
+## 먼저 읽을 문서
 
-- [Target Project Creation](target-project.md)
-- [Agent Task Runs](agent-task-run.md)
+- [Target Project 생성](target-project.md)
+- [Agent Task 실행](agent-task-run.md)
 - [Dashboard Preview](dashboard-preview.md)
 - [Troubleshooting](troubleshooting.md)
 - [Architecture](../developer-guide/architecture.md)
-

@@ -1,18 +1,18 @@
 # Meta Harness Dashboard
 
-This is the MH-011 dashboard skeleton. It is intentionally dependency-free for the MVP so smoke tests do not need network access or a package install.
+이 디렉터리는 MH-011에서 추가된 dashboard skeleton입니다. MVP에서는 network access나 package install 없이 smoke test가 동작하도록 dependency-free 구조를 유지합니다.
 
 ## Preview
 
-From the repository root:
+repository root에서 실행합니다.
 
 ```bash
 npm run dashboard:preview
 ```
 
-Then open `http://localhost:4173`.
+그 다음 `http://localhost:4173`을 엽니다.
 
-The preview serves only `apps/dashboard/**`. The UI reads local fixture files from `apps/dashboard/fixtures`:
+preview는 `apps/dashboard/**`만 serve합니다. UI는 `apps/dashboard/fixtures`의 local fixture file을 읽습니다.
 
 - `run-result.json`
 - `run-history.json`
@@ -23,8 +23,8 @@ The preview serves only `apps/dashboard/**`. The UI reads local fixture files fr
 
 ## Views
 
-The Runs view lists status, task id, adapter, duration, and timestamp from normalized `.harness/runs/<run-id>/run-result.json` data. The Artifacts view shows patch, summary, test-report, screenshot, and arbitrary artifact file names or links.
+Runs view는 normalized `.harness/runs/<run-id>/run-result.json` data에서 status, task id, adapter, duration, timestamp를 표시합니다. Artifacts view는 patch, summary, test-report, screenshot, arbitrary artifact file name/link를 보여줍니다.
 
-The Patch Diff view parses `patch.diff` as a unified diff, groups hunks by file, and shows additions, deletions, context lines, summary counts, truncation notices, malformed-line warnings, and forbidden path warnings based on the task packet `forbiddenScope`.
+Patch Diff view는 `patch.diff`를 unified diff로 parse하고 file별 hunk, addition, deletion, context line, summary count, truncation notice, malformed-line warning, task packet `forbiddenScope` 기반 forbidden path warning을 표시합니다.
 
-Parser tests use sanitized run directories under `tests/fixtures/dashboard-runs` and sanitized patch fixtures under `tests/fixtures/dashboard-patches` so smoke tests do not need external services or target-owned run artifacts.
+Parser test는 `tests/fixtures/dashboard-runs`의 sanitized run directory와 `tests/fixtures/dashboard-patches`의 sanitized patch fixture를 사용합니다. smoke test는 external service나 target-owned run artifact에 의존하지 않습니다.

@@ -1,30 +1,30 @@
 # Meta Harness Platform Portfolio Landing Page
 
-Meta Harness Platform is a repo-resident agentic software factory skeleton. It is not a finished autonomous developer. Its purpose is to turn approved planning artifacts into a Target Repo-local development factory with task packets, execution profiles, policy gates, run artifacts, and portfolio-grade demos.
+Meta Harness Platform은 repo-resident agentic software factory skeleton입니다. 완성된 autonomous developer가 아닙니다. 목적은 승인된 planning artifact를 Target Repo-local development factory로 바꾸는 것입니다. 이 factory는 task packet, execution profile, policy gate, run artifact, portfolio-grade demo를 포함합니다.
 
 ## Positioning
 
-**Problem:** AI coding agents can produce code quickly, but real projects need durable planning contracts, scoped write permissions, reproducible execution, security boundaries, and reviewable artifacts.
+**Problem:** AI coding agent는 code를 빠르게 만들 수 있지만, 실제 프로젝트에는 durable planning contract, scoped write permission, reproducible execution, security boundary, reviewable artifact가 필요합니다.
 
-**Solution:** Meta Harness builds the factory that lives inside a Target Project Repo. The Target Repo owns planning docs, code, infrastructure, run logs, and artifacts. Meta owns reusable templates, generators, schemas, policies, evals, and sanitized improvement signals.
+**Solution:** Meta Harness는 Target Project Repo 안에 존재하는 factory를 만듭니다. Target Repo는 planning docs, code, infrastructure, run logs, artifacts를 소유합니다. Meta는 reusable template, generator, schema, policy, eval, sanitized improvement signal을 소유합니다.
 
-**Current status:** This repository is an MVP-to-full-harness implementation workspace. It demonstrates the main lifecycle locally, but it should not be described as production-ready until the quality gates and release gates prove that claim.
+**Current status:** 이 repository는 MVP-to-full-harness implementation workspace입니다. local에서 main lifecycle을 보여주지만, quality gate와 release gate가 그 수준을 입증하기 전까지 production-ready라고 설명하면 안 됩니다.
 
 ## Demo Flow
 
-The shortest portfolio demo is the offline E2E flow from an empty output directory to generated planning docs, a frozen factory, and shell-run artifacts.
+가장 짧은 portfolio demo는 empty output directory에서 generated planning docs, frozen factory, shell-run artifacts까지 가는 offline E2E flow입니다.
 
 ```bash
 bash ./examples/e2e-demo/run-demo.sh
 ```
 
-Optional output directory:
+선택 output directory:
 
 ```bash
 bash ./examples/e2e-demo/run-demo.sh /tmp/mh-e2e-review
 ```
 
-Useful review commands:
+review에 유용한 명령:
 
 ```bash
 node ./bin/mh.mjs doctor
@@ -32,7 +32,7 @@ bash ./tests/smoke.sh
 npm run dashboard:preview
 ```
 
-Dashboard preview opens at `http://localhost:4173` and serves only `apps/dashboard/**` fixtures.
+Dashboard preview는 `http://localhost:4173`에서 열리며 `apps/dashboard/**` fixture만 serve합니다.
 
 ## Architecture At A Glance
 
@@ -49,11 +49,11 @@ Target Project Repo
   -> owns docs/planning, apps, packages, infra, run artifacts, and PR output
 ```
 
-The most important boundary is ownership: Meta can generate a factory, but project source data and execution artifacts remain Target Repo-owned.
+가장 중요한 boundary는 ownership입니다. Meta는 factory를 생성할 수 있지만, project source data와 execution artifact는 Target Repo 소유로 남습니다.
 
-## Diagrams And Screenshots
+## Diagram과 Screenshot
 
-Architecture diagrams are stored in [docs/architecture/diagrams](architecture/diagrams). Recommended portfolio views:
+Architecture diagram은 [docs/architecture/diagrams](architecture/diagrams)에 있습니다. portfolio에 추천하는 view:
 
 - [Overall architecture](architecture/diagrams/전체_아키텍처_개요_다이어그램.png)
 - [Lifecycle flow](architecture/diagrams/전체_생애주기_흐름도.png)
@@ -62,42 +62,42 @@ Architecture diagrams are stored in [docs/architecture/diagrams](architecture/di
 - [Task contract pipeline](architecture/diagrams/작업_계약_파이프라인_흐름도.png)
 - [Security boundary](architecture/diagrams/보안_경계와_소유권_분리_안내.png)
 
-Dashboard screenshots can be captured from the local preview after running:
+Dashboard screenshot은 아래 명령 실행 후 local preview에서 캡처할 수 있습니다.
 
 ```bash
 npm run dashboard:preview
 ```
 
-The dashboard currently focuses on sanitized fixtures for run history, artifacts, patch diffs, manifest state, and task packet policy review.
+현재 dashboard는 run history, artifacts, patch diffs, manifest state, task packet policy review를 위한 sanitized fixture에 집중합니다.
 
 ## Implementation Highlights
 
-- CLI skeleton and smoke-tested lifecycle commands in `bin/mh.mjs`.
-- Planning-first flow: scaffold, synthesize, compile acceptance criteria, freeze, then bootstrap.
-- Task packet contract with editable scope, forbidden scope, verification commands, budgets, and expected artifacts.
-- L0 local worktree runner path and shell adapter artifact generation.
-- Agent adapter layer with Codex adapter path.
-- Security policy checks for forbidden writes and command boundaries.
-- GitHub PR loop skeleton and execution profile skeletons for local, CI, container, and kind paths.
-- Upgrade dry-run and managed-block update strategy.
-- Dashboard views for runs, artifacts, patch diffs, and policy warnings.
-- Eval registry, sanitized feedback exporter, productization audit, release, and maintenance harness skeletons.
-- Offline E2E demo fixture under `examples/e2e-demo`.
+- `bin/mh.mjs`의 CLI skeleton과 smoke-tested lifecycle command
+- Planning-first flow: scaffold, synthesize, compile acceptance criteria, freeze, bootstrap
+- editable scope, forbidden scope, verification command, budget, expected artifact를 가진 task packet contract
+- L0 local worktree runner path와 shell adapter artifact generation
+- Codex adapter path를 포함한 agent adapter layer
+- forbidden write와 command boundary를 위한 security policy check
+- GitHub PR loop skeleton과 local/CI/container/kind execution profile skeleton
+- upgrade dry-run과 managed-block update strategy
+- run, artifact, patch diff, policy warning dashboard view
+- eval registry, sanitized feedback exporter, productization audit, release, maintenance harness skeleton
+- `examples/e2e-demo` 아래 offline E2E demo fixture
 
 ## Implemented, Planned, Out Of Scope
 
 | Area | Status | Notes |
 |---|---|---|
-| Planning scaffold and freeze | Implemented skeleton | Demonstrated in smoke and E2E flows. |
-| Factory bootstrap | Implemented skeleton | Creates Target Repo-local harness contracts after planning is frozen. |
-| L0 local worktree execution | Implemented skeleton | Worktree-first profile remains the default path. |
-| Shell/Codex adapter paths | Implemented skeleton | Shell path is suitable for deterministic local smoke tests. |
-| Dashboard | Implemented static MVP | Fixture-backed preview for run, artifact, and patch inspection. |
-| GitHub PR loop | Planned skeleton | Not a production GitHub App or full Checks API integration. |
-| Container/kind execution | Planned skeleton | Kept behind L0 maturity; not the default runner. |
-| Release and maintenance workflows | Planned skeleton | Useful for portfolio explanation, not proof of production readiness. |
-| Raw project data learning | Intentionally out of scope | Meta stores sanitized signals only, never raw PRDs, raw code, logs, or secrets. |
-| Fully autonomous development | Intentionally out of scope | The system provides contracts and guardrails for agents; it is not presented as a complete autonomous developer. |
+| Planning scaffold and freeze | Implemented skeleton | smoke와 E2E flow에서 검증됩니다. |
+| Factory bootstrap | Implemented skeleton | planning freeze 이후 Target Repo-local harness contract를 생성합니다. |
+| L0 local worktree execution | Implemented skeleton | worktree-first profile이 기본 path입니다. |
+| Shell/Codex adapter paths | Implemented skeleton | Shell path는 deterministic local smoke test에 적합합니다. |
+| Dashboard | Implemented static MVP | run, artifact, patch inspection을 위한 fixture-backed preview입니다. |
+| GitHub PR loop | Planned skeleton | production GitHub App이나 full Checks API integration이 아닙니다. |
+| Container/kind execution | Planned skeleton | L0 maturity 뒤에 둔 profile이며 default runner가 아닙니다. |
+| Release and maintenance workflows | Planned skeleton | portfolio 설명에는 유용하지만 production readiness 증거는 아닙니다. |
+| Raw project data learning | Intentionally out of scope | Meta는 sanitized signal만 저장하며 raw PRD, raw code, log, secret은 저장하지 않습니다. |
+| Fully autonomous development | Intentionally out of scope | 이 system은 agent를 위한 contract와 guardrail을 제공하며 complete autonomous developer로 제시하지 않습니다. |
 
 ## Source Links
 
@@ -112,4 +112,4 @@ The dashboard currently focuses on sanitized fixtures for run history, artifacts
 
 ## Review Narrative
 
-This project is strongest as a DevTool systems portfolio piece: it shows how to structure agent work as contracts, how to keep generated code and project-owned code separate, how to gate unsafe changes, and how to leave artifacts a reviewer can inspect. The realistic claim is an MVP skeleton with deterministic local demos and clear extension points, not a production autonomous engineering platform.
+이 프로젝트는 DevTool systems portfolio piece로 가장 강합니다. agent work를 contract로 구조화하는 방법, generated code와 project-owned code를 분리하는 방법, unsafe change를 gate하는 방법, reviewer가 inspection할 artifact를 남기는 방법을 보여줍니다. 현실적인 claim은 deterministic local demo와 clear extension point를 가진 MVP skeleton이지 production autonomous engineering platform이 아닙니다.
