@@ -12,4 +12,6 @@ npm run dashboard:preview
 
 Open `http://localhost:4173`.
 
-The preview loads sample fixtures from `apps/dashboard/fixtures`: `run-result.json`, `manifest.lock`, `state.yml`, and `task-packet.json`. These fixtures are sanitized examples owned by the Meta repo and do not copy raw target project data.
+The preview loads sample fixtures from `apps/dashboard/fixtures`: `run-result.json`, `run-history.json`, `manifest.lock`, `state.yml`, and `task-packet.json`. These fixtures are sanitized examples owned by the Meta repo and do not copy raw target project data.
+
+The run history parser normalizes `.harness/runs/<run-id>/run-result.json` records into dashboard rows with status, task id, adapter, duration, timestamp, and artifact metadata. The static preview uses `run-history.json`; unit-level smoke tests read sanitized run directories from `tests/fixtures/dashboard-runs`.

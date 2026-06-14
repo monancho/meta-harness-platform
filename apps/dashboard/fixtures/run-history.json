@@ -1,0 +1,57 @@
+{
+  "state": "ready",
+  "runs": [
+    {
+      "schemaVersion": "1.0.0",
+      "runId": "run-20260614120500-002-d4e5f6-MH-012",
+      "taskId": "MH-012",
+      "status": "failed",
+      "adapter": "codex",
+      "reasonCode": "MH_TEST_FAILED",
+      "message": "Sanitized fixture failure for dashboard display.",
+      "startedAt": "2026-06-14T12:05:00.000Z",
+      "completedAt": "2026-06-14T12:05:09.250Z",
+      "execution": {
+        "mode": "git-worktree",
+        "profile": "L0_LOCAL_WORKTREE"
+      },
+      "artifacts": [
+        "patch.diff",
+        "summary.md",
+        "run-result.json",
+        "test-report.json",
+        "screenshots/failure.png",
+        "logs/sanitized-output.txt"
+      ]
+    },
+    {
+      "schemaVersion": "1.0.0",
+      "runId": "run-20260614120000-001-a1b2c3-MH-011",
+      "taskId": "MH-011",
+      "status": "passed",
+      "adapter": "shell",
+      "reasonCode": null,
+      "startedAt": "2026-06-14T12:00:00.000Z",
+      "durationMs": 1750,
+      "execution": {
+        "mode": "local-worktree",
+        "profile": "L0"
+      },
+      "artifacts": [
+        {
+          "path": ".harness/runs/run-20260614120000-001-a1b2c3-MH-011/patch.diff",
+          "kind": "patch"
+        },
+        {
+          "path": ".harness/runs/run-20260614120000-001-a1b2c3-MH-011/summary.md",
+          "kind": "summary"
+        },
+        {
+          "path": ".harness/runs/run-20260614120000-001-a1b2c3-MH-011/run-result.json",
+          "kind": "result"
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -61,7 +61,7 @@ function dashboardView(activeView, state) {
     </header>
     <section class="summary-grid" aria-label="Fixture summary">
       ${metric('Project', state.summary.projectId)}
-      ${metric('Task', state.summary.taskId)}
+      ${metric('Runs', state.summary.runCount)}
       ${metric('Last Run', state.summary.lastRunStatus)}
       ${metric('Artifacts', state.summary.artifactCount)}
     </section>
@@ -95,33 +95,45 @@ function projectStateView(fixtures, summary) {
 }
 
 function runsView(fixtures) {
-  const run = fixtures.runResult;
+  const history = fixtures.runHistory ?? { state: 'empty', runs: [], errors: [] };
+  if (history.state === 'empty' || history.runs.length === 0) {
+    return emptyPanel('Run History', 'No harness run directories were found.');
+  }
   return `
     <section class="panel">
       <div class="panel-heading">
-        <h2>Recent Run</h2>
-        <span>${escapeHtml(run.adapter ?? 'adapter pending')}</span>
+        <h2>Run History</h2>
+        <span>${history.runs.length} runs</span>
       </div>
-      <dl class="details">
-        ${detail('Run ID', run.runId)}
-        ${detail('Status', run.status)}
-        ${detail('Reason Code', run.reasonCode ?? 'none')}
-        ${detail('Execution Mode', run.execution?.mode)}
-      </dl>
+      ${history.errors?.length ? runErrors(history.errors) : ''}
+      <div class="run-table" role="table" aria-label="Harness run history">
+        <div class="run-row run-head" role="row">
+          <span role="columnheader">Status</span>
+          <span role="columnheader">Task</span>
+          <span role="columnheader">Adapter</span>
+          <span role="columnheader">Duration</span>
+          <span role="columnheader">Timestamp</span>
+        </div>
+        ${history.runs.map(run => runRow(run)).join('')}
+      </div>
     </section>
   `;
 }
 
 function artifactsView(fixtures) {
-  const artifacts = fixtures.runResult.artifacts ?? [];
+  const runs = fixtures.runHistory?.runs ?? [];
+  const artifacts = runs.flatMap(run => run.artifacts.map(artifact => ({ ...artifact, runId: run.runId, status: run.status })));
+  if (artifacts.length === 0) {
+    return emptyPanel('Artifacts', 'No run artifacts were found.');
+  }
   return `
     <section class="panel">
       <div class="panel-heading">
         <h2>Artifacts</h2>
         <span>${artifacts.length} files</span>
       </div>
-      <ul class="list">
-        ${artifacts.map(item => `<li><span>${escapeHtml(item.path)}</span><code>${escapeHtml(item.kind)}</code></li>`).join('')}
+      <ul class="list artifact-list">
+        ${artifacts.map(item => artifactItem(item)).join('')}
       </ul>
     </section>
   `;
@@ -175,11 +187,11 @@ function detail(label, value) {
 }
 
 function loadingView() {
-  return '<section class="panel"><h1>Loading dashboard fixtures...</h1></section>';
+  return '<section class="panel state-panel"><h1>Loading dashboard fixtures...</h1><p>Reading local run history and policy fixtures.</p></section>';
 }
 
 function errorView(error) {
-  return `<section class="panel error"><h1>Fixture load failed</h1><p>${escapeHtml(error.message)}</p></section>`;
+  return `<section class="panel error state-panel"><h1>Fixture load failed</h1><p>${escapeHtml(error.message)}</p></section>`;
 }
 
 function currentView() {
@@ -195,6 +207,68 @@ function escapeHtml(value) {
     '"': '&quot;',
     "'": '&#39;'
   })[char]);
+}
+
+function runRow(run) {
+  return `
+    <div class="run-row" role="row">
+      <span role="cell"><strong class="status-text ${statusClass(run.status)}">${escapeHtml(run.status)}</strong></span>
+      <span role="cell">${escapeHtml(run.taskId)}</span>
+      <span role="cell">${escapeHtml(run.adapter)}</span>
+      <span role="cell">${escapeHtml(formatDuration(run.durationMs))}</span>
+      <span role="cell">${escapeHtml(formatTimestamp(run.timestamp))}</span>
+    </div>
+  `;
+}
+
+function artifactItem(item) {
+  return `
+    <li>
+      <span>
+        <a href="${escapeAttribute(item.href)}">${escapeHtml(item.fileName || item.path)}</a>
+        <small>${escapeHtml(item.runId)}</small>
+      </span>
+      <code>${escapeHtml(item.kind)}</code>
+    </li>
+  `;
+}
+
+function runErrors(errors) {
+  return `
+    <div class="inline-error" role="alert">
+      ${errors.map(error => `<p>${escapeHtml(error.runId)}: ${escapeHtml(error.message)}</p>`).join('')}
+    </div>
+  `;
+}
+
+function emptyPanel(title, message) {
+  return `
+    <section class="panel state-panel">
+      <h2>${escapeHtml(title)}</h2>
+      <p>${escapeHtml(message)}</p>
+    </section>
+  `;
+}
+
+function formatDuration(value) {
+  if (typeof value !== 'number') return 'unknown';
+  if (value < 1000) return `${value} ms`;
+  return `${(value / 1000).toFixed(1)} s`;
+}
+
+function formatTimestamp(value) {
+  if (!value || value === 'unknown') return 'unknown';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toISOString();
+}
+
+function statusClass(status) {
+  return status === 'passed' ? 'passed' : status === 'failed' ? 'failed' : 'unknown';
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value).replace(/`/g, '&#96;');
 }
 
 window.addEventListener('hashchange', start);

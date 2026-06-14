@@ -1,7 +1,10 @@
+import { normalizeRunResult, summarizeRunHistory } from './run-history.mjs';
+
 const DEFAULT_FIXTURE_BASE = './fixtures';
 
 const FIXTURE_FILES = {
   runResult: 'run-result.json',
+  runHistory: 'run-history.json',
   manifest: 'manifest.lock',
   state: 'state.yml',
   taskPacket: 'task-packet.json'
@@ -11,16 +14,19 @@ export async function loadDashboardFixtures(options = {}) {
   const basePath = normalizeBasePath(options.basePath ?? DEFAULT_FIXTURE_BASE);
   const readText = options.readText ?? readTextWithFetch;
 
-  const [runResultText, manifestText, stateText, taskPacketText] = await Promise.all([
+  const [runResultText, runHistoryText, manifestText, stateText, taskPacketText] = await Promise.all([
     readFixture(readText, basePath, FIXTURE_FILES.runResult),
+    readOptionalFixture(readText, basePath, FIXTURE_FILES.runHistory),
     readFixture(readText, basePath, FIXTURE_FILES.manifest),
     readFixture(readText, basePath, FIXTURE_FILES.state),
     readFixture(readText, basePath, FIXTURE_FILES.taskPacket)
   ]);
 
+  const runResult = parseJsonFixture(FIXTURE_FILES.runResult, runResultText);
   return {
     source: basePath,
-    runResult: parseJsonFixture(FIXTURE_FILES.runResult, runResultText),
+    runResult,
+    runHistory: parseRunHistoryFixture(runHistoryText, runResult),
     manifest: parseJsonFixture(FIXTURE_FILES.manifest, manifestText),
     state: parseSimpleYaml(stateText),
     taskPacket: parseJsonFixture(FIXTURE_FILES.taskPacket, taskPacketText)
@@ -29,18 +35,21 @@ export async function loadDashboardFixtures(options = {}) {
 
 export function summarizeDashboardFixtures(fixtures) {
   const managedFiles = fixtures.manifest?.managedFiles ?? [];
-  const artifacts = fixtures.runResult?.artifacts ?? [];
+  const runSummary = summarizeRunHistory(fixtures.runHistory);
   const forbiddenScope = fixtures.taskPacket?.forbiddenScope ?? [];
   const editableScope = fixtures.taskPacket?.editableScope ?? [];
 
   return {
     projectId: fixtures.state?.projectId ?? 'unknown',
     phase: fixtures.state?.phase ?? 'unknown',
-    lastRunStatus: fixtures.runResult?.status ?? 'unknown',
-    lastRunId: fixtures.runResult?.runId ?? 'unknown',
+    lastRunStatus: runSummary.latestRunStatus,
+    lastRunId: fixtures.runHistory?.runs?.[0]?.runId ?? fixtures.runResult?.runId ?? 'unknown',
     taskId: fixtures.taskPacket?.taskId ?? 'unknown',
     managedFileCount: managedFiles.length,
-    artifactCount: artifacts.length,
+    artifactCount: runSummary.artifactCount,
+    runCount: runSummary.runCount,
+    failedRunCount: runSummary.failedCount,
+    passedRunCount: runSummary.passedCount,
     policyCount: forbiddenScope.length + editableScope.length
   };
 }
@@ -51,6 +60,14 @@ function normalizeBasePath(basePath) {
 
 async function readFixture(readText, basePath, fileName) {
   return readText(`${basePath}/${fileName}`);
+}
+
+async function readOptionalFixture(readText, basePath, fileName) {
+  try {
+    return await readFixture(readText, basePath, fileName);
+  } catch {
+    return null;
+  }
 }
 
 async function readTextWithFetch(path) {
@@ -68,6 +85,23 @@ function parseJsonFixture(fileName, text) {
   } catch (error) {
     throw new Error(`Invalid JSON fixture ${fileName}: ${error.message}`);
   }
+}
+
+function parseRunHistoryFixture(text, fallbackRunResult) {
+  if (!text) {
+    return {
+      state: 'ready',
+      runs: [normalizeRunResult(fallbackRunResult)],
+      errors: []
+    };
+  }
+  const parsed = parseJsonFixture(FIXTURE_FILES.runHistory, text);
+  const runs = (parsed.runs ?? []).map(item => normalizeRunResult(item));
+  return {
+    state: parsed.state ?? 'ready',
+    runs,
+    errors: parsed.errors ?? []
+  };
 }
 
 export function parseSimpleYaml(text) {
