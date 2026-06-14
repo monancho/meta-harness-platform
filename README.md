@@ -20,6 +20,12 @@
 - 기본 자동화 모드: `safe`
 - 공격적 자동화 모드: `yolo` — 컨테이너를 버릴 수 있다는 전제에서만 사용
 
+## 포트폴리오 랜딩
+
+프로젝트의 문제 정의, 솔루션, 아키텍처, 데모 흐름, 구현 상태는 [docs/PORTFOLIO.md](docs/PORTFOLIO.md)에 정리되어 있습니다.
+
+핵심 포지셔닝은 **완성된 자율 개발자**가 아니라, Target Repo 안에 agentic software factory를 생성하고 실행 산출물을 검증 가능하게 남기는 **repo-resident DevTool skeleton**입니다.
+
 
 ## v1.4 인스턴트 모드
 
