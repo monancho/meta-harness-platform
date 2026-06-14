@@ -93,6 +93,7 @@ node --input-type=module - "$BAD_SCOPE_RESULT" <<'NODE'
 import fs from 'node:fs';
 const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 if (result.status !== 'failed') throw new Error('expected failed security result');
+if (result.failureCategory !== 'security') throw new Error(`unexpected failureCategory: ${result.failureCategory}`);
 if (result.reasonCode !== 'MH_SECURITY_INVALID_SCOPE') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
 NODE
 
@@ -123,7 +124,101 @@ node --input-type=module - "$DENIED_COMMAND_RESULT" <<'NODE'
 import fs from 'node:fs';
 const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 if (result.status !== 'failed') throw new Error('expected failed command policy result');
+if (result.failureCategory !== 'security') throw new Error(`unexpected failureCategory: ${result.failureCategory}`);
 if (result.reasonCode !== 'MH_SECURITY_COMMAND_DENIED') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
+NODE
+
+ENV_FORBIDDEN_TASK="$TARGET/.harness/tasks/SEC-ENV-FORBIDDEN.task.json"
+cat > "$ENV_FORBIDDEN_TASK" <<'JSON'
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "SEC-ENV-FORBIDDEN",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Forbidden env file",
+  "objective": "Exercise forbidden .env changed-file detection.",
+  "editableScope": ["**"],
+  "forbiddenScope": [".env*", "infra/production/**"],
+  "acceptanceCriteria": [{ "id": "SEC-AC-004", "text": "Env file changes are blocked." }],
+  "verifyCommands": ["node -e \"import fs from 'node:fs'; fs.writeFileSync('.env.local','placeholder=true'); console.log('mutated env file')\""],
+  "commands": { "verify": ["node -e \"import fs from 'node:fs'; fs.writeFileSync('.env.local','placeholder=true'); console.log('mutated env file')\""] },
+  "budgets": { "maxRuntimeMinutes": 20, "maxChangedFiles": 20, "maxPatchLines": 800 },
+  "expectedArtifacts": ["patch.diff", "run-result.json", "summary.md"]
+}
+JSON
+if node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/SEC-ENV-FORBIDDEN.task.json --adapter shell >"$TMP/security-env-forbidden.out" 2>"$TMP/security-env-forbidden.err"; then
+  echo "[error] .env forbidden change unexpectedly passed" >&2
+  exit 1
+fi
+ENV_FORBIDDEN_RESULT="$(find "$TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+node --input-type=module - "$ENV_FORBIDDEN_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'failed') throw new Error('expected failed .env forbidden result');
+if (result.failureCategory !== 'security') throw new Error(`unexpected failureCategory: ${result.failureCategory}`);
+if (result.reasonCode !== 'MH_SECURITY_FORBIDDEN_CHANGED_FILE') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
+NODE
+
+DEPLOY_PROD_TASK="$TARGET/.harness/tasks/SEC-DEPLOY-PROD.task.json"
+cat > "$DEPLOY_PROD_TASK" <<'JSON'
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "SEC-DEPLOY-PROD",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Forbidden deploy-prod workflow",
+  "objective": "Exercise deploy-prod workflow changed-file detection.",
+  "editableScope": ["**"],
+  "forbiddenScope": [".env*", ".github/workflows/deploy-prod.yml"],
+  "acceptanceCriteria": [{ "id": "SEC-AC-005", "text": "deploy-prod workflow changes are blocked." }],
+  "verifyCommands": ["node -e \"import fs from 'node:fs'; fs.mkdirSync('.github/workflows',{recursive:true}); fs.writeFileSync('.github/workflows/deploy-prod.yml','name: deploy-prod'); console.log('mutated deploy workflow')\""],
+  "commands": { "verify": ["node -e \"import fs from 'node:fs'; fs.mkdirSync('.github/workflows',{recursive:true}); fs.writeFileSync('.github/workflows/deploy-prod.yml','name: deploy-prod'); console.log('mutated deploy workflow')\""] },
+  "budgets": { "maxRuntimeMinutes": 20, "maxChangedFiles": 20, "maxPatchLines": 800 },
+  "expectedArtifacts": ["patch.diff", "run-result.json", "summary.md"]
+}
+JSON
+if node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/SEC-DEPLOY-PROD.task.json --adapter shell >"$TMP/security-deploy-prod.out" 2>"$TMP/security-deploy-prod.err"; then
+  echo "[error] deploy-prod forbidden change unexpectedly passed" >&2
+  exit 1
+fi
+DEPLOY_PROD_RESULT="$(find "$TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+node --input-type=module - "$DEPLOY_PROD_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'failed') throw new Error('expected failed deploy-prod forbidden result');
+if (result.failureCategory !== 'security') throw new Error(`unexpected failureCategory: ${result.failureCategory}`);
+if (result.reasonCode !== 'MH_SECURITY_FORBIDDEN_CHANGED_FILE') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
+NODE
+
+SECRET_PATTERN_TASK="$TARGET/.harness/tasks/SEC-SECRET-PATTERN.task.json"
+cat > "$SECRET_PATTERN_TASK" <<'JSON'
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "SEC-SECRET-PATTERN",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Secret pattern command",
+  "objective": "Exercise secret-like command content detection.",
+  "editableScope": ["apps/**"],
+  "forbiddenScope": [".env*", "infra/production/**"],
+  "acceptanceCriteria": [{ "id": "SEC-AC-006", "text": "Secret-like command content is blocked." }],
+  "verifyCommands": ["node -e \"const API_KEY='aaaaaaaaaaaa'; console.log(API_KEY.length)\""],
+  "commands": { "verify": ["node -e \"const API_KEY='aaaaaaaaaaaa'; console.log(API_KEY.length)\""] },
+  "budgets": { "maxRuntimeMinutes": 20, "maxChangedFiles": 20, "maxPatchLines": 800 },
+  "expectedArtifacts": ["patch.diff", "run-result.json", "summary.md"]
+}
+JSON
+if node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/SEC-SECRET-PATTERN.task.json --adapter shell >"$TMP/security-secret-pattern.out" 2>"$TMP/security-secret-pattern.err"; then
+  echo "[error] secret-like command unexpectedly passed" >&2
+  exit 1
+fi
+SECRET_PATTERN_RESULT="$(find "$TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+node --input-type=module - "$SECRET_PATTERN_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'failed') throw new Error('expected failed secret-pattern result');
+if (result.failureCategory !== 'security') throw new Error(`unexpected failureCategory: ${result.failureCategory}`);
+if (result.reasonCode !== 'MH_SECURITY_SECRET_PATTERN') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
 NODE
 
 INVALID_TASK="$TMP/invalid.task.json"
