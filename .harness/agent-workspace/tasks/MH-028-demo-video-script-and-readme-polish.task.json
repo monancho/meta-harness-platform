@@ -7,7 +7,7 @@
   "objective": "Prepare a concise demo script and polish the README so the project can be understood by recruiters, collaborators, and future implementation agents.",
   "contextFiles": [
     "AGENTS.md",
-    ".harness/agent-workspace/tasks/MH-028-demo-video-script-readme-polish.task.json",
+    ".harness/agent-workspace/tasks/MH-028-demo-video-script-and-readme-polish.task.json",
     "README.md"
   ],
   "editableScope": [
