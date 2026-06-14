@@ -109,3 +109,16 @@ node ./bin/mh.mjs run --target <target-repo> --task .harness/tasks/BL-001.task.j
   - `.harness/runs/<run-id>/patch.diff`
   - `.harness/runs/<run-id>/run-result.json`
   - `.harness/runs/<run-id>/summary.md`
+
+## T-090 GitHub PR Loop Skeleton
+
+- 명령: `mh github pr --target <dir> --run <run-id>`
+- 기대 결과:
+  - stdout에 PR body markdown을 출력한다.
+  - `.harness/runs/<run-id>/pr-body.md`를 생성한다.
+  - 기본 실행은 G0 local patch 모드이며 `gh` 또는 network를 요구하지 않는다.
+- 명령: `mh github pr --target <dir> --run <run-id> --create`
+- 기대 결과:
+  - G1 gh PR 모드로 branch, commit, PR 생성을 시도한다.
+  - `gh`가 없으면 설치 또는 인증 방법과 `--create` 없는 G0 재실행 방법을 안내하며 실패한다.
+  - G2 GitHub Actions PR loop는 후속 단계로 문서화되어야 한다.
