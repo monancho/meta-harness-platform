@@ -45,6 +45,66 @@ node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapte
 grep -q "phase: runnable" "$TARGET/.harness/state.yml"
 grep -Eq "lastRunResultHash: sha256:[a-f0-9]{64}" "$TARGET/.harness/state.yml"
 
+BAD_SCOPE_TASK="$TARGET/.harness/tasks/SEC-BAD-SCOPE.task.json"
+cat > "$BAD_SCOPE_TASK" <<'JSON'
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "SEC-BAD-SCOPE",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Invalid editable scope",
+  "objective": "Exercise security preflight for invalid scope patterns.",
+  "editableScope": ["../outside/**"],
+  "forbiddenScope": [".env*", "infra/production/**"],
+  "acceptanceCriteria": [{ "id": "SEC-AC-001", "text": "Security preflight fails." }],
+  "verifyCommands": ["node -e \"console.log('should not run')\""],
+  "commands": { "verify": ["node -e \"console.log('should not run')\""] },
+  "budgets": { "maxRuntimeMinutes": 20, "maxChangedFiles": 20, "maxPatchLines": 800 },
+  "expectedArtifacts": ["patch.diff", "run-result.json", "summary.md"]
+}
+JSON
+if node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/SEC-BAD-SCOPE.task.json --adapter shell >"$TMP/security-bad-scope.out" 2>"$TMP/security-bad-scope.err"; then
+  echo "[error] invalid security scope unexpectedly passed" >&2
+  exit 1
+fi
+BAD_SCOPE_RESULT="$(find "$TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+node --input-type=module - "$BAD_SCOPE_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'failed') throw new Error('expected failed security result');
+if (result.reasonCode !== 'MH_SECURITY_INVALID_SCOPE') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
+NODE
+
+DENIED_COMMAND_TASK="$TARGET/.harness/tasks/SEC-DENIED-COMMAND.task.json"
+cat > "$DENIED_COMMAND_TASK" <<'JSON'
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "SEC-DENIED-COMMAND",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Denied command",
+  "objective": "Exercise command deny policy.",
+  "editableScope": ["apps/**"],
+  "forbiddenScope": [".env*", "infra/production/**"],
+  "acceptanceCriteria": [{ "id": "SEC-AC-002", "text": "Denied command is blocked." }],
+  "verifyCommands": ["git push origin main"],
+  "commands": { "verify": ["git push origin main"] },
+  "budgets": { "maxRuntimeMinutes": 20, "maxChangedFiles": 20, "maxPatchLines": 800 },
+  "expectedArtifacts": ["patch.diff", "run-result.json", "summary.md"]
+}
+JSON
+if node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task .harness/tasks/SEC-DENIED-COMMAND.task.json --adapter shell >"$TMP/security-denied-command.out" 2>"$TMP/security-denied-command.err"; then
+  echo "[error] denied command unexpectedly passed" >&2
+  exit 1
+fi
+DENIED_COMMAND_RESULT="$(find "$TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+node --input-type=module - "$DENIED_COMMAND_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'failed') throw new Error('expected failed command policy result');
+if (result.reasonCode !== 'MH_SECURITY_COMMAND_DENIED') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
+NODE
+
 INVALID_TASK="$TMP/invalid.task.json"
 cat > "$INVALID_TASK" <<'JSON'
 {
@@ -116,6 +176,36 @@ git -C "$GIT_TARGET" config user.email "smoke@example.invalid"
 git -C "$GIT_TARGET" config user.name "Smoke Test"
 git -C "$GIT_TARGET" add .
 git -C "$GIT_TARGET" commit -q -m "initial target factory"
+
+POST_FORBIDDEN_TASK="$GIT_TARGET/.harness/tasks/SEC-POST-FORBIDDEN.task.json"
+cat > "$POST_FORBIDDEN_TASK" <<'JSON'
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "SEC-POST-FORBIDDEN",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Forbidden post-run change",
+  "objective": "Exercise post-execution forbidden changed-file detection.",
+  "editableScope": ["**"],
+  "forbiddenScope": [".env*", "infra/production/**"],
+  "acceptanceCriteria": [{ "id": "SEC-AC-003", "text": "Forbidden changed file fails the run." }],
+  "verifyCommands": ["node -e \"import fs from 'node:fs'; fs.mkdirSync('infra/production',{recursive:true}); fs.writeFileSync('infra/production/blocked.txt','blocked'); console.log('mutated forbidden path')\""],
+  "commands": { "verify": ["node -e \"import fs from 'node:fs'; fs.mkdirSync('infra/production',{recursive:true}); fs.writeFileSync('infra/production/blocked.txt','blocked'); console.log('mutated forbidden path')\""] },
+  "budgets": { "maxRuntimeMinutes": 20, "maxChangedFiles": 20, "maxPatchLines": 800 },
+  "expectedArtifacts": ["patch.diff", "run-result.json", "summary.md"]
+}
+JSON
+if node "$ROOT/bin/mh.mjs" run --target "$GIT_TARGET" --task .harness/tasks/SEC-POST-FORBIDDEN.task.json --adapter shell >"$TMP/security-post-forbidden.out" 2>"$TMP/security-post-forbidden.err"; then
+  echo "[error] forbidden changed file unexpectedly passed" >&2
+  exit 1
+fi
+POST_FORBIDDEN_RESULT="$(find "$GIT_TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"
+node --input-type=module - "$POST_FORBIDDEN_RESULT" <<'NODE'
+import fs from 'node:fs';
+const result = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (result.status !== 'failed') throw new Error('expected failed forbidden changed-file result');
+if (result.reasonCode !== 'MH_SECURITY_FORBIDDEN_CHANGED_FILE') throw new Error(`unexpected reasonCode: ${result.reasonCode}`);
+NODE
 
 node "$ROOT/bin/mh.mjs" run --target "$GIT_TARGET" --task "$GENERATED_TASK" --adapter shell --cleanup false
 GIT_RUN_RESULT="$(find "$GIT_TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name run-result.json | sort | tail -n 1)"

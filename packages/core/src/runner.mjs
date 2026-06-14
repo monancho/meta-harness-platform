@@ -24,11 +24,23 @@ export function cmdRun(opts, fail) {
   const adapter = opts.adapter || 'shell';
   const before = listRunResultFiles(target);
   const cleanupArg = opts.cleanup === undefined ? '' : ` --cleanup ${JSON.stringify(String(opts.cleanup))}`;
-  execSync(`node ${JSON.stringify(runner)} --task ${JSON.stringify(task)} --adapter ${JSON.stringify(adapter)}${cleanupArg}`, { cwd: target, stdio: 'inherit' });
+  let runnerError = null;
+  try {
+    execSync(`node ${JSON.stringify(runner)} --task ${JSON.stringify(task)} --adapter ${JSON.stringify(adapter)}${cleanupArg}`, { cwd: target, stdio: 'inherit' });
+  } catch (error) {
+    runnerError = error;
+  }
   const after = [...listRunResultFiles(target)].filter(file => !before.has(file)).sort();
   const resultPath = after.at(-1);
-  if (!resultPath) fail('run-result.json not found after harness run');
+  if (!resultPath) {
+    if (runnerError) fail(`runner failed before writing run-result.json: ${runnerError.message}`);
+    fail('run-result.json not found after harness run');
+  }
   assertContractFile('runResult', resultPath, fail);
+  if (runnerError) {
+    const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+    fail(`runner failed: ${result.reasonCode || result.status || runnerError.message}`);
+  }
   setState(target, {
     projectId: readProjectId(target),
     phase: 'runnable',
