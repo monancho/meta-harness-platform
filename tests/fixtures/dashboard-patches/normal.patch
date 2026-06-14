@@ -1,0 +1,19 @@
+diff --git a/apps/web/src/index.ts b/apps/web/src/index.ts
+index 2f8a14b..19d925f 100644
+--- a/apps/web/src/index.ts
++++ b/apps/web/src/index.ts
+@@ -1,5 +1,6 @@
+ import { startApp } from './app';
+ 
+-startApp();
++startApp({
++  mode: 'preview'
++});
+diff --git a/docs/DASHBOARD.md b/docs/DASHBOARD.md
+index 93f2a01..f7a7c68 100644
+--- a/docs/DASHBOARD.md
++++ b/docs/DASHBOARD.md
+@@ -2,3 +2,4 @@
+ 
+ The dashboard reads local fixtures.
++Patch diff summaries are shown by file.
