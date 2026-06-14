@@ -11,3 +11,4 @@ examples/generated-target-project-demo/.harness/tmp/
 .harness/agent-workspace/auto-runs/
 .harness/agent-workspace/autoloop.lock
 .harness/agent-workspace/latest-checkpoint.txt
+INSTANT_NEXT_STEPS.md
