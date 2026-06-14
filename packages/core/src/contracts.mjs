@@ -10,6 +10,7 @@ export const CONTRACTS = {
   manifest: 'manifest.contract.json',
   taskPacket: 'task-packet.contract.json',
   runResult: 'run-result.contract.json',
+  sanitizedSignal: 'sanitized-signal.schema.json',
   buildHandoff: 'build-handoff.contract.json',
   evalSuite: 'eval-suite.contract.json',
   evalResult: 'eval-result.contract.json'

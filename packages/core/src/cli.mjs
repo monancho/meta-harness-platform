@@ -5,6 +5,7 @@ import { cmdGithubPr } from './github-pr.mjs';
 import { cmdManifestCheck } from './manifest.mjs';
 import { cmdCompileAcceptance, cmdCompileTasks, cmdPlanFreeze, cmdPlanSynthesize, cmdScaffoldPlanning } from './planning.mjs';
 import { cmdRun } from './runner.mjs';
+import { cmdSignalExport } from './sanitized-signal.mjs';
 import { cmdFactoryUpgrade } from './upgrade.mjs';
 import { cmdEvalList, cmdEvalRun } from './evals.mjs';
 
@@ -37,7 +38,7 @@ function cmdDoctor() {
 }
 
 function usage() {
-  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir> [--enable-kind-namespace]\n  factory upgrade --target <dir> --dry-run\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex [--execution-profile L0_LOCAL_WORKTREE|L1_CONTAINER_WORKER|L2_KIND_NAMESPACE] [--dry-run]\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n  eval list\n  eval run --suite <suite-id> [--no-network] [--output <json>]\n`);
+  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir> [--enable-kind-namespace]\n  factory upgrade --target <dir> --dry-run\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex [--execution-profile L0_LOCAL_WORKTREE|L1_CONTAINER_WORKER|L2_KIND_NAMESPACE] [--dry-run]\n  signal export --target <dir> [--run <run-id|run-result.json>] [--output <json>]\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n  eval list\n  eval run --suite <suite-id> [--no-network] [--output <json>]\n`);
 }
 
 export function runCli(argv) {
@@ -54,6 +55,7 @@ export function runCli(argv) {
   else if (a === 'factory' && b === 'upgrade') ok(cmdFactoryUpgrade(opts, fail));
   else if (a === 'manifest' && b === 'check') ok(cmdManifestCheck(opts, fail));
   else if (a === 'run') cmdRun(opts, fail);
+  else if (a === 'signal' && b === 'export') cmdSignalExport(opts, fail);
   else if (a === 'github' && b === 'pr') cmdGithubPr(opts, fail);
   else if (a === 'eval' && b === 'list') ok(cmdEvalList(opts, fail));
   else if (a === 'eval' && b === 'run') cmdEvalRun(opts, fail);

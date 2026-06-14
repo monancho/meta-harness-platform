@@ -18,6 +18,7 @@ node "$ROOT/tests/dashboard-run-history.test.mjs"
 node "$ROOT/tests/dashboard-patch-diff.test.mjs"
 node "$ROOT/tests/managed-blocks.test.mjs"
 node "$ROOT/tests/kind-namespace-profile.test.mjs"
+node "$ROOT/tests/sanitized-signal.test.mjs"
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
 
 if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then
@@ -82,6 +83,18 @@ if grep -q "^  push:" "$TARGET/.github/workflows/harness-run.yml" || grep -q "^ 
   exit 1
 fi
 node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapter shell
+LATEST_SIGNAL="$(find "$TARGET/.harness/runs" -mindepth 2 -maxdepth 2 -name sanitized-signal.json | sort | tail -n 1)"
+test -f "$LATEST_SIGNAL"
+node --input-type=module - "$LATEST_SIGNAL" <<'NODE'
+import fs from 'node:fs';
+const signal = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+if (signal.taskType !== 'frontend-ui') throw new Error(`unexpected taskType: ${signal.taskType}`);
+if (signal.result !== 'passed') throw new Error(`unexpected result: ${signal.result}`);
+if (!signal.privacyFlags?.excludesRawPatchContent) throw new Error('missing raw patch privacy flag');
+if (JSON.stringify(signal).includes('generatedTask')) throw new Error('sanitized signal leaked patch content');
+NODE
+node "$ROOT/bin/mh.mjs" signal export --target "$TARGET" --run "$(basename "$(dirname "$LATEST_SIGNAL")")" >"$TMP/signal-export.out"
+grep -q "sanitized signal exported" "$TMP/signal-export.out"
 
 if MH_CODEX_BINARY="$TMP/missing-codex" node "$ROOT/bin/mh.mjs" run --target "$TARGET" --task "$GENERATED_TASK" --adapter codex >"$TMP/codex-missing.out" 2>"$TMP/codex-missing.err"; then
   echo "[error] codex adapter unexpectedly passed with a missing codex binary" >&2
