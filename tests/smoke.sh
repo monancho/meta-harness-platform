@@ -20,6 +20,7 @@ node "$ROOT/tests/managed-blocks.test.mjs"
 node "$ROOT/tests/kind-namespace-profile.test.mjs"
 node "$ROOT/tests/sanitized-signal.test.mjs"
 node "$ROOT/tests/feedback-analyzer.test.mjs"
+node "$ROOT/tests/productization-report.test.mjs"
 node "$ROOT/bin/mh.mjs" scaffold planning --target "$TARGET" --project-id smoke-demo
 
 if node "$ROOT/bin/mh.mjs" factory bootstrap --target "$TARGET" >"$TMP/bootstrap-before-freeze.out" 2>"$TMP/bootstrap-before-freeze.err"; then
@@ -298,6 +299,20 @@ fi
 grep -q "acceptanceCriteria가 없습니다" "$TMP/compile-bad.err"
 
 test -f "$TARGET/.harness/factory.yml"
+test -f "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "autoFixDefault: false" "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "category: ux" "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "category: a11y" "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "category: responsive" "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "category: performance" "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "category: security" "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "category: content" "$TARGET/.harness/productization/audit-checklist.yml"
+grep -q "category: release-readiness" "$TARGET/.harness/productization/audit-checklist.yml"
+node "$ROOT/bin/mh.mjs" productization report --target "$TARGET" >"$TMP/productization-report.out"
+test -f "$TARGET/.harness/productization/productization-report.md"
+grep -q "Productization Audit Report" "$TARGET/.harness/productization/productization-report.md"
+grep -q "Hardening Backlog" "$TARGET/.harness/productization/productization-report.md"
+grep -q "does not auto-fix findings" "$TARGET/.harness/productization/productization-report.md"
 test -f "$TARGET/.harness/manifest.lock"
 node --input-type=module - "$TARGET/.harness/manifest.lock" <<'NODE'
 import fs from 'node:fs';

@@ -10,3 +10,4 @@ export * as upgrade from './upgrade.mjs';
 export * as evals from './evals.mjs';
 export * as sanitizedSignal from './sanitized-signal.mjs';
 export * as feedbackAnalyzer from './feedback-analyzer.mjs';
+export * as productization from './productization.mjs';
