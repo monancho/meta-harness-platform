@@ -6,8 +6,125 @@ function jsonContent(obj) {
   return JSON.stringify(obj, null, 2) + '\n';
 }
 
-export function buildFactoryFilePlan({ projectId, handoff, handoffPath }) {
+function boolText(value) {
+  return value ? 'true' : 'false';
+}
+
+function buildKindNamespaceFiles() {
   return [
+    ['infra/local-task-k8s/README.md', `# Local Task Kubernetes Profile
+
+This directory is generated only when \`factory bootstrap --enable-kind-namespace\` is used.
+It is a skeleton for the optional \`L2_KIND_NAMESPACE\` execution profile and does not require
+a live Kubernetes cluster during generation.
+
+## Namespace-per-run Lifecycle
+
+1. Create one namespace for the run, for example \`mh-run-<run-id>\`.
+2. Apply the worker job that executes the selected task packet.
+3. Apply preview and QA jobs for multi-service validation.
+4. Collect artifacts from job logs and shared artifact paths into \`.harness/runs/<run-id>/\`.
+5. Cleanup the namespace after artifacts are collected.
+
+The default profile remains \`L0_LOCAL_WORKTREE\`. Use this profile only after explicitly
+enabling it in \`.harness/execution-profiles.yml\` and wiring a real kind cluster runner.
+`],
+    ['infra/local-task-k8s/kustomization.yml', `resources:
+  - namespace.yml
+  - worker-job.yml
+  - preview-job.yml
+  - qa-job.yml
+`],
+    ['infra/local-task-k8s/namespace.yml', `apiVersion: v1
+kind: Namespace
+metadata:
+  name: mh-run-placeholder
+  labels:
+    app.kubernetes.io/name: meta-harness-local-task
+    meta-harness.dev/profile: L2_KIND_NAMESPACE
+`],
+    ['infra/local-task-k8s/worker-job.yml', `apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mh-worker
+  namespace: mh-run-placeholder
+  labels:
+    meta-harness.dev/stage: worker
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: worker
+          image: node:22
+          workingDir: /workspace
+          command: ["node", ".harness/bin/runner.mjs"]
+          args: ["--task", "$(MH_TASK_PATH)", "--adapter", "$(MH_ADAPTER)", "--execution-profile", "L2_KIND_NAMESPACE"]
+          env:
+            - name: MH_TASK_PATH
+              value: ".harness/tasks/example.task.json"
+            - name: MH_ADAPTER
+              value: "shell"
+`],
+    ['infra/local-task-k8s/preview-job.yml', `apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mh-preview
+  namespace: mh-run-placeholder
+  labels:
+    meta-harness.dev/stage: preview
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: preview
+          image: node:22
+          workingDir: /workspace
+          command: ["npm", "run", "preview", "--if-present"]
+`],
+    ['infra/local-task-k8s/qa-job.yml', `apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mh-qa
+  namespace: mh-run-placeholder
+  labels:
+    meta-harness.dev/stage: qa
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: qa
+          image: node:22
+          workingDir: /workspace
+          command: ["npm", "test"]
+`],
+    ['infra/local-task-k8s/run-namespace-lifecycle.sh', `#!/usr/bin/env bash
+set -euo pipefail
+
+RUN_ID="\${1:-run-local}"
+NAMESPACE="mh-\${RUN_ID}"
+ARTIFACT_DIR=".harness/runs/\${RUN_ID}"
+
+mkdir -p "$ARTIFACT_DIR"
+kubectl create namespace "$NAMESPACE"
+trap 'kubectl delete namespace "$NAMESPACE" --ignore-not-found=true' EXIT
+
+sed "s/mh-run-placeholder/$NAMESPACE/g" infra/local-task-k8s/worker-job.yml | kubectl apply -f -
+sed "s/mh-run-placeholder/$NAMESPACE/g" infra/local-task-k8s/preview-job.yml | kubectl apply -f -
+sed "s/mh-run-placeholder/$NAMESPACE/g" infra/local-task-k8s/qa-job.yml | kubectl apply -f -
+
+kubectl -n "$NAMESPACE" wait --for=condition=complete job/mh-worker job/mh-preview job/mh-qa --timeout=20m
+kubectl -n "$NAMESPACE" logs job/mh-worker > "$ARTIFACT_DIR/worker.log"
+kubectl -n "$NAMESPACE" logs job/mh-preview > "$ARTIFACT_DIR/preview.log"
+kubectl -n "$NAMESPACE" logs job/mh-qa > "$ARTIFACT_DIR/qa.log"
+`, { executable: true }]
+  ];
+}
+
+export function buildFactoryFilePlan({ projectId, handoff, handoffPath, enableKindNamespace = false }) {
+  const files = [
     ['package.json', jsonContent({ name: projectId, version: '0.1.0', private: true, type: 'module', scripts: { test: "node -e \"console.log('test ok')\"", lint: "node -e \"console.log('lint ok')\"", typecheck: "node -e \"console.log('typecheck ok')\"" } })],
     ['apps/web/src/index.ts', `export const appName = ${JSON.stringify(handoff.projectName || projectId)};\n`],
     ['apps/api/src/server.ts', `export function health(){ return { ok: true }; }\n`],
@@ -160,8 +277,8 @@ jobs:
 `],
     ['Makefile', `dev:\n\t@echo \"dev placeholder\"\n\npreview:\n\t@echo \"preview placeholder\"\n\ntest:\n\tnpm test\n\nlint:\n\tnpm run lint\n\ntypecheck:\n\tnpm run typecheck\n\nharness-run:\n\tnode .harness/bin/runner.mjs --task $(TASK) --adapter $(ADAPTER)\n`],
     ['.harness/bin/runner.mjs', targetRunnerCode(), { executable: true }],
-    ['.harness/factory.yml', `schemaVersion: 1\nfactory:\n  id: ${projectId}\n  version: 0.1.0\n  generatedBy: meta-harness-platform-starter\n  generatorVersion: ${VERSION}\ngeneratedFrom:\n  buildHandoff: .harness/planning/build-handoff.json\n  buildHandoffHash: sha256:${shaFile(handoffPath)}\ncapabilities:\n  planning: true\n  bootstrap: true\n  mvpBuild: true\n  localWorktreeRunner: true\n  localTaskKubernetes: false\n  githubActions: true\n`],
-    ['.harness/execution-profiles.yml', `defaultProfile: L0_LOCAL_WORKTREE\nprofiles:\n  L0_LOCAL_WORKTREE:\n    enabled: true\n    isolation:\n      filesystem: git-worktree-or-fallback\n      network: inherited-restricted\n      secrets: filtered-env\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n  L1_CONTAINER_WORKER:\n    enabled: false\n  L2_KIND_NAMESPACE:\n    enabled: false\n  L3_GITHUB_ACTION:\n    enabled: false\n    trigger: workflow_dispatch\n    workflow: .github/workflows/harness-run.yml\n    runner: github-hosted-ubuntu\n    wrapsProfile: L0_LOCAL_WORKTREE\n    inputs:\n      - task_path\n      - adapter\n      - execution_profile\n    permissions:\n      contents: read\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n    notes:\n      - PR comments, checks, branch writes, and remote patch application are staged behind later hardening.\n`],
+    ['.harness/factory.yml', `schemaVersion: 1\nfactory:\n  id: ${projectId}\n  version: 0.1.0\n  generatedBy: meta-harness-platform-starter\n  generatorVersion: ${VERSION}\ngeneratedFrom:\n  buildHandoff: .harness/planning/build-handoff.json\n  buildHandoffHash: sha256:${shaFile(handoffPath)}\ncapabilities:\n  planning: true\n  bootstrap: true\n  mvpBuild: true\n  localWorktreeRunner: true\n  localTaskKubernetes: ${boolText(enableKindNamespace)}\n  githubActions: true\n`],
+    ['.harness/execution-profiles.yml', `defaultProfile: L0_LOCAL_WORKTREE\nprofiles:\n  L0_LOCAL_WORKTREE:\n    enabled: true\n    isolation:\n      filesystem: git-worktree-or-fallback\n      network: inherited-restricted\n      secrets: filtered-env\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n  L1_CONTAINER_WORKER:\n    enabled: false\n  L2_KIND_NAMESPACE:\n    enabled: ${boolText(enableKindNamespace)}\n    optInFlag: --enable-kind-namespace\n    templates: infra/local-task-k8s\n    cluster: kind\n    lifecycle:\n      - create namespace per run\n      - run worker job\n      - run preview job\n      - run QA job\n      - collect artifacts\n      - cleanup namespace\n    notes:\n      - Disabled by default; generated Kubernetes templates require explicit bootstrap opt-in.\n      - Skeleton only; config generation and tests do not require a live Kubernetes cluster.\n  L3_GITHUB_ACTION:\n    enabled: false\n    trigger: workflow_dispatch\n    workflow: .github/workflows/harness-run.yml\n    runner: github-hosted-ubuntu\n    wrapsProfile: L0_LOCAL_WORKTREE\n    inputs:\n      - task_path\n      - adapter\n      - execution_profile\n    permissions:\n      contents: read\n    artifacts:\n      - patch.diff\n      - run-result.json\n      - summary.md\n    notes:\n      - PR comments, checks, branch writes, and remote patch application are staged behind later hardening.\n`],
     ['.harness/agents/adapters.yml', `schemaVersion: 1\ndefaultAdapter: shell\ninterface:\n  lifecycle: prepare-execute-collectArtifacts-summarize\n  methods: prepare, execute, collectArtifacts, summarize\nadapters:\n  shell:\n    enabled: true\n    type: local-shell-mvp\n    implementation: builtin:shell\n    status: default\n  codex:\n    enabled: true\n    type: codex-exec\n    implementation: builtin:codex\n    binary: codex\n    status: available-if-codex-cli-installed\n  claude:\n    enabled: false\n    type: claude-code\n    implementation: placeholder\n    status: disabled-placeholder\n  openhands:\n    enabled: false\n    type: openhands\n    implementation: placeholder\n    status: disabled-placeholder\n`],
     ['.harness/security/runtime-policy.yml', `phases:\n  setup:\n    network:\n      default: deny\n      allow:\n        - registry.npmjs.org\n        - api.github.com\n  worker:\n    network:\n      default: deny\n    forbiddenWrites:\n      - .env*\n      - **/*.pem\n      - **/*secret*\n      - **/*token*\n      - infra/**/production/**\n      - .github/workflows/deploy-prod.yml\n    commandPolicy:\n      default: deny\n      allow:\n        - node *\n        - npm test\n        - npm run *\n        - bash ./tests/*\n        - make *\n      deny:\n        - git push*\n        - npm publish*\n        - docker login*\n        - rm -rf .git*\n`],
     ['.harness/budgets.yml', `budgets:\n  default:\n    maxRuntimeMinutes: 20\n    maxRetries: 1\n    maxChangedFiles: 20\n    maxPatchLines: 800\n`],
@@ -180,5 +297,7 @@ jobs:
       budgets: { maxRuntimeMinutes: 20, maxRetries: 1, maxChangedFiles: 20, maxPatchLines: 800 },
       expectedArtifacts: ['patch.diff', 'run-result.json', 'summary.md']
     })]
-  ].map(([path, content, options = {}]) => ({ path, content, ...options }));
+  ];
+  if (enableKindNamespace) files.push(...buildKindNamespaceFiles());
+  return files.map(([path, content, options = {}]) => ({ path, content, ...options }));
 }
