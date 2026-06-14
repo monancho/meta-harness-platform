@@ -1,6 +1,7 @@
 import { execSync } from 'node:child_process';
 import { VERSION } from './constants.mjs';
 import { cmdFactoryBootstrap } from './bootstrap.mjs';
+import { cmdGithubPr } from './github-pr.mjs';
 import { cmdManifestCheck } from './manifest.mjs';
 import { cmdCompileAcceptance, cmdCompileTasks, cmdPlanFreeze, cmdPlanSynthesize, cmdScaffoldPlanning } from './planning.mjs';
 import { cmdRun } from './runner.mjs';
@@ -34,7 +35,7 @@ function cmdDoctor() {
 }
 
 function usage() {
-  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir>\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex\n`);
+  log(`Meta Harness Starter v${VERSION}\n\nCommands:\n  doctor\n  scaffold planning --target <dir> --project-id <id>\n  plan synthesize --target <dir> --input <json>\n  plan compile-acceptance --target <dir>\n  plan compile-tasks --target <dir>\n  plan freeze --target <dir> --approved\n  factory bootstrap --target <dir>\n  manifest check --target <dir>\n  run --target <dir> --task <task.json> --adapter shell|codex\n  github pr --target <dir> --run <run-id|run-result.json> [--create]\n`);
 }
 
 export function runCli(argv) {
@@ -50,5 +51,6 @@ export function runCli(argv) {
   else if (a === 'factory' && b === 'bootstrap') ok(cmdFactoryBootstrap(opts, fail));
   else if (a === 'manifest' && b === 'check') ok(cmdManifestCheck(opts, fail));
   else if (a === 'run') cmdRun(opts, fail);
+  else if (a === 'github' && b === 'pr') cmdGithubPr(opts, fail);
   else fail(`unknown command: ${opts._.join(' ')}`);
 }

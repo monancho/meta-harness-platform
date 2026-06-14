@@ -257,6 +257,19 @@ test "$GIT_CLEAN_RUN_ID" != "$GIT_RUN_ID"
 test -f "$GIT_TARGET/.harness/runs/$GIT_CLEAN_RUN_ID/run-result.json"
 test ! -e "$GIT_TARGET/.harness/tmp/worktrees/$GIT_CLEAN_RUN_ID"
 
+node "$ROOT/bin/mh.mjs" github pr --target "$GIT_TARGET" --run "$GIT_CLEAN_RUN_ID" >"$TMP/github-pr-dry-run.out"
+test -f "$GIT_TARGET/.harness/runs/$GIT_CLEAN_RUN_ID/pr-body.md"
+grep -q "# Harness Run PR" "$TMP/github-pr-dry-run.out"
+grep -q "Run ID: $GIT_CLEAN_RUN_ID" "$GIT_TARGET/.harness/runs/$GIT_CLEAN_RUN_ID/pr-body.md"
+grep -q "dry run only" "$TMP/github-pr-dry-run.out"
+
+if MH_GH_BINARY="$TMP/missing-gh" node "$ROOT/bin/mh.mjs" github pr --target "$GIT_TARGET" --run "$GIT_CLEAN_RUN_ID" --create >"$TMP/github-pr-missing-gh.out" 2>"$TMP/github-pr-missing-gh.err"; then
+  echo "[error] github pr unexpectedly passed with a missing gh binary" >&2
+  exit 1
+fi
+grep -q "gh CLI not found" "$TMP/github-pr-missing-gh.err"
+grep -q "rerun without --create" "$TMP/github-pr-missing-gh.err"
+
 FAKE_CODEX="$TMP/fake-codex"
 cat > "$FAKE_CODEX" <<'SH'
 #!/usr/bin/env bash
