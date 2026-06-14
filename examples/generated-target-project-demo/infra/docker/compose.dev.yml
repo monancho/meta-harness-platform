@@ -1,0 +1,7 @@
+services:
+  web:
+    image: node:22
+    working_dir: /workspace
+    volumes:
+      - ../../:/workspace
+    command: node -e "console.log('dev placeholder')"

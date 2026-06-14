@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectId": "generated-demo",
+  "projectName": "Portfolio Learning Tracker",
+  "stack": {
+    "frontend": "React",
+    "backend": "Node/Fastify",
+    "database": "SQLite",
+    "packageManager": "pnpm"
+  },
+  "firstVerticalSlice": {
+    "id": "BL-001",
+    "requirementId": "REQ-001",
+    "title": "학습 목표 등록",
+    "taskType": "frontend-ui",
+    "acceptanceCriteria": [
+      "AC-001"
+    ]
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "text": "학습 목표 등록",
+      "priority": "must"
+    },
+    {
+      "id": "REQ-002",
+      "text": "작업 카드 관리",
+      "priority": "should"
+    },
+    {
+      "id": "REQ-003",
+      "text": "산출물 링크 기록",
+      "priority": "should"
+    },
+    {
+      "id": "REQ-004",
+      "text": "진행률 대시보드",
+      "priority": "should"
+    }
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirementId": "REQ-001",
+      "text": "학습 목표 등록 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-002",
+      "requirementId": "REQ-002",
+      "text": "작업 카드 관리 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-003",
+      "requirementId": "REQ-003",
+      "text": "산출물 링크 기록 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-004",
+      "requirementId": "REQ-004",
+      "text": "진행률 대시보드 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    }
+  ],
+  "screenSpecs": [
+    {
+      "id": "SCREEN-001",
+      "name": "Dashboard",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "success"
+      ],
+      "responsive": [
+        "mobile",
+        "tablet",
+        "desktop"
+      ]
+    }
+  ],
+  "nonGoals": [
+    "팀 협업 기능",
+    "결제 기능",
+    "모바일 앱",
+    "AI 자동 평가"
+  ]
+}

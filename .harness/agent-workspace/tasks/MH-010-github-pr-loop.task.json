@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-010",
+  "taskType": "implementation",
+  "priority": "P2",
+  "title": "GitHub PR loop skeleton",
+  "objective": "Add the minimal branch/commit/PR creation skeleton using gh CLI when available, without requiring it for smoke tests.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "packages/**",
+    "bin/**",
+    "templates/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-010-AC-01",
+      "text": "Add optional command for PR creation from a run result."
+    },
+    {
+      "id": "MH-010-AC-02",
+      "text": "If gh is unavailable, command fails with actionable message."
+    },
+    {
+      "id": "MH-010-AC-03",
+      "text": "Initial output is PR body/summary markdown even without creating a PR."
+    },
+    {
+      "id": "MH-010-AC-04",
+      "text": "Docs define G0 local patch, G1 gh PR, G2 GitHub Actions progression."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "GitHub PR Loop Skeleton",
+  "koObjective": "run 결과를 branch/commit/PR/comment/artifact 흐름으로 연결하는 기초를 만든다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

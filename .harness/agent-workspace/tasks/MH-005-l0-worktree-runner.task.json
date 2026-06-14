@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-005",
+  "taskType": "implementation",
+  "priority": "P0",
+  "title": "Real L0 git worktree runner",
+  "objective": "Replace the runner fallback-only behavior with a real git worktree execution path when git is available, keeping fallback mode for non-git demos.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "packages/**",
+    "bin/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-005-AC-01",
+      "text": "Runner creates a worktree under .harness/tmp/worktrees/<run-id> when the target is a git repo."
+    },
+    {
+      "id": "MH-005-AC-02",
+      "text": "Runner executes inside the worktree and collects patch.diff back to .harness/runs/<run-id>."
+    },
+    {
+      "id": "MH-005-AC-03",
+      "text": "Runner cleans up the worktree unless cleanup=false."
+    },
+    {
+      "id": "MH-005-AC-04",
+      "text": "Fallback mode still works when git is unavailable or repo is not initialized."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "실제 L0 git worktree runner",
+  "koObjective": "작업마다 git worktree를 만들고 실행·검증·정리하는 L0 실행기를 구현한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

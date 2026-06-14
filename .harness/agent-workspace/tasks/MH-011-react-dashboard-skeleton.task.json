@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-011",
+  "taskType": "dashboard",
+  "priority": "P2",
+  "title": "React Dashboard skeleton",
+  "objective": "Create the initial React dashboard app skeleton for visualizing project state, runs, artifacts, and policies without requiring backend services.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    "docs/AGENT_TASK_INDEX.md",
+    "docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec_full.md",
+    ".harness/agent-workspace/tasks/MH-011-react-dashboard-skeleton.task.json"
+  ],
+  "editableScope": [
+    "apps/dashboard/**",
+    "packages/**",
+    "templates/**",
+    "docs/**",
+    "package.json",
+    "tests/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-011-AC-01",
+      "text": "Create apps/dashboard or equivalent frontend workspace with a minimal React/Vite structure or dependency-free static fallback if package installation is intentionally deferred."
+    },
+    {
+      "id": "MH-011-AC-02",
+      "text": "Add dashboard routes or views for Project State, Runs, Artifacts, Policies, and Settings placeholders."
+    },
+    {
+      "id": "MH-011-AC-03",
+      "text": "Add a local fixture loader that can read sample run-result.json, manifest.lock, state.yml, and task-packet.json from examples or fixtures."
+    },
+    {
+      "id": "MH-011-AC-04",
+      "text": "Document how to run or preview the dashboard in README/docs without breaking the no-network smoke test path."
+    },
+    {
+      "id": "MH-011-AC-05",
+      "text": "Smoke test still passes after dashboard skeleton is added."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "React Dashboard Skeleton",
+  "koObjective": "project state, runs, artifacts, policies를 볼 수 있는 React 대시보드 뼈대를 만든다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

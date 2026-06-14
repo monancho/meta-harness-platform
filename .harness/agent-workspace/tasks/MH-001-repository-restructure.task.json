@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-001",
+  "taskType": "implementation",
+  "priority": "P0",
+  "title": "Repository restructure for implementation-ready codebase",
+  "objective": "Split the single-file CLI skeleton into a minimal maintainable package structure without changing user-facing commands.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "bin/**",
+    "packages/**",
+    "tests/**",
+    "docs/**",
+    "package.json"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-001-AC-01",
+      "text": "Create packages/core or equivalent modules for fs utilities, state handling, planning, bootstrap, and runner concerns."
+    },
+    {
+      "id": "MH-001-AC-02",
+      "text": "Keep bin/mh.mjs as the CLI entrypoint and preserve all existing commands."
+    },
+    {
+      "id": "MH-001-AC-03",
+      "text": "Smoke test passes after restructure."
+    },
+    {
+      "id": "MH-001-AC-04",
+      "text": "README or docs note the new internal structure."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "구현 준비용 레포 구조 재정리",
+  "koObjective": "단일 파일 CLI 뼈대를 유지보수 가능한 패키지 구조로 분리하되, 기존 사용자 명령은 깨지지 않게 한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

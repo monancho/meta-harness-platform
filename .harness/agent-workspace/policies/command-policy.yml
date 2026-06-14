@@ -1,0 +1,18 @@
+allowedCommands:
+  - node ./bin/mh.mjs doctor
+  - bash ./tests/smoke.sh
+  - npm test
+  - npm run smoke
+  - git status
+  - git diff
+  - find . -maxdepth 4 -type f
+forbiddenCommands:
+  - rm -rf /
+  - git push --force
+  - docker login
+  - kubectl delete namespace --all
+  - printenv
+  - env
+notes:
+  - Network calls are not required for MVP tasks.
+  - Ask for explicit approval before destructive commands.

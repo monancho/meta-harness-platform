@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-015",
+  "taskType": "upgrade",
+  "priority": "P2",
+  "title": "Upgrade engine dry-run",
+  "objective": "Implement a dry-run upgrade engine that compares current generated files against template versions and reports safe changes, conflicts, and review-required items.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-015-upgrade-engine-dry-run.task.json",
+    "docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec_full.md"
+  ],
+  "editableScope": [
+    "bin/**",
+    "packages/**",
+    "schemas/**",
+    "templates/**",
+    "examples/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-015-AC-01",
+      "text": "Add a CLI command such as mh factory upgrade --target <repo> --dry-run or equivalent."
+    },
+    {
+      "id": "MH-015-AC-02",
+      "text": "Read .harness/manifest.lock and compare managed files with current templates and checksums."
+    },
+    {
+      "id": "MH-015-AC-03",
+      "text": "Classify changes as safe-auto, changed-by-user, conflict, propose-only, or ignored."
+    },
+    {
+      "id": "MH-015-AC-04",
+      "text": "Produce an upgrade-report.json and upgrade-summary.md without modifying target files in dry-run mode."
+    },
+    {
+      "id": "MH-015-AC-05",
+      "text": "Add tests using a fixture Target Repo with at least one unchanged file and one user-modified file."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Upgrade Engine Dry-run",
+  "koObjective": "factory upgrade 시 어떤 파일이 바뀔지 dry-run으로 보여준다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

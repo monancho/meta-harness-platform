@@ -1,0 +1,80 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-022",
+  "taskType": "feedback",
+  "priority": "P3",
+  "title": "Feedback pattern analyzer",
+  "objective": "Add a minimal analyzer that groups sanitized signals into failure categories and produces generalized improvement proposals for templates, prompts, policies, or gates.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-022-feedback-pattern-analyzer.task.json"
+  ],
+  "editableScope": [
+    "packages/**",
+    "schemas/**",
+    "learning/**",
+    "evals/**",
+    "bin/**",
+    "examples/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-022-AC-01",
+      "text": "Read a directory of sanitized-signal.json files and group by failureCategory, reasonCode, profile, adapter, and generatorVersion."
+    },
+    {
+      "id": "MH-022-AC-02",
+      "text": "Generate a failure-taxonomy summary and improvement-proposals/*.md without raw project content."
+    },
+    {
+      "id": "MH-022-AC-03",
+      "text": "Mark proposals as candidate-only until validated by eval regression."
+    },
+    {
+      "id": "MH-022-AC-04",
+      "text": "Add sample sanitized signals and expected analyzer output."
+    },
+    {
+      "id": "MH-022-AC-05",
+      "text": "Document how this supports Meta Learning without violating project ownership."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Feedback Pattern Analyzer",
+  "koObjective": "sanitized signal에서 반복 실패 패턴과 개선 후보를 추출한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

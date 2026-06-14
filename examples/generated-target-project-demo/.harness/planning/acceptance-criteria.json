@@ -1,0 +1,28 @@
+{
+  "acceptanceCriteria": [
+    {
+      "id": "AC-001",
+      "requirementId": "REQ-001",
+      "text": "학습 목표 등록 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-002",
+      "requirementId": "REQ-002",
+      "text": "작업 카드 관리 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-003",
+      "requirementId": "REQ-003",
+      "text": "산출물 링크 기록 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    },
+    {
+      "id": "AC-004",
+      "requirementId": "REQ-004",
+      "text": "진행률 대시보드 기능은 기본 성공/빈 상태/오류 상태를 처리해야 한다.",
+      "verification": "test-or-manual-gate"
+    }
+  ]
+}

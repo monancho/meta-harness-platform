@@ -1,0 +1,24 @@
+{
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "text": "학습 목표 등록",
+      "priority": "must"
+    },
+    {
+      "id": "REQ-002",
+      "text": "작업 카드 관리",
+      "priority": "should"
+    },
+    {
+      "id": "REQ-003",
+      "text": "산출물 링크 기록",
+      "priority": "should"
+    },
+    {
+      "id": "REQ-004",
+      "text": "진행률 대시보드",
+      "priority": "should"
+    }
+  ]
+}

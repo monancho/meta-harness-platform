@@ -1,0 +1,81 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-014",
+  "taskType": "security",
+  "priority": "P1",
+  "title": "Security gate enforcement",
+  "objective": "Turn the security policies from documentation into executable gates that fail early when a task or patch violates forbidden scopes, commands, or secrets rules.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/policies/*.yml",
+    ".harness/agent-workspace/tasks/MH-014-security-gate-enforcement.task.json",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "bin/**",
+    "packages/**",
+    "schemas/**",
+    "tests/**",
+    "docs/**",
+    ".harness/agent-workspace/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-014-AC-01",
+      "text": "Implement forbidden path detection for task packets and generated patch paths."
+    },
+    {
+      "id": "MH-014-AC-02",
+      "text": "Implement command allow/deny validation before runner execution."
+    },
+    {
+      "id": "MH-014-AC-03",
+      "text": "Add secret pattern checks for task packets, environment exports, run summaries, and artifacts where practical."
+    },
+    {
+      "id": "MH-014-AC-04",
+      "text": "When a gate fails, produce a structured run-result with failureCategory and reasonCode."
+    },
+    {
+      "id": "MH-014-AC-05",
+      "text": "Add tests for .env*, production infra, deploy-prod workflows, and denied commands."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Security Gate 강제",
+  "koObjective": "보안 정책 위반을 gate 실패로 막고 명확한 리포트를 만든다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

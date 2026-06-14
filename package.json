@@ -1,0 +1,37 @@
+{
+  "name": "meta-harness-platform-ko-instant-starter",
+  "version": "1.4.0-instant-devcontainer",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "mh": "./bin/mh.mjs"
+  },
+  "scripts": {
+    "mh": "node ./bin/mh.mjs",
+    "doctor": "node ./bin/mh.mjs doctor",
+    "smoke": "bash ./tests/smoke.sh",
+    "agent:tasks": "node -e \"console.log(require('fs').readFileSync('.harness/agent-workspace/backlog.yml','utf8'))\"",
+    "agent:ready": "node ./scripts/agent/validate-agent-ready.mjs",
+    "agent:start": "bash ./scripts/agent/start-task.sh MH-001",
+    "devcontainer:check": "bash ./scripts/devcontainer/check-env.sh",
+    "verify": "bash ./scripts/agent/verify-after-task.sh",
+    "task:mh001": "bash ./scripts/agent/task-cycle.sh MH-001",
+    "task:mh002": "bash ./scripts/agent/task-cycle.sh MH-002",
+    "agent:status": "bash ./scripts/agent/status.sh",
+    "agent:next": "bash ./scripts/agent/next-task.sh",
+    "agent:finish": "bash ./scripts/agent/finish-task.sh",
+    "agent:codex": "bash ./scripts/agent/run-codex-current-task.sh",
+    "agent:auto": "bash ./scripts/agent/auto-loop.sh --limit 1 --mode safe",
+    "agent:auto3": "bash ./scripts/agent/auto-loop.sh --limit 3 --mode safe",
+    "agent:checkpoint": "bash ./scripts/agent/create-checkpoint.sh",
+    "agent:restore": "bash ./scripts/agent/restore-checkpoint.sh",
+    "agent:preflight": "bash ./scripts/agent/autopilot-preflight.sh",
+    "go": "bash ./GO.sh",
+    "instant": "bash ./scripts/agent/instant-autopilot.sh",
+    "setup": "bash ./.devcontainer/instant-setup.sh",
+    "codex:check": "bash ./scripts/agent/check-codex.sh"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

@@ -1,0 +1,39 @@
+schemaVersion: 1
+gates:
+  smoke:
+    command: bash ./tests/smoke.sh
+    required: true
+  agentReadyValidation:
+    command: node ./scripts/agent/validate-agent-ready.mjs
+    required: true
+  noForbiddenPathChanges:
+    policy: .harness/agent-workspace/policies/forbidden-scope.yml
+    required: true
+  docsUpdatedWhenBehaviorChanges:
+    required: true
+  deterministicLocalRun:
+    required: true
+  dashboardDoesNotBreakCli:
+    requiredFor:
+      - MH-011
+      - MH-012
+      - MH-013
+    required: true
+  securityGateHasNegativeTests:
+    requiredFor:
+      - MH-014
+      - MH-007
+    required: true
+  upgradeDryRunDoesNotModifyFiles:
+    requiredFor:
+      - MH-015
+      - MH-016
+    required: true
+  noNetworkRequiredForSmokeTests:
+    required: true
+  noRawProjectDataInMetaLearning:
+    requiredFor:
+      - MH-020
+      - MH-021
+      - MH-022
+    required: true

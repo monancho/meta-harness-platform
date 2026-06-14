@@ -1,0 +1,8 @@
+schemaVersion: 1
+project:
+  id: generated-demo
+  name: generated-demo
+  owner: target-repo
+  sourceOfTruth:
+    planning: docs/planning
+    agentPack: .harness/planning

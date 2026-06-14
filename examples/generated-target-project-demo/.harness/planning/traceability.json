@@ -1,0 +1,24 @@
+{
+  "links": [
+    {
+      "requirementId": "REQ-001",
+      "acceptanceCriteriaId": "AC-001",
+      "backlogItemId": "BL-001"
+    },
+    {
+      "requirementId": "REQ-002",
+      "acceptanceCriteriaId": "AC-002",
+      "backlogItemId": "BL-002"
+    },
+    {
+      "requirementId": "REQ-003",
+      "acceptanceCriteriaId": "AC-003",
+      "backlogItemId": "BL-003"
+    },
+    {
+      "requirementId": "REQ-004",
+      "acceptanceCriteriaId": "AC-004",
+      "backlogItemId": "BL-004"
+    }
+  ]
+}

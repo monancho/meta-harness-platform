@@ -1,0 +1,35 @@
+{
+  "name": "Meta Harness KO Instant — Dev Container",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+  "remoteUser": "node",
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {
+      "version": "latest"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "github.vscode-github-actions",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "files.eol": "\n",
+        "git.autofetch": false,
+        "editor.formatOnSave": false
+      }
+    }
+  },
+  "postCreateCommand": "bash .devcontainer/instant-setup.sh",
+  "postAttachCommand": "bash .devcontainer/print-next-steps.sh",
+  "containerEnv": {
+    "META_HARNESS_DEVCONTAINER": "1",
+    "META_HARNESS_AUTOPILOT_DEFAULT_MODE": "safe"
+  }
+}

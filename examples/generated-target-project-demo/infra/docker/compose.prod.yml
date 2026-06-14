@@ -1,0 +1,4 @@
+services:
+  app:
+    image: node:22
+    command: node -e "console.log('prod placeholder')"

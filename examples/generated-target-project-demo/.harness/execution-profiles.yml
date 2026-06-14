@@ -1,0 +1,17 @@
+defaultProfile: L0_LOCAL_WORKTREE
+profiles:
+  L0_LOCAL_WORKTREE:
+    isolation:
+      filesystem: git-worktree-or-fallback
+      network: inherited-restricted
+      secrets: filtered-env
+    artifacts:
+      - patch.diff
+      - run-result.json
+      - summary.md
+  L1_CONTAINER_WORKER:
+    enabled: false
+  L2_KIND_NAMESPACE:
+    enabled: false
+  L3_GITHUB_ACTION:
+    enabled: false

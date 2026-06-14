@@ -1,0 +1,5 @@
+{
+  "name": "target-project-factory",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:22",
+  "workspaceFolder": "/workspace"
+}

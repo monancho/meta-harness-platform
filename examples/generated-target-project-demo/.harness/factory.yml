@@ -1,0 +1,16 @@
+schemaVersion: 1
+factory:
+  id: generated-demo
+  version: 0.1.0
+  generatedBy: meta-harness-platform-starter
+  generatorVersion: 1.2.0-mvp
+generatedFrom:
+  buildHandoff: .harness/planning/build-handoff.json
+  buildHandoffHash: sha256:b6b728220fcc3a5697f816dcec5c04b44d68584edfb3d3c6eba4185933f52ffc
+capabilities:
+  planning: true
+  bootstrap: true
+  mvpBuild: true
+  localWorktreeRunner: true
+  localTaskKubernetes: false
+  githubActions: true

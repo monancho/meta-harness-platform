@@ -1,0 +1,16 @@
+{
+  "projectName": "Portfolio Learning Tracker",
+  "projectId": "portfolio-learning-tracker",
+  "problem": "포트폴리오 학습 과정을 기록하고, 작업 단위별 진행률과 산출물을 관리하기 어렵다.",
+  "goal": "사용자가 학습 목표, 작업, 산출물, 회고를 구조적으로 관리할 수 있는 웹 앱의 MVP를 만든다.",
+  "targetUsers": ["프론트엔드/풀스택 학습자", "포트폴리오를 준비하는 취업 준비생"],
+  "mvpScope": ["학습 목표 등록", "작업 카드 관리", "산출물 링크 기록", "진행률 대시보드"],
+  "nonGoals": ["팀 협업 기능", "결제 기능", "모바일 앱", "AI 자동 평가"],
+  "primaryScreen": "Dashboard",
+  "stack": {
+    "frontend": "React",
+    "backend": "Node/Fastify",
+    "database": "SQLite",
+    "packageManager": "pnpm"
+  }
+}

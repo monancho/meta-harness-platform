@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-016",
+  "taskType": "upgrade",
+  "priority": "P2",
+  "title": "Managed block update strategy",
+  "objective": "Implement a managed-block update strategy for shared files such as AGENTS.md, README.md, Makefile, and workflow files.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-016-managed-block-update-strategy.task.json"
+  ],
+  "editableScope": [
+    "bin/**",
+    "packages/**",
+    "templates/**",
+    "tests/**",
+    "docs/**",
+    "examples/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-016-AC-01",
+      "text": "Define a managed block marker format such as BEGIN META-HARNESS MANAGED BLOCK / END META-HARNESS MANAGED BLOCK."
+    },
+    {
+      "id": "MH-016-AC-02",
+      "text": "Implement replacement only inside matching managed blocks while preserving user-owned content outside the block."
+    },
+    {
+      "id": "MH-016-AC-03",
+      "text": "Fail safely when block markers are missing, duplicated, or nested incorrectly."
+    },
+    {
+      "id": "MH-016-AC-04",
+      "text": "Integrate managed-block decisions with manifest.lock mergeStrategy."
+    },
+    {
+      "id": "MH-016-AC-05",
+      "text": "Add tests for block replacement, missing marker, duplicated marker, and user-owned content preservation."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Managed Block Update Strategy",
+  "koObjective": "사용자 수정 파일과 생성 파일을 충돌 없이 갱신하는 managed block 전략을 구현한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

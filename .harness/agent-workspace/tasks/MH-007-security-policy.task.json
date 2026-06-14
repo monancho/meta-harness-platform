@@ -1,0 +1,74 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-007",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Security policy enforcement",
+  "objective": "Enforce editableScope, forbiddenScope, command policy, and secret boundary before and after runner execution.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "packages/**",
+    "bin/**",
+    "schemas/**",
+    "tests/**",
+    "docs/**",
+    ".harness/agent-workspace/policies/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-007-AC-01",
+      "text": "Runner fails before execution if task editable/forbidden scope is invalid."
+    },
+    {
+      "id": "MH-007-AC-02",
+      "text": "Runner detects forbidden changed files before writing run-result success."
+    },
+    {
+      "id": "MH-007-AC-03",
+      "text": "Command allow/deny policy is represented in target runtime-policy or command-policy."
+    },
+    {
+      "id": "MH-007-AC-04",
+      "text": "Security failures produce run-result.json with status=failed and reasonCode."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "Security Policy 기초 적용",
+  "koObjective": "forbidden path, secret policy, command policy를 실제 실행 전에 검사한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

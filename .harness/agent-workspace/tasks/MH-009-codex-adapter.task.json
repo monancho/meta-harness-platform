@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-009",
+  "taskType": "implementation",
+  "priority": "P2",
+  "title": "Codex adapter implementation",
+  "objective": "Implement a Codex adapter path that can call codex exec when it is installed, while keeping tests independent of Codex availability.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "packages/**",
+    "bin/**",
+    "templates/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-009-AC-01",
+      "text": "Adapter checks for codex binary and fails gracefully if unavailable."
+    },
+    {
+      "id": "MH-009-AC-02",
+      "text": "Adapter builds a deterministic prompt from task-packet.json and AGENTS.md."
+    },
+    {
+      "id": "MH-009-AC-03",
+      "text": "Adapter writes artifacts to the standard run directory."
+    },
+    {
+      "id": "MH-009-AC-04",
+      "text": "Smoke test does not require Codex, but a manual test command is documented."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "Codex Adapter 구현",
+  "koObjective": "task packet을 Codex CLI/환경에 전달하고 결과를 artifact로 회수하는 adapter를 구현한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

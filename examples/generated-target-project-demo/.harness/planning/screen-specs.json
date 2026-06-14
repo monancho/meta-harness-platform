@@ -1,0 +1,19 @@
+{
+  "screens": [
+    {
+      "id": "SCREEN-001",
+      "name": "Dashboard",
+      "states": [
+        "loading",
+        "empty",
+        "error",
+        "success"
+      ],
+      "responsive": [
+        "mobile",
+        "tablet",
+        "desktop"
+      ]
+    }
+  ]
+}

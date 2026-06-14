@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-006",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Task packet compiler hardening",
+  "objective": "Generate task packets from backlog and verification-map instead of only using a static example task.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "packages/**",
+    "bin/**",
+    "schemas/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-006-AC-01",
+      "text": "Add a CLI command or bootstrap step that creates .harness/tasks/*.task.json from backlog.items.json."
+    },
+    {
+      "id": "MH-006-AC-02",
+      "text": "Task packet includes objective, editableScope, forbiddenScope, acceptanceCriteria, verifyCommands, budgets, expectedArtifacts."
+    },
+    {
+      "id": "MH-006-AC-03",
+      "text": "Invalid or missing acceptance criteria fail with clear error."
+    },
+    {
+      "id": "MH-006-AC-04",
+      "text": "Smoke test updated to use generated task where appropriate."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "Task Packet Compiler 고도화",
+  "koObjective": "backlog/issue/planning 산출물을 검증 가능한 task-packet.json으로 컴파일한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

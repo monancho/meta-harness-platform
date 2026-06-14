@@ -1,0 +1,11 @@
+allowedWrites:
+  - bin/**
+  - packages/**
+  - schemas/**
+  - templates/**
+  - examples/**
+  - tests/**
+  - docs/**
+  - .harness/agent-workspace/**
+  - README.md
+  - package.json

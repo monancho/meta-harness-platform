@@ -1,0 +1,12 @@
+forbiddenWrites:
+  - .env*
+  - **/*.pem
+  - **/*secret*
+  - **/*token*
+  - node_modules/**
+  - examples/generated-target-project-demo/.harness/runs/**
+  - docs/spec/*.pdf
+  - docs/spec/*.docx
+notes:
+  - Do not commit secrets or long-lived credentials.
+  - Do not rewrite binary documentation unless explicitly requested.

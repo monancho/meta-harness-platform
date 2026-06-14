@@ -1,0 +1,239 @@
+schemaVersion: 1
+project: meta-harness-platform
+currentPhase: full-harness-implementation
+description: "MVP부터 최종형 Project Factory Harness까지 가는 한국어 친화형 작업 큐."
+preferredOrder:
+  - MH-001
+  - MH-002
+  - MH-003
+  - MH-004
+  - MH-005
+  - MH-006
+  - MH-007
+  - MH-008
+  - MH-009
+  - MH-010
+  - MH-011
+  - MH-012
+  - MH-013
+  - MH-014
+  - MH-015
+  - MH-016
+  - MH-017
+  - MH-018
+  - MH-019
+  - MH-020
+  - MH-021
+  - MH-022
+  - MH-023
+  - MH-024
+  - MH-025
+  - MH-026
+  - MH-027
+  - MH-028
+
+milestones:
+  M0_자동화_준비:
+    - MH-001
+    - MH-002
+    - MH-003
+    - MH-004
+  M1_로컬_MVP_하네스:
+    - MH-005
+    - MH-006
+    - MH-007
+    - MH-008
+    - MH-009
+    - MH-010
+  M2_대시보드_보안:
+    - MH-011
+    - MH-012
+    - MH-013
+    - MH-014
+  M3_업그레이드_실행프로필:
+    - MH-015
+    - MH-016
+    - MH-017
+    - MH-018
+    - MH-019
+  M4_평가_피드백_제품화:
+    - MH-020
+    - MH-021
+    - MH-022
+    - MH-023
+    - MH-024
+    - MH-025
+  M5_포트폴리오_전달:
+    - MH-026
+    - MH-027
+    - MH-028
+
+tasks:
+  - id: MH-001
+    title: 단일 파일 CLI 뼈대를 유지보수 가능한 패키지 구조로 분리하되, 기존 사용자 명령은 깨지지 않게 한다.
+    koTitle: 구현 준비용 레포 구조 재정리
+    status: todo
+    priority: P0
+    taskFile: .harness/agent-workspace/tasks/MH-001-repository-restructure.task.json
+  - id: MH-002
+    title: state/factory/manifest/task packet 같은 핵심 계약 파일을 검증하는 최소 엔진을 만든다.
+    koTitle: 스키마 계약과 검증 엔진
+    status: todo
+    priority: P0
+    taskFile: .harness/agent-workspace/tasks/MH-002-schema-validation.task.json
+  - id: MH-003
+    title: planning-scaffolded → planning-frozen → factory-ready 같은 상태 전이를 코드로 강제한다.
+    koTitle: Factory 상태 머신 강제
+    status: todo
+    priority: P0
+    taskFile: .harness/agent-workspace/tasks/MH-003-state-machine.task.json
+  - id: MH-004
+    title: 생성 파일의 ownership, checksum, merge strategy를 추적하는 manifest 체계를 만든다.
+    koTitle: manifest.lock과 생성 파일 소유권
+    status: todo
+    priority: P0
+    taskFile: .harness/agent-workspace/tasks/MH-004-manifest-ownership.task.json
+  - id: MH-005
+    title: 작업마다 git worktree를 만들고 실행·검증·정리하는 L0 실행기를 구현한다.
+    koTitle: 실제 L0 git worktree runner
+    status: todo
+    priority: P0
+    taskFile: .harness/agent-workspace/tasks/MH-005-l0-worktree-runner.task.json
+  - id: MH-006
+    title: backlog/issue/planning 산출물을 검증 가능한 task-packet.json으로 컴파일한다.
+    koTitle: Task Packet Compiler 고도화
+    status: todo
+    priority: P1
+    taskFile: .harness/agent-workspace/tasks/MH-006-task-packet-compiler.task.json
+  - id: MH-007
+    title: forbidden path, secret policy, command policy를 실제 실행 전에 검사한다.
+    koTitle: Security Policy 기초 적용
+    status: todo
+    priority: P1
+    taskFile: .harness/agent-workspace/tasks/MH-007-security-policy.task.json
+  - id: MH-008
+    title: Shell, Codex, Claude 등 agent 실행 방식을 어댑터로 분리한다.
+    koTitle: Agent Adapter Layer
+    status: todo
+    priority: P1
+    taskFile: .harness/agent-workspace/tasks/MH-008-agent-adapter-layer.task.json
+  - id: MH-009
+    title: task packet을 Codex CLI/환경에 전달하고 결과를 artifact로 회수하는 adapter를 구현한다.
+    koTitle: Codex Adapter 구현
+    status: todo
+    priority: P1
+    taskFile: .harness/agent-workspace/tasks/MH-009-codex-adapter.task.json
+  - id: MH-010
+    title: run 결과를 branch/commit/PR/comment/artifact 흐름으로 연결하는 기초를 만든다.
+    koTitle: GitHub PR Loop Skeleton
+    status: todo
+    priority: P1
+    taskFile: .harness/agent-workspace/tasks/MH-010-github-pr-loop.task.json
+  - id: MH-011
+    title: project state, runs, artifacts, policies를 볼 수 있는 React 대시보드 뼈대를 만든다.
+    koTitle: React Dashboard Skeleton
+    status: todo
+    priority: P2
+    taskFile: .harness/agent-workspace/tasks/MH-011-react-dashboard-skeleton.task.json
+  - id: MH-012
+    title: 실행 이력과 artifact를 UI/CLI에서 확인할 수 있게 한다.
+    koTitle: Run History와 Artifact Viewer
+    status: todo
+    priority: P2
+    taskFile: .harness/agent-workspace/tasks/MH-012-run-history-and-artifact-viewer.task.json
+  - id: MH-013
+    title: patch.diff를 사람이 읽기 좋게 보여주는 viewer를 만든다.
+    koTitle: Patch Diff Viewer
+    status: todo
+    priority: P2
+    taskFile: .harness/agent-workspace/tasks/MH-013-patch-diff-viewer.task.json
+  - id: MH-014
+    title: 보안 정책 위반을 gate 실패로 막고 명확한 리포트를 만든다.
+    koTitle: Security Gate 강제
+    status: todo
+    priority: P2
+    taskFile: .harness/agent-workspace/tasks/MH-014-security-gate-enforcement.task.json
+  - id: MH-015
+    title: factory upgrade 시 어떤 파일이 바뀔지 dry-run으로 보여준다.
+    koTitle: Upgrade Engine Dry-run
+    status: todo
+    priority: P2
+    taskFile: .harness/agent-workspace/tasks/MH-015-upgrade-engine-dry-run.task.json
+  - id: MH-016
+    title: 사용자 수정 파일과 생성 파일을 충돌 없이 갱신하는 managed block 전략을 구현한다.
+    koTitle: Managed Block Update Strategy
+    status: todo
+    priority: P2
+    taskFile: .harness/agent-workspace/tasks/MH-016-managed-block-update-strategy.task.json
+  - id: MH-017
+    title: L3 GitHub Actions 실행 profile의 기본 구조를 만든다.
+    koTitle: GitHub Actions Execution Profile
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-017-github-actions-execution-profile.task.json
+  - id: MH-018
+    title: L1 컨테이너 worker 실행 profile을 만든다.
+    koTitle: Container Worker Execution Profile
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-018-container-worker-execution-profile.task.json
+  - id: MH-019
+    title: L2 kind namespace-per-run 실행 profile skeleton을 만든다.
+    koTitle: kind Namespace Execution Profile
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-019-kind-namespace-execution-profile.task.json
+  - id: MH-020
+    title: 회귀 검증과 평가 결과를 저장하는 eval registry 뼈대를 만든다.
+    koTitle: Eval Registry Skeleton
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-020-eval-registry-skeleton.task.json
+  - id: MH-021
+    title: raw 데이터 없이 failure code/metrics/improvement signal만 export한다.
+    koTitle: Sanitized Signal Exporter
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-021-sanitized-signal-exporter.task.json
+  - id: MH-022
+    title: sanitized signal에서 반복 실패 패턴과 개선 후보를 추출한다.
+    koTitle: Feedback Pattern Analyzer
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-022-feedback-pattern-analyzer.task.json
+  - id: MH-023
+    title: UX/A11Y/Perf/Security 제품화 audit skeleton을 만든다.
+    koTitle: Productization Audit Harness
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-023-productization-audit-harness.task.json
+  - id: MH-024
+    title: 릴리즈 체크리스트, changelog, deploy 준비 skeleton을 만든다.
+    koTitle: Release Harness Skeleton
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-024-release-harness-skeleton.task.json
+  - id: MH-025
+    title: 의존성/보안/장애 대응 작업 흐름 skeleton을 만든다.
+    koTitle: Maintenance Harness Skeleton
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-025-maintenance-harness-skeleton.task.json
+  - id: MH-026
+    title: 빈 폴더에서 planning→factory→run까지 보여주는 데모 프로젝트를 만든다.
+    koTitle: End-to-End Demo Project
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-026-end-to-end-demo-project.task.json
+  - id: MH-027
+    title: 이 프로젝트를 커리어 포트폴리오로 보여줄 랜딩 페이지를 만든다.
+    koTitle: Portfolio Landing Page
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-027-portfolio-landing-page.task.json
+  - id: MH-028
+    title: 데모 영상 대본과 최종 README를 다듬는다.
+    koTitle: Demo Video Script와 README Polish
+    status: todo
+    priority: P3
+    taskFile: .harness/agent-workspace/tasks/MH-028-demo-video-script-and-readme-polish.task.json

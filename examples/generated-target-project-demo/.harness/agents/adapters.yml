@@ -1,0 +1,14 @@
+defaultAdapter: shell
+adapters:
+  shell:
+    enabled: true
+    type: local-shell-mvp
+  codex:
+    enabled: false
+    type: codex-exec
+  claude:
+    enabled: false
+    type: claude-code
+  openhands:
+    enabled: false
+    type: openhands

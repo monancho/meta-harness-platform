@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-028",
+  "taskType": "portfolio",
+  "priority": "P3",
+  "title": "Demo video script and README polish",
+  "objective": "Prepare a concise demo script and polish the README so the project can be understood by recruiters, collaborators, and future implementation agents.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-028-demo-video-script-readme-polish.task.json",
+    "README.md"
+  ],
+  "editableScope": [
+    "README.md",
+    "docs/**",
+    "examples/**",
+    ".harness/agent-workspace/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-028-AC-01",
+      "text": "Create docs/DEMO_VIDEO_SCRIPT.md with a 3–5 minute demo narrative and exact command sequence."
+    },
+    {
+      "id": "MH-028-AC-02",
+      "text": "Polish README with quick start, architecture summary, implementation status, and roadmap."
+    },
+    {
+      "id": "MH-028-AC-03",
+      "text": "Add a recruiter-friendly project summary and a developer-friendly implementation guide."
+    },
+    {
+      "id": "MH-028-AC-04",
+      "text": "Add a realistic limitations section that distinguishes starter, MVP, beta, and full harness."
+    },
+    {
+      "id": "MH-028-AC-05",
+      "text": "Ensure AGENT_TASK_INDEX.md and backlog.yml remain consistent."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./scripts/agent/validate-agent-ready.mjs",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Demo Video Script와 README Polish",
+  "koObjective": "데모 영상 대본과 최종 README를 다듬는다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

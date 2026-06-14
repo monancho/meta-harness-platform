@@ -1,0 +1,14 @@
+phases:
+  setup:
+    network:
+      default: deny
+      allow:
+        - registry.npmjs.org
+        - api.github.com
+  worker:
+    network:
+      default: deny
+    forbiddenWrites:
+      - .env*
+      - infra/**/production/**
+      - .github/workflows/deploy-prod.yml

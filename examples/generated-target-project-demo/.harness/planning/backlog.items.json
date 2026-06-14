@@ -1,0 +1,40 @@
+{
+  "backlog": [
+    {
+      "id": "BL-001",
+      "requirementId": "REQ-001",
+      "title": "학습 목표 등록",
+      "taskType": "frontend-ui",
+      "acceptanceCriteria": [
+        "AC-001"
+      ]
+    },
+    {
+      "id": "BL-002",
+      "requirementId": "REQ-002",
+      "title": "작업 카드 관리",
+      "taskType": "fullstack-feature",
+      "acceptanceCriteria": [
+        "AC-002"
+      ]
+    },
+    {
+      "id": "BL-003",
+      "requirementId": "REQ-003",
+      "title": "산출물 링크 기록",
+      "taskType": "fullstack-feature",
+      "acceptanceCriteria": [
+        "AC-003"
+      ]
+    },
+    {
+      "id": "BL-004",
+      "requirementId": "REQ-004",
+      "title": "진행률 대시보드",
+      "taskType": "fullstack-feature",
+      "acceptanceCriteria": [
+        "AC-004"
+      ]
+    }
+  ]
+}

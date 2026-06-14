@@ -1,0 +1,78 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-027",
+  "taskType": "portfolio",
+  "priority": "P3",
+  "title": "Portfolio landing page",
+  "objective": "Add a portfolio-ready landing page that explains the project, architecture, demo flow, and career-relevant implementation highlights.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-027-portfolio-landing-page.task.json",
+    "docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec_full.md"
+  ],
+  "editableScope": [
+    "apps/dashboard/**",
+    "docs/**",
+    "README.md",
+    "examples/**",
+    "package.json"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-027-AC-01",
+      "text": "Create a landing page or static docs page with problem, solution, architecture, demo, screenshots/diagrams, and implementation status."
+    },
+    {
+      "id": "MH-027-AC-02",
+      "text": "Include concise positioning: repo-resident agentic software factory, not finished autonomous developer."
+    },
+    {
+      "id": "MH-027-AC-03",
+      "text": "Link to PRD/spec PDF, diagrams, task backlog, and demo command sequence."
+    },
+    {
+      "id": "MH-027-AC-04",
+      "text": "Add sections for what is implemented, what is planned, and what is intentionally out of scope."
+    },
+    {
+      "id": "MH-027-AC-05",
+      "text": "Keep claims realistic and avoid describing the project as production-ready until gates prove it."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Portfolio Landing Page",
+  "koObjective": "이 프로젝트를 커리어 포트폴리오로 보여줄 랜딩 페이지를 만든다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

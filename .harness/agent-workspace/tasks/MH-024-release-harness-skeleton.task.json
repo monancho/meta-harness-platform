@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-024",
+  "taskType": "release",
+  "priority": "P4",
+  "title": "Release harness skeleton",
+  "objective": "Create a Release Harness skeleton that checks release readiness, packages artifacts, and documents deployment steps without pushing to production by default.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-024-release-harness-skeleton.task.json"
+  ],
+  "editableScope": [
+    "packages/**",
+    "schemas/**",
+    "templates/**",
+    "bin/**",
+    "examples/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-024-AC-01",
+      "text": "Generate .harness/release/release-readiness.yml and docs/operations/release.md in Target Repos."
+    },
+    {
+      "id": "MH-024-AC-02",
+      "text": "Define release gates for tests, build, migration notes, rollback plan, env checklist, and artifact availability."
+    },
+    {
+      "id": "MH-024-AC-03",
+      "text": "Create a release package manifest without performing deployment by default."
+    },
+    {
+      "id": "MH-024-AC-04",
+      "text": "Support a dry-run release command that prints required next actions."
+    },
+    {
+      "id": "MH-024-AC-05",
+      "text": "Add tests for missing release gates and successful dry-run output."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Release Harness Skeleton",
+  "koObjective": "릴리즈 체크리스트, changelog, deploy 준비 skeleton을 만든다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

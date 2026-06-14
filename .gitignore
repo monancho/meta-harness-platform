@@ -1,0 +1,13 @@
+node_modules/
+.DS_Store
+*.log
+.harness/runs/
+.harness/tmp/
+examples/generated-target-project-demo/.harness/runs/
+examples/generated-target-project-demo/.harness/tmp/
+.tmp-smoke-target-project/
+.harness/agent-workspace/current-task.md
+.harness/agent-workspace/*.log
+.harness/agent-workspace/auto-runs/
+.harness/agent-workspace/autoloop.lock
+.harness/agent-workspace/latest-checkpoint.txt

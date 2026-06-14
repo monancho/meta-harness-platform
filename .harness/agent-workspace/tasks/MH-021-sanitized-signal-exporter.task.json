@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-021",
+  "taskType": "feedback",
+  "priority": "P3",
+  "title": "Sanitized signal exporter",
+  "objective": "Export privacy-preserving sanitized run signals from Target Repo runs for Meta-level improvement analysis without raw code, raw docs, raw logs, or secrets.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-021-sanitized-signal-exporter.task.json"
+  ],
+  "editableScope": [
+    "packages/**",
+    "schemas/**",
+    "bin/**",
+    "templates/**",
+    "examples/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-021-AC-01",
+      "text": "Define sanitized-signal.schema.json with fields for generatorVersion, executionProfile, taskType, result, failureCategory, reasonCodes, metric buckets, and privacy flags."
+    },
+    {
+      "id": "MH-021-AC-02",
+      "text": "Add exporter command or runner hook that creates sanitized-signal.json from run-result.json."
+    },
+    {
+      "id": "MH-021-AC-03",
+      "text": "Ensure exported signals exclude raw patch content, raw logs, raw docs, secrets, and customer-specific text."
+    },
+    {
+      "id": "MH-021-AC-04",
+      "text": "Add tests for redaction and privacy flag correctness."
+    },
+    {
+      "id": "MH-021-AC-05",
+      "text": "Document the difference between Target-owned raw artifacts and Meta-ingested sanitized signals."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Sanitized Signal Exporter",
+  "koObjective": "raw 데이터 없이 failure code/metrics/improvement signal만 export한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

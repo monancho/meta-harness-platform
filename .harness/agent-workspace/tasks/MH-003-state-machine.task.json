@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-003",
+  "taskType": "implementation",
+  "priority": "P0",
+  "title": "Factory state machine enforcement",
+  "objective": "Harden lifecycle phase transitions and prevent illegal command ordering.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "packages/**",
+    "bin/**",
+    "schemas/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-003-AC-01",
+      "text": "Define allowed transitions empty -> planning-scaffolded -> planning-frozen -> factory-ready -> runnable."
+    },
+    {
+      "id": "MH-003-AC-02",
+      "text": "factory bootstrap fails unless phase is planning-frozen."
+    },
+    {
+      "id": "MH-003-AC-03",
+      "text": "run fails unless phase is factory-ready or runnable."
+    },
+    {
+      "id": "MH-003-AC-04",
+      "text": "State updates are deterministic and include hashes when relevant."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "Factory 상태 머신 강제",
+  "koObjective": "planning-scaffolded → planning-frozen → factory-ready 같은 상태 전이를 코드로 강제한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

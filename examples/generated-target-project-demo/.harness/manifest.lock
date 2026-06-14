@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 1,
+  "factoryId": "generated-demo",
+  "generator": {
+    "name": "meta-harness-platform-starter",
+    "version": "1.2.0-mvp"
+  },
+  "source": {
+    "buildHandoff": ".harness/planning/build-handoff.json",
+    "buildHandoffHash": "sha256:b6b728220fcc3a5697f816dcec5c04b44d68584edfb3d3c6eba4185933f52ffc"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "ownership": "harness",
+      "checksum": "sha256:15760916dd5dbefe4cf7e857c92be5dc66688787ecc814492d24c1ce7631928a",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "apps/web/src/index.ts",
+      "ownership": "harness",
+      "checksum": "sha256:538e51abdd9562fdac1bd159f82ba13b3d6e6713469205f7c19cd08fffbe4393",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "apps/api/src/server.ts",
+      "ownership": "harness",
+      "checksum": "sha256:f4f07e8c9f93965c4a6c9c7543450717d807b6e54a690351c80ac0f9e08646eb",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "packages/shared/src/index.ts",
+      "ownership": "harness",
+      "checksum": "sha256:51951d9d7680a72fc65e0d3f8aa7d11c95392446799672baf6b72b1131ed5233",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "packages/contracts/README.md",
+      "ownership": "harness",
+      "checksum": "sha256:06ffe796bb4c7b0fd9204af6bdf2daafa2b347ae016b05b330c50dd9f1ce03fe",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "infra/docker/compose.dev.yml",
+      "ownership": "harness",
+      "checksum": "sha256:470a525937eed76b928acf1ff636d143105b5e8d35913adf034b68b8cd49e115",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "infra/docker/compose.preview.yml",
+      "ownership": "harness",
+      "checksum": "sha256:ea4317a6920d7cfcb247d10d804c68df4b6a9ba1110fe7ece8c5a3f121fb3812",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "infra/docker/compose.prod.yml",
+      "ownership": "harness",
+      "checksum": "sha256:be9cf6e9ddad6271f61bf387c19f2d059f43bc8749ae86b7c0b391e52ed767a0",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "infra/caddy/Caddyfile",
+      "ownership": "harness",
+      "checksum": "sha256:8e729dbf73bad9f2de6ddfd7e64be6f2491209a67fe984701213a2cd107a566c",
+      "mergeStrategy": "propose-only"
+    },
+    {
+      "path": ".devcontainer/devcontainer.json",
+      "ownership": "harness",
+      "checksum": "sha256:dd825e3fd18daf2d854b42a332d82897be00d132a345d39889a6f9132dffd1b4",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".codex/config.toml",
+      "ownership": "harness",
+      "checksum": "sha256:742c67a959848637cb37468b86ad15fcdfb508e51228189181c5fbcace801cdb",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "AGENTS.md",
+      "ownership": "shared",
+      "checksum": "sha256:90821ad958f32c095badc2fdcc1b8559b604545d7bc1ab6875da6f208084177c",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "ownership": "shared",
+      "checksum": "sha256:a5b64efbeb2826f980eac1ab1630fc62f665e56e91132d889acb91500300c612",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "Makefile",
+      "ownership": "harness",
+      "checksum": "sha256:d778fc94882007a45551d3340cdefb41589ee22d30d1334982ad7b1020a2aa63",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".harness/bin/runner.mjs",
+      "ownership": "harness",
+      "checksum": "sha256:9796404572c03c70ab59c53b1fd74b12f22e82c5bc47f6eb5a82354fd1e01e79",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".harness/factory.yml",
+      "ownership": "harness",
+      "checksum": "sha256:e6fcb83cbe19456c88d25245b565462794f02339a32e364c2e6009d8539453f5",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".harness/execution-profiles.yml",
+      "ownership": "harness",
+      "checksum": "sha256:20927ad1acf83d073b8a79eaa62fdd8847f4ac452acd5769bf1d64350102c820",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".harness/agents/adapters.yml",
+      "ownership": "harness",
+      "checksum": "sha256:a30aa3accdf1c1fd06bc7657cefc177f5fdd3c6e06af88fcfdce4456982662d2",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".harness/security/runtime-policy.yml",
+      "ownership": "harness",
+      "checksum": "sha256:5c626a3b426868b6cfdb60e06bdd69341ecabb1acd9c1eff33db3c8a359d12d5",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".harness/budgets.yml",
+      "ownership": "harness",
+      "checksum": "sha256:c05accdf926146dae23e888d9f2380f2fa4c1becd89d2ee919424194d071cdb5",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": ".harness/tasks/example.task.json",
+      "ownership": "harness",
+      "checksum": "sha256:a858c2e42e4627abca8562cd7ecff50a7192e90e72c28606831420cc111d5195",
+      "mergeStrategy": "replace-if-unchanged"
+    },
+    {
+      "path": "CLAUDE.md",
+      "ownership": "shared",
+      "checksum": "sha256:336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "mergeStrategy": "managed-blocks",
+      "conflictPolicy": "require-human-review"
+    }
+  ]
+}

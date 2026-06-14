@@ -1,0 +1,6 @@
+budgets:
+  default:
+    maxRuntimeMinutes: 20
+    maxRetries: 1
+    maxChangedFiles: 20
+    maxPatchLines: 800

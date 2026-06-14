@@ -1,0 +1,32 @@
+{
+  "verificationMap": [
+    {
+      "acceptanceCriteriaId": "AC-001",
+      "testId": "TEST-001",
+      "strategy": "test-or-manual-gate",
+      "suggestedCommand": "node -e \"console.log('AC-001 ok')\"",
+      "manualReviewRequired": false
+    },
+    {
+      "acceptanceCriteriaId": "AC-002",
+      "testId": "TEST-002",
+      "strategy": "test-or-manual-gate",
+      "suggestedCommand": "node -e \"console.log('AC-002 ok')\"",
+      "manualReviewRequired": false
+    },
+    {
+      "acceptanceCriteriaId": "AC-003",
+      "testId": "TEST-003",
+      "strategy": "test-or-manual-gate",
+      "suggestedCommand": "node -e \"console.log('AC-003 ok')\"",
+      "manualReviewRequired": false
+    },
+    {
+      "acceptanceCriteriaId": "AC-004",
+      "testId": "TEST-004",
+      "strategy": "test-or-manual-gate",
+      "suggestedCommand": "node -e \"console.log('AC-004 ok')\"",
+      "manualReviewRequired": false
+    }
+  ]
+}

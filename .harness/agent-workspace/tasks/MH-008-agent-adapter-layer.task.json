@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-008",
+  "taskType": "implementation",
+  "priority": "P1",
+  "title": "Agent adapter layer",
+  "objective": "Introduce an adapter interface so shell, codex, claude, and openhands are pluggable without changing task packet semantics.",
+  "contextFiles": [
+    "AGENTS.md",
+    "docs/AGENT_START_HERE.md",
+    ".harness/agent-workspace/backlog.yml",
+    "docs/TEST_SPEC.md"
+  ],
+  "editableScope": [
+    "packages/**",
+    "bin/**",
+    "templates/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-008-AC-01",
+      "text": "Define adapter interface: prepare, execute, collectArtifacts, summarize."
+    },
+    {
+      "id": "MH-008-AC-02",
+      "text": "Shell adapter implements the interface and remains the default."
+    },
+    {
+      "id": "MH-008-AC-03",
+      "text": "Codex/Claude/OpenHands are present as disabled placeholder configs only."
+    },
+    {
+      "id": "MH-008-AC-04",
+      "text": "Target Repo .harness/agents/adapters.yml reflects the adapter layer."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "node ./bin/mh.mjs doctor",
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "test output",
+    "implementation summary"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 45,
+    "maxChangedFiles": 20,
+    "maxPatchLines": 1200
+  },
+  "koTitle": "Agent Adapter Layer",
+  "koObjective": "Shell, Codex, Claude 등 agent 실행 방식을 어댑터로 분리한다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schemaVersion": "1.0.0",
+  "taskId": "MH-023",
+  "taskType": "productization",
+  "priority": "P4",
+  "title": "Productization audit harness",
+  "objective": "Add a Productization Harness skeleton for UX, accessibility, responsive, performance, security, and release-readiness audits.",
+  "contextFiles": [
+    "AGENTS.md",
+    ".harness/agent-workspace/tasks/MH-023-productization-audit-harness.task.json"
+  ],
+  "editableScope": [
+    "packages/**",
+    "schemas/**",
+    "templates/**",
+    "bin/**",
+    "examples/**",
+    "tests/**",
+    "docs/**"
+  ],
+  "forbiddenScope": [
+    ".env*",
+    "node_modules/**",
+    "docs/spec/*.pdf",
+    "docs/spec/*.docx",
+    "examples/generated-target-project-demo/.harness/runs/**",
+    "**/*SECRET*",
+    "**/*TOKEN*"
+  ],
+  "acceptanceCriteria": [
+    {
+      "id": "MH-023-AC-01",
+      "text": "Generate .harness/productization/audit-checklist.yml for Target Repos."
+    },
+    {
+      "id": "MH-023-AC-02",
+      "text": "Define audit categories: UX, a11y, responsive, performance, security, content, release-readiness."
+    },
+    {
+      "id": "MH-023-AC-03",
+      "text": "Add a command or template hook that produces productization-report.md from checklist inputs and run artifacts."
+    },
+    {
+      "id": "MH-023-AC-04",
+      "text": "Do not auto-fix by default; create hardening backlog items instead."
+    },
+    {
+      "id": "MH-023-AC-05",
+      "text": "Add fixture-based tests for report generation."
+    }
+  ],
+  "commands": {
+    "verify": [
+      "bash ./tests/smoke.sh"
+    ]
+  },
+  "expectedArtifacts": [
+    "code changes",
+    "tests or fixtures when behavior changes",
+    "implementation summary",
+    "updated documentation if user-facing behavior changes"
+  ],
+  "budgets": {
+    "maxRuntimeMinutes": 60,
+    "maxChangedFiles": 30,
+    "maxPatchLines": 1800
+  },
+  "koTitle": "Productization Audit Harness",
+  "koObjective": "UX/A11Y/Perf/Security 제품화 audit skeleton을 만든다.",
+  "koGuide": {
+    "요약": "이 작업은 Codex가 Dev Container 안에서 자동 구현할 수 있도록 설계된 단계별 task packet입니다.",
+    "진행방식": [
+      "AGENTS.md를 먼저 읽기",
+      "current-task.md와 원본 task packet 확인",
+      "수정 가능 범위만 변경",
+      "검증 통과 후 요약 보고"
+    ]
+  }
+}
