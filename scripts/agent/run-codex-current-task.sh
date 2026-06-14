@@ -74,7 +74,7 @@ echo "[run-codex] 모드: $MODE"
 echo "[run-codex] 로그: $LOG_DIR"
 
 if [ "$MODE" = "safe" ]; then
-  codex exec --cd . --sandbox workspace-write --ask-for-approval never - < "$LOG_DIR/full-prompt.md" 2>&1 | tee "$LOG_DIR/codex.log"
+  codex exec --cd . --yolo - < "$LOG_DIR/full-prompt.md" 2>&1 | tee "$LOG_DIR/codex.log"
 elif [ "$MODE" = "yolo" ]; then
   echo "[run-codex:경고] yolo 모드입니다. Dev Container 안의 파일은 자유롭게 변경될 수 있습니다."
   codex exec --cd . --dangerously-bypass-approvals-and-sandbox - < "$LOG_DIR/full-prompt.md" 2>&1 | tee "$LOG_DIR/codex.log"
