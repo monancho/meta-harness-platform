@@ -1,187 +1,102 @@
 # Meta Harness Platform
 
-Meta Harness Platform is a repo-resident agentic software factory starter. It does not try to be a finished autonomous developer. It builds the repeatable factory that a Target Project Repo can own: planning contracts, task packets, scoped execution, security gates, run artifacts, upgrade reports, and review surfaces.
+Meta Harness Platform is a repo-resident project factory for AI-assisted software delivery. It creates and verifies the factory that lives inside a Target Project Repo: planning contracts, task packets, scoped runners, security gates, run artifacts, dashboard fixtures, and maintenance reports.
 
-The core idea is simple:
+The ownership rule is the core of the project:
 
 ```text
-Meta Harness Platform creates and upgrades the factory.
-Target Project Repo owns the project plan, code, infra, logs, and artifacts.
+Meta Harness Platform owns templates, generators, schemas, policies, evals, and sanitized improvement signals.
+Target Project Repo owns planning docs, application code, infrastructure, run logs, and artifacts.
 ```
 
-## Recruiter-Friendly Summary
+## What This Repo Provides
 
-This project demonstrates systems thinking for AI-assisted software delivery. It turns agent work into auditable contracts instead of one-off chat sessions: a task has editable scope, forbidden scope, verification commands, budgets, expected artifacts, and a deterministic local run path.
-
-It is strongest as a DevTool portfolio piece. It shows product architecture, CLI workflows, policy enforcement, local execution, generated project scaffolding, dashboard fixtures, eval skeletons, and a concise demo path that can run offline inside a Dev Container.
+- `mh` CLI lifecycle commands under `bin/mh.mjs` and `packages/core`.
+- Planning-first Target Project Factory bootstrap.
+- Task packet contracts with editable scope, forbidden scope, verification commands, budgets, and expected artifacts.
+- L0 local git worktree runner with fallback behavior for non-git demos.
+- Agent adapter, execution profile, GitHub PR loop, container, kind, eval, release, and maintenance skeletons.
+- Dependency-free dashboard preview served by `apps/dashboard/preview.mjs`.
+- Smoke and demo scripts that run without relying on external services.
 
 ## Quick Start
 
-Open this repository in VS Code and reopen it in the Dev Container:
-
-```text
-Command Palette -> Dev Containers: Reopen in Container
-```
-
-Run the main verification:
+Use Node 20 or newer. The repository is designed to work inside the included Dev Container, but the core scripts are plain Node and Bash.
 
 ```bash
-bash ./scripts/agent/verify-after-task.sh
+npm run doctor
+npm run verify
+npm run smoke
 ```
 
-Run the end-to-end demo:
-
-```bash
-bash ./examples/e2e-demo/run-demo.sh
-```
-
-Keep a named demo output directory:
-
-```bash
-bash ./examples/e2e-demo/run-demo.sh /tmp/mh-e2e-review
-```
-
-Preview the dashboard fixtures:
+Run the dashboard preview:
 
 ```bash
 npm run dashboard:preview
 ```
 
-The dashboard preview serves local fixtures and opens at `http://localhost:4173`.
+Then open `http://localhost:4173`. The preview server is `apps/dashboard/preview.mjs`; it serves only `apps/dashboard/**` and reads sanitized fixtures from `apps/dashboard/fixtures`.
 
-## Demo Narrative
-
-For a 3-5 minute walkthrough, use [docs/DEMO_VIDEO_SCRIPT.md](docs/DEMO_VIDEO_SCRIPT.md). The short version is:
+Run the offline end-to-end demo:
 
 ```bash
-node ./bin/mh.mjs doctor
-bash ./examples/e2e-demo/run-demo.sh /tmp/mh-e2e-review
-bash ./tests/smoke.sh
-npm run dashboard:preview
+npm run demo:e2e
 ```
 
-The demo proves the MVP lifecycle from an empty output folder to generated planning docs, a frozen factory, a Target Repo-local harness, and shell-run artifacts.
+The demo creates a generated Target Project in a temporary output directory and validates planning docs, factory bootstrap output, task packet shape, and run artifacts.
 
-## Architecture Summary
+## Main Commands
 
-```text
-Meta Harness Platform
-  -> templates, generators, schemas, policies, evals
-  -> planning scaffold and synthesis
-  -> task packet compiler
-  -> factory bootstrap and manifest ownership
-  -> execution profiles and agent adapters
-  -> policy gates and artifact contracts
-  -> dashboard, release, maintenance, and feedback skeletons
+These commands are defined in the root `package.json`.
 
-Target Project Repo
-  -> docs/planning/**
-  -> .harness/planning/**
-  -> apps/**, packages/**, infra/**
-  -> run artifacts and review output
-```
+| Command | Purpose |
+|---|---|
+| `npm run doctor` | Check local Node/Git/Make environment. |
+| `npm run verify` | Run agent-ready validation, syntax checks, and smoke tests. |
+| `npm run smoke` | Run the full smoke suite. |
+| `npm run dashboard:preview` | Start the local dependency-free dashboard preview server. |
+| `npm run demo:e2e` | Run the offline end-to-end demo. |
+| `npm run agent:status` | Show the MH-001 through MH-028 task completion state. |
 
-The most important rule is ownership separation. Meta may generate Target Repo files, but it must not keep raw PRDs, raw code, raw logs, secrets, or project-specific business documents. Meta can keep sanitized failure categories, reason codes, runtime buckets, retry counts, generator versions, and template improvement signals.
+## Documentation Map
 
-## Implementation Status
+User-facing guides:
 
-| Area | Status | Notes |
-|---|---|---|
-| CLI lifecycle | MVP skeleton | `bin/mh.mjs` supports doctor, planning, factory, run, eval, signal, audit, release, and maintenance flows. |
-| Planning-first gate | Implemented skeleton | Factory bootstrap is blocked until planning is frozen. |
-| Task packet contract | Implemented skeleton | Packets include scope, commands, budgets, acceptance criteria, and artifacts. |
-| L0 local runner | Implemented skeleton | Worktree-first execution is the default direction; shell adapter is the deterministic smoke path. |
-| Codex adapter | Skeleton | Captures the adapter contract and missing-binary failure path. |
-| Security policy | Implemented MVP checks | Forbidden scope and denied command cases are covered in smoke tests. |
-| Upgrade engine | Dry-run skeleton | Reports managed-file changes without mutating Target files. |
-| Dashboard | Static MVP | Fixture-backed views for runs, artifacts, patches, manifest state, and task policy review. |
-| Eval and feedback | Skeleton | Stores sanitized signals only; raw project data remains out of scope. |
-| Release and maintenance | Skeleton | Provides checklists and report shape, not production release automation. |
-| E2E demo | Implemented fixture | `examples/e2e-demo/run-demo.sh` runs offline. |
+- [Getting Started](docs/user-guide/getting-started.md)
+- [Target Project Creation](docs/user-guide/target-project.md)
+- [Agent Task Runs](docs/user-guide/agent-task-run.md)
+- [Dashboard Preview](docs/user-guide/dashboard-preview.md)
+- [Troubleshooting](docs/user-guide/troubleshooting.md)
 
-## Developer Implementation Guide
+Developer guides:
 
-Start with the repository contract:
+- [Architecture](docs/developer-guide/architecture.md)
+- [Agent Adapter](docs/developer-guide/agent-adapter.md)
+- [Execution Profile](docs/developer-guide/execution-profile.md)
+- [Security Policy](docs/developer-guide/security-policy.md)
+- [Testing](docs/developer-guide/testing.md)
 
-```bash
-sed -n '1,220p' AGENTS.md
-sed -n '1,220p' .harness/agent-workspace/current-task.md
-sed -n '1,220p' .harness/agent-workspace/quality-gates.yml
-```
+History and release notes:
 
-Run a single current task manually:
+- [MH-001 to MH-028 Summary](docs/development-history/mh-001-to-mh-028-summary.md)
+- [Design Decisions](docs/development-history/design-decisions.md)
+- [Release Cleanup Notes](docs/development-history/release-cleanup-notes.md)
 
-```bash
-bash ./scripts/agent/next-task.sh
-bash ./scripts/agent/run-codex-current-task.sh --mode safe
-bash ./scripts/agent/finish-task.sh
-```
+Portfolio material:
 
-Run the task loop in safe mode:
+- [Case Study Draft](docs/portfolio/case-study.md)
+- [Demo Script Draft](docs/portfolio/demo-script.md)
+- [Portfolio Summary Draft](docs/portfolio/portfolio-summary.md)
 
-```bash
-bash ./scripts/agent/auto-loop.sh --limit 1 --mode safe
-```
+Existing detailed references remain available under `docs/`, including [Dashboard](docs/DASHBOARD.md), [End-to-End Demo](docs/E2E_DEMO.md), [Test Spec](docs/TEST_SPEC.md), [Portfolio](docs/PORTFOLIO.md), and [Architecture Diagrams](docs/architecture/DIAGRAMS.md).
 
-Inspect project status:
+## Operational Rules
 
-```bash
-bash ./scripts/agent/status.sh
-```
+- Do not work directly on `main` for release cleanup or hardening.
+- Do not push, publish, deploy, or merge without explicit user request.
+- Do not commit `.env*`, secrets, keys, runtime logs, or run artifacts.
+- Keep Target Repo raw project data out of Meta.
+- Prefer small commits: cleanup notes, operations guidance, docs, and verification report.
 
-The implementation flow is intentionally worktree-first:
-
-```text
-1. Shell adapter
-2. Real local git worktree runner
-3. Codex adapter
-4. GitHub PR loop
-5. Container worker
-6. kind namespace runner
-```
-
-Kubernetes and remote execution profiles are not the base path. They remain opt-in extensions after L0 local execution is stable.
-
-## Roadmap
-
-| Phase | Focus | Outcome |
-|---|---|---|
-| Starter | Agent-ready repo and task queue | Humans and agents can understand the work order. |
-| MVP | Planning, task packets, local runner, policy gates | A Target Repo can run scoped local factory tasks with artifacts. |
-| Beta | Dashboard, PR loop, stronger security, upgrade strategy | Reviewers can inspect runs and managed changes before merge. |
-| Full harness | Evals, sanitized feedback, release and maintenance workflows, optional remote profiles | Teams can operate repeatable AI-assisted delivery loops with governance. |
-
-See [docs/AGENT_TASK_INDEX.md](docs/AGENT_TASK_INDEX.md) and [.harness/agent-workspace/backlog.yml](.harness/agent-workspace/backlog.yml) for the MH-001 through MH-028 task map.
-
-## Realistic Limitations
-
-| Level | What it means here | What it is not yet |
-|---|---|---|
-| Starter | A structured workspace with Korean/English agent instructions, task packets, and verification scripts. | Not a complete product or autonomous engineer. |
-| MVP | A local, deterministic project-factory skeleton with planning-first flow and smoke-tested artifacts. | Not production-grade orchestration or a replacement for review. |
-| Beta | The intended next maturity level: stronger PR review loop, dashboard usage, security gates, and upgrade workflows. | Not proven multi-tenant infrastructure or enterprise governance. |
-| Full harness | The long-term target: governed execution profiles, eval feedback, release and maintenance loops, and repeatable upgrades. | Not a license to store raw project data in Meta or bypass Target Repo ownership. |
-
-## Key Commands
-
-```bash
-node ./bin/mh.mjs doctor
-bash ./scripts/agent/verify-after-task.sh
-bash ./tests/smoke.sh
-bash ./examples/e2e-demo/run-demo.sh
-npm run dashboard:preview
-bash ./scripts/agent/status.sh
-bash ./scripts/agent/auto-loop.sh --limit 1 --mode safe
-```
-
-## Project References
-
-- [Portfolio page](docs/PORTFOLIO.md)
-- [Demo video script](docs/DEMO_VIDEO_SCRIPT.md)
-- [End-to-end demo guide](docs/E2E_DEMO.md)
-- [Dashboard guide](docs/DASHBOARD.md)
-- [Architecture diagrams](docs/architecture/DIAGRAMS.md)
-- [Agent task index](docs/AGENT_TASK_INDEX.md)
-- [Full harness backlog](docs/FULL_HARNESS_BACKLOG.md)
-- [Technical PRD/spec Markdown](docs/spec/meta_harness_project_factory_v1_2_PRD_tech_test_spec_full.md)
+See [AGENTS.md](AGENTS.md) for the full maintenance instructions.
 
